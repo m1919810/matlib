@@ -1,0 +1,17 @@
+/bin/
+/.settings/
+/target/
+.idea/
+*.iml
+*.jar
+.project
+.classpath
+.DS_Store
+workspace.xml
+*.bat
+debug_history
+debug_history/
+*.data
+/scripts/data/*
+*.pyc
+*__pycache__*
