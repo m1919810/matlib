@@ -8,4 +8,7 @@ public class VersionedUtils {
         return new UnsupportedOperationException("low version");
     }
 
+    public static void checkVersionAnnotations(Class<?> constValueClass){
+        //todo complete, check @DependOnVersion
+    }
 }

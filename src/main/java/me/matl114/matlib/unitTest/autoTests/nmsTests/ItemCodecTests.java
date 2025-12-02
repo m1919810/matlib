@@ -43,23 +43,29 @@ public class ItemCodecTests implements TestCase {
     public void test_component() throws Throwable{
         version();
         ItemStackHelper_1_20_R4 HELPER = (ItemStackHelper_1_20_R4) ITEMSTACK;
-        Object comp = DataComponentEnum.CUSTOM_MODEL_DATA;
-        Codec<Object> codec = ComponentCodecEnum.CUSTOM_MODEL_DATA;
-        Debug.logger(codec);
-        DynamicOps<Object> nbt = Env.NBT_OP;
-        Debug.logger(nbt);
-        Object int1 = TAGS.intTag(114514);
-        DataResult<? extends Pair<?, Object>> val =  codec.decode(nbt, int1);
-        Debug.logger(val);
-        Debug.logger(val.result().get().getFirst());
 
-        DataResult<? extends Pair<?, Object>> val2 = codec.decode(TypeOps.I, 1919);
-        Debug.logger(val2);
-        Debug.logger(val2.result().get().getFirst(), val2.result().get().getSecond());
+        if(!Version.getVersionInstance().isAtLeast(Version.v1_21_R3)){
+            //below 1.21.4 cmd
+            Codec<Object> codec = ComponentCodecEnum.CUSTOM_MODEL_DATA;
+            Debug.logger(codec);
+            DynamicOps<Object> nbt = Env.NBT_OP;
+            Debug.logger(nbt);
+            Object int1 = TAGS.intTag(114514);
+            DataResult<? extends Pair<?, Object>> val =  codec.decode(nbt, int1);
+            Debug.logger(val);
+            Debug.logger(val.result().get().getFirst());
+            DataResult<? extends Pair<?, Object>> val2 = codec.decode(TypeOps.I, 1919);
+            Debug.logger(val2);
+            Debug.logger(val2.result().get().getFirst(), val2.result().get().getSecond());
 
-        Object cmd=val2.result().get().getFirst();
-        Integer inte =(Integer) CodecUtils.<Object>encodeEnd( codec.encode(cmd, TypeOps.I, null));
-        Assert(inte == 1919);
+            Object cmd=val2.result().get().getFirst();
+            Integer inte =(Integer) CodecUtils.<Object>encodeEnd( codec.encode(cmd, TypeOps.I, null));
+            Assert(inte == 1919);
+        }else{
+            //TODO: upper 1.21.4 cmd
+        }
+
+
         ItemStack itemStack = ItemUtils.newStack(Material.IRON_AXE, 13);
         Object handle = ItemUtils.unwrapHandle(itemStack);
         ItemMeta meta = itemStack.getItemMeta();
@@ -67,11 +73,16 @@ public class ItemCodecTests implements TestCase {
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         itemStack.setItemMeta(meta);
         Debug.logger(ItemUtils.dumpItemStack(handle));
-        Object hideFlag = HELPER.getFromPatch(handle, DataComponentEnum.HIDE_ADDITIONAL_TOOLTIP);
-        Debug.logger(hideFlag);
-        Debug.logger(ComponentCodecEnum.HIDE_ADDITIONAL_TOOLTIP.decode(TypeOps.I, Map.of()));
-        Debug.logger(CodecUtils.encodeEnd(ComponentCodecEnum.HIDE_ADDITIONAL_TOOLTIP.encodeStart(TypeOps.I,hideFlag)));
-        Debug.logger(CodecUtils.decode(ComponentCodecEnum.UNBREAKABLE,TypeOps.I, Map.of("show_in_tooltip",true)));
+        if(!Version.getVersionInstance().isAtLeast(Version.v1_21_R4)){
+            Object hideFlag = HELPER.getFromPatch(handle, DataComponentEnum.HIDE_ADDITIONAL_TOOLTIP);
+            Debug.logger(hideFlag);
+            Debug.logger(ComponentCodecEnum.HIDE_ADDITIONAL_TOOLTIP.decode(TypeOps.I, Map.of()));
+            Debug.logger(CodecUtils.encodeEnd(ComponentCodecEnum.HIDE_ADDITIONAL_TOOLTIP.encodeStart(TypeOps.I,hideFlag)));
+            Debug.logger(CodecUtils.decode(ComponentCodecEnum.UNBREAKABLE,TypeOps.I, Map.of("show_in_tooltip",true)));
+        }else{
+            //TODO: 1.21.4
+        }
+
        // Debug.logger(CodecUtils.result(ComponentCodecEnum.HIDE_ADDITIONAL_TOOLTIP.decode(TypeOps.I, hideFlag)));
 
     }
@@ -83,14 +94,17 @@ public class ItemCodecTests implements TestCase {
         Object obj = ITEMSTACK.saveNbtAsTag(nms);
 //        Map<String, ?> mapNbt = (Map<String, ?>) Env.NBT_OP.convertTo(TypeOps.I, obj);
 //        Debug.logger(mapNbt);
+        Map<String , ?> levelMap = Version.getVersionInstance().isAtLeast(Version.v1_21_R4)?Map.of(
+            "minecraft:efficiency", 114
+        ): Map.of(
+            "levels", Map.of(
+                "minecraft:efficiency", 114
+            ),
+            "show_in_tooltip", false
+        );
         Map<String, ?> mapNbt3 = Map.of(
             "minecraft:unbreakable", Map.of(),
-            "minecraft:enchantments",Map.of(
-                "levels", Map.of(
-                    "minecraft:efficiency", 114
-                ),
-                "show_in_tooltip", false
-            )
+            "minecraft:enchantments",levelMap
         );
         Map<String,?> mapComp = ITEMSTACK.saveNbtAsHashMap(nms);
         try{
@@ -106,25 +120,30 @@ public class ItemCodecTests implements TestCase {
         }catch (Throwable e){
         }
         version();
-        Assert(stack.getItemMeta().hasItemFlag(ItemFlag.HIDE_ENCHANTS));
-        Map<String,?> val = (Map<String, ?>) ITEMSTACK.saveElementInPath(nms, "minecraft:enchantments");
-        Debug.logger(val);
-        val.remove("show_in_tooltip");
-        ITEMSTACK.replaceElementInPath(nms, "minecraft:enchantments", val);
-        Assert(!stack.getItemMeta().hasItemFlag(ItemFlag.HIDE_ENCHANTS));
+        Assert(Version.getVersionInstance().isAtLeast(Version.v1_21_R4) || stack.getItemMeta().hasItemFlag(ItemFlag.HIDE_ENCHANTS));
+        if(!Version.getVersionInstance().isAtLeast(Version.v1_21_R4)){
+            Map<String,?> val = (Map<String, ?>) ITEMSTACK.saveElementInPath(nms, "minecraft:enchantments");
+            Debug.logger(val);
+            val.remove("show_in_tooltip");
+            ITEMSTACK.replaceElementInPath(nms, "minecraft:enchantments", val);
+            Assert(!stack.getItemMeta().hasItemFlag(ItemFlag.HIDE_ENCHANTS));
+        }
+
     }
 
     @OnlineTest(name = "test item data values work")
     public void test_itemDataValues()throws Throwable{
         ItemStack simple = ItemUtils.newStack(Material.DIAMOND, 33);
         Object nms = ItemUtils.unwrapHandle(simple);
-        Map<String,?> mapValue = Map.of(
-            "levels",Map.of(
-                "minecraft:efficiency", 114,
-                "minecraft:protection", 114,
-                "minecraft:fire_protection",191,
-                "minecraft:sharpness",114
-            )
+        Map<String,?> levelValue = Map.of(
+            "minecraft:efficiency", 114,
+            "minecraft:protection", 114,
+            "minecraft:fire_protection",191,
+            "minecraft:sharpness",114
+        );
+
+        Map<String,?> mapValue = Version.getVersionInstance().isAtLeast(Version.v1_21_R4) ? levelValue: Map.of(
+            "levels", levelValue
         );
         String compKey = "minecraft:enchantments";
         ItemDataValue dataValue = ItemDataValue.primitive(compKey, mapValue);
@@ -247,5 +266,6 @@ public class ItemCodecTests implements TestCase {
         player.getInventory().addItem(stack3);
     }
 
+    //TODO: add versioned DataEnum test
 
 }

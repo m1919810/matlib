@@ -1,8 +1,10 @@
 package me.matl114.matlib.nmsMirror.nbt;
 
+import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
+import me.matl114.matlib.utils.version.Version;
 
 import java.util.AbstractList;
 import java.util.List;
@@ -15,7 +17,14 @@ public interface ListTagHelper extends TagHelper {
     AbstractList<?> newListTag();
 
     @ConstructorTarget
-    AbstractList<?> newListTag(List<?> list, byte type);
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4)
+    default AbstractList<?> newListTag(List<?> list, byte type){
+        return newListTag0(list);
+    }
+
+    @ConstructorTarget
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = true)
+    AbstractList<?> newListTag0(List<?> list);
 
     @MethodTarget
     Object remove(Object listTag, int index);
@@ -69,8 +78,8 @@ public interface ListTagHelper extends TagHelper {
     @MethodTarget
     void clear(Object listTag);
 
-    @FieldTarget
-    @RedirectType("B")
-    byte typeGetter(Object listTag);
+//    @FieldTarget
+//    @RedirectType("B")
+//    byte typeGetter(Object listTag);
 
 }

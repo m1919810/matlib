@@ -1,6 +1,7 @@
 package me.matl114.matlib.nmsMirror.core;
 
 import me.matl114.matlib.nmsMirror.Utils;
+import me.matl114.matlib.nmsUtils.VersionedUtils;
 import me.matl114.matlib.utils.reflect.internel.ObfManager;
 import me.matl114.matlib.utils.version.DependsOnVersion;
 import me.matl114.matlib.utils.version.Version;
@@ -37,5 +38,6 @@ public class BuiltInRegistryEnum {
 
         ENCHANTMENT = Utils.matchNull(fields, "ENCHANTMENT");
         DATA_COMPONENT_TYPE = Utils.matchNull(fields, "DATA_COMPONENT_TYPE");
+        VersionedUtils.checkVersionAnnotations(BuiltInRegistryEnum.class);
     }
 }

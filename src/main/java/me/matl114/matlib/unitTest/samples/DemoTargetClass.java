@@ -1,13 +1,9 @@
-package me.matl114.matlib.unitTest.demo;
+package me.matl114.matlib.unitTest.samples;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.experimental.Helper;
-import lombok.experimental.PackagePrivate;
 import lombok.val;
 import me.matl114.matlib.utils.Debug;
-
-import java.util.ArrayList;
 
 @Accessors(chain = true,fluent = true)
 public class DemoTargetClass extends DemoTargetSuper implements DemoTargetInterface{

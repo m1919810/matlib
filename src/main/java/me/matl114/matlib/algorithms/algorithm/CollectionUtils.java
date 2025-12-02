@@ -1,8 +1,14 @@
 package me.matl114.matlib.algorithms.algorithm;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Utility class for collection operations and manipulations.
@@ -124,5 +130,81 @@ public class CollectionUtils {
             }
             return map2.isEmpty();
         }
+    }
+
+    /**
+     * Copied from com.google.common.primitives.Bytes
+     * Returns an array containing each value of {@code collection}, converted to a {@code byte} value
+     * in the manner of {@link Number#byteValue}.
+     *
+     * <p>Elements are copied from the argument collection as if by {@code collection.toArray()}.
+     * Calling this method is as thread-safe as calling that method.
+     *
+     * @param collection a collection of {@code Number} instances
+     * @return an array containing the same values as {@code collection}, in the same order, converted
+     *     to primitives
+     * @throws NullPointerException if {@code collection} or any of its elements is null
+     * @since 1.0 (parameter was {@code Collection<Byte>} before 12.0)
+     */
+
+    public static byte[] toByteArray(Collection<? extends Number> collection){
+        Object[] boxedArray = collection.toArray();
+        int len = boxedArray.length;
+        byte[] array = new byte[len];
+        for (int i = 0; i < len; i++) {
+            // checkNotNull for GWT (do not optimize)
+            array[i] = ((Number) checkNotNull(boxedArray[i])).byteValue();
+        }
+        return array;
+    }
+    /**
+     * Copied from com.google.common.primitives.Ints
+     * Returns an array containing each value of {@code collection}, converted to a {@code int} value
+     * in the manner of {@link Number#intValue}.
+     *
+     * <p>Elements are copied from the argument collection as if by {@code collection.toArray()}.
+     * Calling this method is as thread-safe as calling that method.
+     *
+     * @param collection a collection of {@code Number} instances
+     * @return an array containing the same values as {@code collection}, in the same order, converted
+     *     to primitives
+     * @throws NullPointerException if {@code collection} or any of its elements is null
+     * @since 1.0 (parameter was {@code Collection<Integer>} before 12.0)
+     */
+
+    public static int[] toIntArray(Collection<? extends Number> collection){
+        Object[] boxedArray = collection.toArray();
+        int len = boxedArray.length;
+        int[] array = new int[len];
+        for (int i = 0; i < len; i++) {
+            // checkNotNull for GWT (do not optimize)
+            array[i] = ((Number) checkNotNull(boxedArray[i])).intValue();
+        }
+        return array;
+    }
+    /**
+     * Copied from com.google.common.primitives.Longs
+     * Returns an array containing each value of {@code collection}, converted to a {@code long} value
+     * in the manner of {@link Number#longValue}.
+     *
+     * <p>Elements are copied from the argument collection as if by {@code collection.toArray()}.
+     * Calling this method is as thread-safe as calling that method.
+     *
+     * @param collection a collection of {@code Number} instances
+     * @return an array containing the same values as {@code collection}, in the same order, converted
+     *     to primitives
+     * @throws NullPointerException if {@code collection} or any of its elements is null
+     * @since 1.0 (parameter was {@code Collection<Long>} before 12.0)
+     */
+
+    public static long[] toLongArray(Collection<? extends Number> collection){
+        Object[] boxedArray = collection.toArray();
+        int len = boxedArray.length;
+        long[] array = new long[len];
+        for (int i = 0; i < len; i++) {
+            // checkNotNull for GWT (do not optimize)
+            array[i] = ((Number) checkNotNull(boxedArray[i])).longValue();
+        }
+        return array;
     }
 }

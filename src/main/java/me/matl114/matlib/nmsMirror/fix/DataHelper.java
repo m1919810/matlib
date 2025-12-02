@@ -23,13 +23,13 @@ public interface DataHelper extends TargetDescriptor {
     @MethodTarget
     @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = true)
     default  <E extends Throwable,R> R getOrThrow(com.mojang.serialization.DataResult<R> result, Function<String, E> var1){
-        return getOrThrow0(result, var1);
+        return _getOrThrow0(result, var1);
     }
     @MethodTarget(isStatic = true)
     @RedirectClass("net.minecraft.Util")
     @RedirectName("getOrThrow")
     @IgnoreFailure(thresholdInclude = Version.v1_20_R4)
-    public <E extends Throwable,R> R getOrThrow0(com.mojang.serialization.DataResult<R> result, Function<String, E> var1);
+    public <E extends Throwable,R> R _getOrThrow0(com.mojang.serialization.DataResult<R> result, Function<String, E> var1);
 
     @MethodTarget(isStatic = true)
     public  <R> DataResult<R> success(R result);

@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import javax.annotation.Nonnull;
 
 public enum Version {
-    unknown("unknown", -1),
+    unknown("unknown", Integer.MAX_VALUE),
     v1_20_R1("v1_20_R1", 15),
     v1_20_R2("v1_20_R2", 18),
     v1_20_R3("v1_20_R3", 26),
@@ -18,8 +18,8 @@ public enum Version {
     v1_21_R3("v1_21_R3", 61),
     v1_21_R4("v1_21_R4", 71),
     v1_21_R5("v1_21_R5", 80),
-    v1_21_R6("v1_21_R6", 90);
-
+    v1_21_R6("v1_21_R6", 81),
+    v1_21_R7("v1_21_R7", 88);
     private Version(String name, int datapackNumber){
         this.name = name;
         this.datapackNumber = datapackNumber;
@@ -76,6 +76,9 @@ public enum Version {
                 case "1.21.8":
                     Debug.logger("Using version",v1_21_R6.name);
                     return v1_21_R6;
+                case "1.21.9":
+                    Debug.logger("Using version",v1_21_R7.name);
+                    return v1_21_R7;
                 default:
             }
             throw new RuntimeException("Version not supported for " + version);

@@ -8,6 +8,7 @@ import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.nmsMirror.Utils;
 import me.matl114.matlib.nmsMirror.core.BuiltInRegistryEnum;
 import me.matl114.matlib.nmsMirror.impl.versioned.Env1_20_R4;
+import me.matl114.matlib.nmsUtils.VersionedUtils;
 import me.matl114.matlib.utils.reflect.internel.ObfManager;
 import me.matl114.matlib.utils.version.DependsOnVersion;
 import me.matl114.matlib.utils.version.Version;
@@ -56,6 +57,15 @@ public class DataComponentEnum {
     public static final Object CHARGED_PROJECTILES;
     public static final Object BUNDLE_CONTENTS;
     public static final Object POTION_CONTENTS;
+    public static final Object BANNER_PATTERNS;
+    public static final Object BLOCK_STATE;
+    public static final Object CONTAINER_LOOT;
+    public static final Object FIREWORK_EXPLOSION;
+    public static final Object FIREWORKS ;
+    public static final Object INSTRUMENT;
+    public static final Object MAP_ID;
+    public static final Object POT_DECORATIONS;
+    public static final Object WRITTEN_BOOK_CONTENT;
     @DependsOnVersion(higherThan = Version.v1_21_R2)
     public static final Object ITEM_MODEL;
     @DependsOnVersion(higherThan = Version.v1_21_R2)
@@ -76,6 +86,12 @@ public class DataComponentEnum {
     public static final Object EQUIPPABLE;
     @DependsOnVersion(higherThan = Version.v1_21_R2)
     public static final Object JUKEBOX_PLAYABLE;
+    @DependsOnVersion(higherThan = Version.v1_21_R4)
+    public static final Object PAINTING_VARIANT;
+    @DependsOnVersion(higherThan = Version.v1_21_R4)
+    public static final Object TROPICAL_FISH_PATTERN;
+    @DependsOnVersion(higherThan = Version.v1_21_R4)
+    public static final Object TOOLTIP_DISPLAY;
 
     public static final Set<Object> ALL_DATA_COMPONENTS;
 
@@ -137,6 +153,16 @@ public class DataComponentEnum {
         CHARGED_PROJECTILES = Utils.matchName(fields, "CHARGED_PROJECTILES");
         BUNDLE_CONTENTS = Utils.matchName(fields, "BUNDLE_CONTENTS");
         POTION_CONTENTS = Utils.matchName(fields, "POTION_CONTENTS");
+        BANNER_PATTERNS = Utils.matchName(fields, "BANNER_PATTERNS");
+        BLOCK_STATE = Utils.matchName(fields, "BLOCK_STATE");
+        CONTAINER_LOOT = Utils.matchName(fields, "CONTAINER_LOOT");
+        FIREWORK_EXPLOSION = Utils.matchName(fields, "FIREWORK_EXPLOSION");
+        FIREWORKS = Utils.matchName(fields, "FIREWORKS");
+        INSTRUMENT = Utils.matchName(fields, "INSTRUMENT");
+        MAP_ID = Utils.matchName(fields, "MAP_ID");
+        POT_DECORATIONS = Utils.matchName(fields, "POT_DECORATIONS");
+        WRITTEN_BOOK_CONTENT = Utils.matchName(fields, "WRITTEN_BOOK_CONTENT");
+
 
         ITEM_MODEL = Utils.matchNull(fields, "ITEM_MODEL");
         CONSUMABLE = Utils.matchNull(fields, "CONSUMABLE");
@@ -148,6 +174,9 @@ public class DataComponentEnum {
         USE_COOLDOWN = Utils.matchNull(fields, "USE_COOLDOWN");
         EQUIPPABLE = Utils.matchNull(fields,"EQUIPPABLE");
         JUKEBOX_PLAYABLE = Utils.matchNull(fields, "JUKEBOX_PLAYABLE");
+        PAINTING_VARIANT = Utils.matchNull(fields, "PAINTING_VARIANT");
+        TROPICAL_FISH_PATTERN = Utils.matchNull(fields, "TROPICAL_FISH_PATTERN");
+        TOOLTIP_DISPLAY = Utils.matchNull(fields, "TOOLTIP_DISPLAY");
 
         COMMON_ITEM_COMPONENTS = Utils.matchName(fields, "COMMON_ITEM_COMPONENTS");
         ALL_DATA_COMPONENTS = new LinkedHashSet<>();
@@ -200,5 +229,8 @@ public class DataComponentEnum {
             return Env1_20_R4.DATA_TYPES.itemContainerContents$fromItems(Env1_20_R4.DATA_TYPES.itemContainerContents$Items(container));
         });
         COMPONENT_COPY_POLICY = val;
+
+        //todo: add version check for safety
+        VersionedUtils.checkVersionAnnotations(DataComponentEnum.class);
     }
 }

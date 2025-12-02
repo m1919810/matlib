@@ -29,8 +29,16 @@ public interface Holder<T> {
     public Holder<T> failHard();
     public Holder<T> peekFail(Consumer<Throwable> task);
     public Holder<T> ifFail(Function<Throwable,T> defaultValue);
+    public Holder<T> recover(Predicate<T> recover);
+    default Holder<T> recover(){
+        return recover((v)->true);
+    }
     public Holder<T> shouldRecover(Predicate<Throwable> predicate);
     public Holder<T> throwException(Predicate<Throwable> predicate);
+    default Holder<T> throwException(){
+        return throwException((w)->true);
+    }
+    public Holder<T> checkArgument(Predicate<T> predicate);
     public static <T> Holder<T> of(T value){
         HolderImpl<T> holder = (HolderImpl<T>) HolderImpl.INSTANCE.clone();
         holder.value = value;

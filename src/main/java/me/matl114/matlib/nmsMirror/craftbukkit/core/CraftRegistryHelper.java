@@ -21,10 +21,10 @@ import static me.matl114.matlib.nmsMirror.Import.*;
 
 @MultiDescriptive(targetDefault = "org.bukkit.craftbukkit.CraftRegistry")
 public interface CraftRegistryHelper extends TargetDescriptor {
-    @MethodTarget(isStatic = true)
-    @Internal
-    @IgnoreFailure(thresholdInclude = Version.v1_20_R3, below = true)
-    public <B extends Keyed, M> B minecraftToBukkit(M minecraft, @RedirectType(ResourceKey)Object registryKey, Registry<B> bukkitRegistry);
+//    @MethodTarget(isStatic = true)
+//    @Internal
+//    @IgnoreFailure(thresholdInclude = Version.v1_20_R3, below = true)
+//    public <B extends Keyed, M> B minecraftToBukkit(M minecraft, @RedirectType(ResourceKey)Object registryKey, Registry<B> bukkitRegistry);
 
     @MethodTarget(isStatic = true)
     @Internal

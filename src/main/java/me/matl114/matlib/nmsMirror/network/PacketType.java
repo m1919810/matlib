@@ -3,7 +3,7 @@ package me.matl114.matlib.nmsMirror.network;
 public interface PacketType {
     String ServerboundHelloPacket =
         "Lnet/minecraft/network/protocol/login/ServerboundHelloPacket;";
-    String ClientboundLoginFinishPacket = "Lnet/minecraft/network/protocol/login/ClientboundGameProfilePacket;";
+    String ClientboundLoginFinishPacket = "Lnet/minecraft/network/protocol/login/ClientboundLoginFinishedPacket;";
     String ClientboundLoginPacket =
         "Lnet/minecraft/network/protocol/game/ClientboundLoginPacket;";
     String BundlePacket = 

@@ -1,6 +1,7 @@
 package me.matl114.matlib.algorithms.algorithm;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * Utility class for mathematical operations and bit manipulation.
@@ -385,5 +386,19 @@ public class MathUtils {
             }
         }
         return true;
+    }
+
+    public static int[] uuidToIntArray(UUID uuid) {
+        long mostSignificantBits = uuid.getMostSignificantBits();
+        long leastSignificantBits = uuid.getLeastSignificantBits();
+        return leastMostToIntArray(mostSignificantBits, leastSignificantBits);
+    }
+
+    private static int[] leastMostToIntArray(long most, long least) {
+        return new int[]{(int)(most >> 32), (int)most, (int)(least >> 32), (int)least};
+    }
+
+    public static UUID uuidFromIntArray(int[] bits) {
+        return new UUID((long)bits[0] << 32 | bits[1] & 4294967295L, (long)bits[2] << 32 | bits[3] & 4294967295L);
     }
 }

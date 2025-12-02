@@ -6,6 +6,7 @@ import me.matl114.matlib.implement.nms.chat.PacketTranslator;
 import me.matl114.matlib.implement.nms.network.PacketEventManager;
 import me.matl114.matlib.implement.nms.network.PacketListener;
 import me.matl114.matlib.unitTest.autoTests.*;
+import me.matl114.matlib.unitTest.demo.DemoTestset;
 import me.matl114.matlib.unitTest.manualTests.DisplayManagerTest;
 import me.matl114.matlib.unitTest.manualTests.ManualTests;
 import me.matl114.matlib.unitTest.manualTests.NMSPlayerTest;
@@ -13,6 +14,7 @@ import me.matl114.matlib.unitTest.manualTests.PlayerTest;
 import me.matl114.matlib.utils.chat.lan.LanguageRegistry;
 import me.matl114.matlib.utils.experimential.FakeSchedular;
 import me.matl114.matlib.core.AddonInitialization;
+import me.matl114.matlib.utils.version.Version;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,13 +53,19 @@ public class MatlibTest extends JavaPlugin {
         FakeSchedular.init();
         chatInputManager =  new ChatInputManager()
             .init(this);
-        packetEventManager = new PacketEventManager()
-            .init(this);
+        boolean isPacketStable = !Version.getVersionInstance().isAtLeast(Version.v1_21_R4);
+
+
         itemLanguageRegistry = new LanguageRegistry(Locale.CHINESE, new NamespacedKey("matlib","item-language-registry"),false);
         chatLanguageRegistry = new LanguageRegistry(Locale.CHINESE, new NamespacedKey("matlib","chat-language-registry"),true);
-        packetTranslator = new PacketTranslator()
-            .init(this)
-            .setLanguageRegistry(itemLanguageRegistry);
+        if(isPacketStable){
+            packetEventManager = new PacketEventManager()
+                .init(this);
+            packetTranslator = new PacketTranslator()
+                .init(this)
+                .setLanguageRegistry(itemLanguageRegistry);
+        }
+
         testRunner = new TestRunner()
             .init(this)
             .setWarmup(false)
@@ -80,8 +88,10 @@ public class MatlibTest extends JavaPlugin {
             .registerTestCase(new ManualTests())
             .registerTestCase(new ImplementationTests())
             .registerTestCase(new TestcaseBuilder())
+            .registerTestCase(new DemoTestset())
         ;
-        packetEventManager.registerListener(new TestPacketListener(),this);
+        if(packetEventManager != null)
+            packetEventManager.registerListener(new TestPacketListener(),this);
         this.getServer().getPluginManager().registerEvents(new TestListeners(),this);
     }
     public void onDisable() {

@@ -294,6 +294,28 @@ public class ReflectUtils {
             return getMethodsByName(clazz,fieldName);
         }
     }
+
+    public static Map<Field, Object> dumpObject(Object value){
+        List<Field> fields = getAllFieldsRecursively(value.getClass());
+        Map<Field, Object> re = new HashMap<>();
+        for (var f : fields){
+            if(!Modifier.isStatic(f.getModifiers())){
+                try{
+                    f.setAccessible(true);
+                    re.put(f, f.get(value));
+                }catch (Throwable e){
+                    re.put(f, "Error while dumping: " + e.getMessage());
+                }
+            }
+        }
+        return re;
+    }
+
+    public static Map<Field, Object> dumpObjectRecursively(Object value){
+        //todo left as not done
+        return dumpObject(value);
+    }
+
     /**
      * Checks if a string represents a Java primitive type.
      *

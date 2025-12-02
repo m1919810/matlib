@@ -4,7 +4,7 @@ import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.Initialize
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
-import me.matl114.matlib.unitTest.demo.DemoFinal;
+import me.matl114.matlib.unitTest.samples.DemoFinal;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.LambdaUtils;
 import me.matl114.matlib.utils.reflect.internel.ObfManager;

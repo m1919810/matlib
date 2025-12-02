@@ -37,8 +37,8 @@ public interface MagicNumberAPI extends TargetDescriptor {
     @MethodTarget(isStatic = true)
     Object getBlock(Material mat);
 
-    @MethodTarget(isStatic = true)
-    @RedirectName("key")
-    Object toResourceLocation(Material mat);
+//    @MethodTarget(isStatic = true)
+//    @RedirectName("key")
+//    Object toResourceLocation(Material mat);
 
 }

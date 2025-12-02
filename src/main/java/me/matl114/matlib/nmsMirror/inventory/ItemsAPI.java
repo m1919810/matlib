@@ -31,8 +31,8 @@ public interface ItemsAPI extends TargetDescriptor {
     boolean isFoil(Object item, @RedirectType(ItemStack)Object itemStack);
 
 
-    @CastCheck("net.minecraft.world.item.DiggerItem")
-    boolean isDiggerItem(Object item);
+//    @CastCheck("net.minecraft.world.item.DiggerItem")
+//    boolean isDiggerItem(Object item);
 
     @CastCheck("net.minecraft.world.item.BlockItem")
     boolean isBlockItem(Object item);

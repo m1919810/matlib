@@ -470,4 +470,15 @@ public abstract class AbstractMainCommand implements ComplexCommandExecutor, Int
     public static Supplier<List<String>> playerNameSupplier(){
         return ()-> Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
     }
+
+    public static void checkArgument(boolean argument, String... msg){
+        if(!argument){
+            throw new LogicalError(String.join(" ", msg));
+        }
+    }
+    public static void checkNonnull(Object object, String... msg){
+        if(object  == null){
+            throw new LogicalError(String.join(" ", msg));
+        }
+    }
 }

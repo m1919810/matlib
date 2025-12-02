@@ -1,6 +1,7 @@
 package me.matl114.matlib.nmsUtils.nbt;
 
 import com.destroystokyo.paper.Namespaced;
+import com.google.common.base.Suppliers;
 import lombok.Getter;
 import me.matl114.matlib.algorithms.dataStructures.frames.collection.ListMapView;
 import me.matl114.matlib.algorithms.dataStructures.frames.mmap.ValueAccess;
@@ -21,27 +22,29 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public interface ItemMetaView extends ItemMeta {
-    public static boolean isVersionAtLeast1_20_R4(){
-        return versionAtLeast1_20_R4;
-    }
+    @Getter
     public static boolean versionAtLeast1_20_R4 = Version.getVersionInstance().isAtLeast(Version.v1_20_R4);
-
+    @Getter
+    public static boolean versionAtLeast1_21_R4 = Version.getVersionInstance().isAtLeast(Version.v1_21_R4);
+    public static Supplier<Function<Object, ItemMetaView>> metaViewFactory = Suppliers.memoize(()->{
+        if(versionAtLeast1_21_R4) {
+            return ItemMetaViewImpl_1_21_R4::new;
+        } else if (versionAtLeast1_20_R4) {
+            return ItemMetaViewImpl_1_20_R4::new;
+        } else {
+            return ItemMetaViewImpl::new;
+        }
+    });
 
     public static ItemMetaView of(Object itemStack){
         //empty item should not have meta! or someone may modify ItemStack.EMPTY using meta
         if(NMSItem.ITEMSTACK.isEmpty(itemStack))return null;
-        if(versionAtLeast1_20_R4){
-            return new ItemMetaViewImpl_1_20_R4(itemStack);
-        }else {
-            try{
-                return new ItemMetaViewImpl(itemStack);
-            }catch (Throwable e){
-                e.getCause().printStackTrace();
-                return null;
-            }
-        }
+
+        return metaViewFactory.get().apply(itemStack);
     }
     public static ItemMetaView ofCraft(ItemStack stack){
         return of(ItemUtils.unwrapHandle(stack));

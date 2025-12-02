@@ -1,6 +1,4 @@
-package me.matl114.matlib.unitTest.demo;
-
-import lombok.val;
+package me.matl114.matlib.unitTest.samples;
 
 import java.util.Optional;
 import java.util.function.Function;

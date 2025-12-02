@@ -4,10 +4,8 @@ import lombok.NoArgsConstructor;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.Debug;
 import org.bukkit.util.Transformation;
+import org.joml.*;
 import org.joml.Math;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 /**
  * Utility class for 3D transformations and quaternion operations.

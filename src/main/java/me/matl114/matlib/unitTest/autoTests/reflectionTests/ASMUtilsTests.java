@@ -4,9 +4,9 @@ import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
-import me.matl114.matlib.unitTest.demo.DemoTargetClass;
-import me.matl114.matlib.unitTest.demo.DemoTargetInterface;
-import me.matl114.matlib.unitTest.demo.DemoTargetSuper;
+import me.matl114.matlib.unitTest.samples.DemoTargetClass;
+import me.matl114.matlib.unitTest.samples.DemoTargetInterface;
+import me.matl114.matlib.unitTest.samples.DemoTargetSuper;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.asm.CustomClassLoader;
 import me.matl114.matlib.utils.reflect.asm.DebugClassReader;
@@ -15,12 +15,7 @@ import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-import org.checkerframework.checker.units.qual.C;
 import org.objectweb.asm.*;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodNode;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -29,7 +24,7 @@ public class ASMUtilsTests implements TestCase {
 
     @OnlineTest(name = "Descriptor Build Test")
     public void test_descriptor() throws Throwable{
-        Class clazz =Class.forName("me.matl114.matlib.unitTest.demo.DemoTargetClass");
+        Class clazz =Class.forName("me.matl114.matlib.unitTest.samples.DemoTargetClass");
         Debug.logger("fetched");
         DemoDescriptor I = DescriptorImplBuilder.createHelperImpl( DemoDescriptor.class);
         Debug.logger(I);
@@ -114,7 +109,7 @@ public class ASMUtilsTests implements TestCase {
         cw.visit(
             Opcodes.V21,
             ACC_PUBLIC,
-            "me/matl114/matlib/unitTest/demo/114514DemoImpl",
+            "me/matl114/matlib/unitTest/samples/114514DemoImpl",
             null,
             Type.getInternalName(DemoTargetSuper.class),
             new String[]{Type.getInternalName(DemoTargetInterface.class)}
@@ -135,11 +130,11 @@ public class ASMUtilsTests implements TestCase {
             methodVisitor.visitMaxs(0,0);
             methodVisitor.visitEnd();
         }
-        methodVisitor = cw.visitMethod(Opcodes.ACC_PUBLIC, "invokeTest", "(Lme/matl114/matlib/unitTest/demo/DemoTargetInterface;)V", null, null);
+        methodVisitor = cw.visitMethod(Opcodes.ACC_PUBLIC, "invokeTest", "(Lme/matl114/matlib/unitTest/samples/DemoTargetInterface;)V", null, null);
 
         methodVisitor.visitCode();
         methodVisitor.visitVarInsn(ALOAD, 1);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "me/matl114/matlib/unitTest/demo/DemoTargetInterface", "r", "()V", false);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "me/matl114/matlib/unitTest/samples/DemoTargetInterface", "r", "()V", false);
         methodVisitor.visitInsn(Opcodes.RETURN);
         methodVisitor.visitMaxs(0,0);
         methodVisitor.visitEnd();
@@ -151,7 +146,7 @@ public class ASMUtilsTests implements TestCase {
 //        mv.visitEnd();
         cw.visitEnd();
         byte[] cls = cw.toByteArray();
-        var cl= CustomClassLoader.getInstance().defineAccessClass("me.matl114.matlib.unitTest.demo.114514DemoImpl", cls);
+        var cl= CustomClassLoader.getInstance().defineAccessClass("me.matl114.matlib.unitTest.samples.114514DemoImpl", cls);
         Object val = cl.getConstructor().newInstance();
         Debug.logger(val.getClass());
         Debug.logger(val);
@@ -180,7 +175,7 @@ public class ASMUtilsTests implements TestCase {
         return null;
     }
 
-    @Descriptive(target = "me.matl114.matlib.unitTest.demo.DemoTargetClass")
+    @Descriptive(target = "me.matl114.matlib.unitTest.samples.DemoTargetClass")
     public static interface DemoDescriptor extends TargetDescriptor {
         //field tests
         @Note("test get, test RedirectType")

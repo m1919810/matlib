@@ -17,6 +17,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.meta.components.*;
 
 import java.util.List;
+import java.util.SequencedSet;
 
 import static me.matl114.matlib.nmsMirror.Import.*;
 
@@ -56,19 +57,27 @@ public interface DataComponentTypeAPI extends TargetDescriptor {
     @RedirectName("toImmutable")
     Object itemEnchantMutable$toImmutable(Object mutable);
 
+    static boolean hasTooltipsComponents(){
+        return Version.getVersionInstance().isAtLeast(Version.v1_21_R4);
+    }
+
+
     @RedirectClass(ItemEnchantmentsMutable)
     @FieldTarget
     @RedirectName("showInTooltipGetter")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     boolean itemEnchantMutable$showInTooltip(Object mutable);
 
     @RedirectClass(ItemEnchantmentsMutable)
     @FieldTarget
     @RedirectName("showInTooltipSetter")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     void itemEnchantMutable$setShowInTooltip(Object mutable, boolean val);
 
     @RedirectClass(ItemEnchantments)
     @FieldTarget
     @RedirectName("showInTooltipGetter")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     boolean itemEnchants$ShowTooltip(Object itemEnchant);
 
 //    @RedirectClass(ItemEnchantments)
@@ -101,6 +110,7 @@ public interface DataComponentTypeAPI extends TargetDescriptor {
     @RedirectClass(AdventureModePredicate)
     @MethodTarget
     @RedirectName("showInTooltip")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     boolean adventureModePredicate$showInTooltip(Object thi);
 
 //    @RedirectClass(ItemAttributeModifiers)
@@ -111,6 +121,7 @@ public interface DataComponentTypeAPI extends TargetDescriptor {
     @RedirectClass(ItemAttributeModifiers)
     @MethodTarget
     @RedirectName("showInTooltip")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     boolean itemAttributeModifiers$showInTooltip(Object thi);
 
     @RedirectClass(ItemAttributeModifiers)
@@ -137,6 +148,7 @@ public interface DataComponentTypeAPI extends TargetDescriptor {
     @RedirectClass(ArmorTrim)
     @FieldTarget
     @RedirectName("showInTooltipGetter")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     boolean armorTrim$showInTooltip(Object thi);
 
 //    @RedirectClass(DyeItemColor)
@@ -147,11 +159,13 @@ public interface DataComponentTypeAPI extends TargetDescriptor {
     @RedirectClass(DyeItemColor)
     @MethodTarget
     @RedirectName("showInTooltip")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     boolean dyeItemColor$showInTooltip(Object thi);
 
     @RedirectClass(ToggleTooltipsHelper)
     @MethodTarget
     @RedirectName("applyIfPresent")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = false)
     void toggleTooltipsAtType(Object helper, @RedirectType(ItemStack)Object itemStack, boolean showInTooltips);
 
     @RedirectClass(UseRemainder)
@@ -182,6 +196,7 @@ public interface DataComponentTypeAPI extends TargetDescriptor {
 
     @RedirectClass(CraftUseCooldownComponent)
     @MethodTarget
+    @RedirectName("getHandle")
     @IgnoreFailure(thresholdInclude = Version.v1_21_R2,below = true)
     Object useCooldownComponent$Handle(Object comp);
 
@@ -251,4 +266,26 @@ public interface DataComponentTypeAPI extends TargetDescriptor {
     @RedirectName("itemsGetter")
     List<?> itemContainerContents$Items(Object val);
 
+    @RedirectClass(TooltipDisplay)
+    @ConstructorTarget
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = true)
+    Object tooltipsDisplay$newComponent(boolean hide, SequencedSet<?> set);
+
+    @RedirectClass(TooltipDisplay)
+    @MethodTarget
+    @RedirectName("shows")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = true)
+    boolean tooltipsDisplay$shows(Object self, @RedirectType(DataComponentType) Object type);
+
+    @RedirectClass(TooltipDisplay)
+    @MethodTarget
+    @RedirectName("hideTooltip")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = true)
+    boolean tooltipsDisplay$hideTooltips(Object self);
+
+    @RedirectClass(TooltipDisplay)
+    @MethodTarget
+    @RedirectName("hiddenComponents")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4, below = true)
+    SequencedSet<?> tooltipsDisplay$hiddenComponents(Object self);
 }

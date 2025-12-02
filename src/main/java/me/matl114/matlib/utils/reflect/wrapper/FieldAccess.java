@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 
 public class FieldAccess {
     private boolean printError = Debug.isDebugMod();
+    @Getter
     private boolean failInitialization=false;
     private Function<Object, Field> lazilyInitializationFunction;
     Field field;
@@ -71,6 +72,9 @@ public class FieldAccess {
     public FieldAccess printError(boolean printError) {
         this.printError = printError;
         return this;
+    }
+    public boolean successfullyInitialized(){
+        return this.field != null;
     }
     private Field getFieldInternal(Object obj) throws Throwable {
         Field field=lazilyInitializationFunction.apply(obj);

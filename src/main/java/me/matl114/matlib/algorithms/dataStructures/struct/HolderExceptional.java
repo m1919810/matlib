@@ -121,6 +121,9 @@ class HolderExceptional<T> implements Holder<T>, Cloneable{
         this.value = defaultValue.apply(this.e);
         return this;
     }
+    public Holder<T> recover(Predicate<T> recover){
+        return Holder.of(this.value);
+    }
 
     @Override
     public Holder<T> shouldRecover(Predicate<Throwable> predicate) {
@@ -136,6 +139,14 @@ class HolderExceptional<T> implements Holder<T>, Cloneable{
             throw new RuntimeException(this.e);
         }
         return this;
+    }
+
+    @Override
+    public Holder<T> checkArgument(Predicate<T> predicate) {
+        if(predicate.test(this.value)){
+            return this;
+        }
+        return this.clone();
     }
 
 

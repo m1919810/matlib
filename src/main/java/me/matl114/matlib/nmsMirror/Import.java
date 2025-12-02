@@ -2,11 +2,13 @@ package me.matl114.matlib.nmsMirror;
 
 import com.mojang.serialization.DataResult;
 import io.papermc.paper.datacomponent.item.CustomModelData;
+import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 
 public interface Import {
     String Tag = "Lnet/minecraft/nbt/Tag;";
     String ListTag = "Lnet/minecraft/nbt/ListTag;";
     String CompoundTag = "Lnet/minecraft/nbt/CompoundTag;";
+    String NumericTag = "Lnet/minecraft/nbt/NumericTag;";
     String Item = "Lnet/minecraft/world/item/Item;";
     String Block = "Lnet/minecraft/world/level/block/Block;";
     String ItemStack = "Lnet/minecraft/world/item/ItemStack;";
@@ -32,13 +34,14 @@ public interface Import {
     String HopperBlockEntity = "Lnet/minecraft/world/level/block/entity/HopperBlockEntity;";
     String CraftPersistentDataContainer = "Lorg/bukkit/craftbukkit/persistence/CraftPersistentDataContainer;";
     String ChatComponent = "Lnet/minecraft/network/chat/Component;";
+    String ComponentSerialization = "Lnet/minecraft/network/chat/ComponentSerialization;";
     String ChannelInitializeListener = "Lio/papermc/paper/network/ChannelInitializeListener;";
     String Packet = "Lnet/minecraft/network/protocol/Packet;";
     String PacketListener = "Lnet/minecraft/network/PacketListener;";
     String FriendlyByteBuf = "Lnet/minecraft/network/FriendlyByteBuf;";
     String PacketSendListener = "Lnet/minecraft/network/PacketSendListener;";
     String Connection = "Lnet/minecraft/network/Connection;";
-    String DataSource = "Lnet/minecraft/network/chat/contents/DataSource;";
+    String DataSource = "Lnet/minecraft/network/chat/contents/data/DataSource;";
     String AdventureComponent = "Lio/papermc/paper/adventure/AdventureComponent;";
     String MutableComponent = "Lnet/minecraft/network/chat/MutableComponent;";
     String Style = "Lnet/minecraft/network/chat/Style;";
@@ -49,6 +52,8 @@ public interface Import {
     String HoverEvent = "Lnet/minecraft/network/chat/HoverEvent;";
     String HoverEventAction = "Lnet/minecraft/network/chat/HoverEvent$Action;";
     String HoverEventItemStackInfo = "Lnet/minecraft/network/chat/HoverEvent$ItemStackInfo;";
+    String HoverEventShowItem = "Lnet/minecraft/network/chat/HoverEvent$ShowItem;";
+    String HoverEventShowText = "Lnet/minecraft/network/chat/HoverEvent$ShowText;";
     String ComponentContents = "Lnet/minecraft/network/chat/ComponentContents;";
     String ScoreContents = "Lnet/minecraft/network/chat/contents/ScoreContents;";
     String NbtContents = "Lnet/minecraft/network/chat/contents/NbtContents;";
@@ -111,12 +116,16 @@ public interface Import {
     String StringTagVisitor = "Lnet/minecraft/nbt/StringTagVisitor;";
     String TextComponentTagVisitor = "Lnet/minecraft/nbt/TextComponentTagVisitor;";
     String ItemContainerContents = "Lnet/minecraft/world/item/component/ItemContainerContents;";
-
-
+    String TooltipDisplay = "Lnet/minecraft/world/item/component/TooltipDisplay;";
+    String FontDescription = "Lnet/minecraft/network/chat/FontDescription;";
+    String FontAtlasSprite= "Lnet/minecraft/network/chat/FontDescription$AtlasSprite;";
+    String FontPlayerSprite = "Lnet/minecraft/network/chat/FontDescription$PlayerSprite;";
+    String FontResource = "Lnet/minecraft/network/chat/FontDescription$Resource;";
 
     String ContainerClass = "net.minecraft.world.Container";
     String HopperBlockEntityClass = "net.minecraft.world.level.block.entity.HopperBlockEntity";
     String NbtCompoundClass = "net.minecraft.nbt.CompoundTag";
+    String NumericTagClass = "net.minecraft.nbt.NumericTag";
     String CustomDataClass = "net.minecraft.world.item.component.CustomData";
     String UnbreakableClass = "net.minecraft.world.item.component.Unbreakable";
     String ChatComponentClass = "net.minecraft.network.chat.Component";
@@ -129,4 +138,13 @@ public interface Import {
     String PacketListenerClass = "net.minecraft.network.PacketListener";
     String FriendlyByteBufClass = "net.minecraft.network.FriendlyByteBuf";
     String PacketSendListenerClass = "net.minecraft.network.PacketSendListener";
+
+    public static Class<?> forName(String desName){
+        try{
+            return Class.forName(ByteCodeUtils.fromJvmType(desName));
+
+        }catch (Throwable e){
+            return null;
+        }
+    }
 }

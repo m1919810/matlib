@@ -13,5 +13,6 @@ public class CommonTestset extends TestSet {
         addTest(new EntityUtilTests());
         addTest(new RegistryTests());
         addTest(new ConfigTests());
+        addTest(new CryptoUtilsTests());
     }
 }

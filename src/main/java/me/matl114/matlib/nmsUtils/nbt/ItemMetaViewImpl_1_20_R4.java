@@ -25,6 +25,7 @@ import me.matl114.matlib.nmsUtils.serialize.CodecUtils;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import me.matl114.matlib.utils.reflect.internel.ObfManager;
 import me.matl114.matlib.nmsUtils.serialize.TypeOps;
+import me.matl114.matlib.utils.version.Version;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -72,11 +73,13 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
         var map = CraftBukkit.META.buildModifiersFromRaw(val);
         return map == null? LinkedHashMultimap.create(): map;
     }
+    private static final boolean hasTooltipField = !Version.getVersionInstance().isAtLeast(Version.v1_21_R4);
 
     protected class EnchantmentKeyMappingObject2IntMap extends AbstractObject2IntMap<Enchantment> {
         protected Object itemEnchantsMutable;
         Object2IntAVLTreeMap<?> rawMap;
         protected Object immutableView;
+
         public void init(){
             Object itemEnchants = HELPER.getFromPatch(itemStack, DataComponentEnum.ENCHANTMENTS);
             if(itemEnchants == null){
@@ -90,7 +93,7 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
         }
         public void writeBack(){
             //set even when rawMap is empty: hide flag, it is different from empty
-            if(!this.rawMap.isEmpty() || !DATA_TYPES.itemEnchantMutable$showInTooltip(this.itemEnchantsMutable)){
+            if(!this.rawMap.isEmpty() || (hasTooltipField && !(DATA_TYPES.itemEnchantMutable$showInTooltip(this.itemEnchantsMutable)))){
                 HELPER.setDataComponentValue(itemStack, DataComponentEnum.ENCHANTMENTS, this.immutableView);
             }else {
                 HELPER.removeFromPatch(itemStack, DataComponentEnum.ENCHANTMENTS);
@@ -330,26 +333,41 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
     private static final Object HELPER_ATTRIBUTE_MODIFIERS;
    // private static final Object HELPER_JUKEBOX_PLAYABLE;
     static{
-        Class<?> clazz0 ;
-        try{
-            clazz0 = ObfManager.getManager().reobfClass("net.minecraft.world.level.storage.loot.functions.ToggleTooltips");
-        }catch (Throwable e){
-            throw new RuntimeException(e);
+
+        if(!ItemMetaView.versionAtLeast1_21_R4){
+            Class<?> clazz0 ;
+            try{
+                clazz0 = ObfManager.getManager().reobfClass("net.minecraft.world.level.storage.loot.functions.ToggleTooltips");
+                List<Field> fields = ReflectUtils.getAllFieldsRecursively(clazz0).stream().filter(m-> Modifier.isStatic(m.getModifiers())).toList();
+                TYPE_TO_TOGGLEHELPERS = Utils.matchName(fields,"TOGGLES");
+                HELPER_TRIM = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.TRIM));
+                HELPER_DYED_COLOR = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.DYED_COLOR));
+                HELPER_ENCHANTMENTS = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.ENCHANTMENTS));
+                HELPER_UNBREAKABLE = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.UNBREAKABLE));
+                HELPER_CAN_BREAK = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.CAN_BREAK));
+                HELPER_STORED_ENCHANTMENTS = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.STORED_ENCHANTMENTS));
+                HELPER_CAN_PLACE_ON = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.CAN_PLACE_ON));
+                HELPER_ATTRIBUTE_MODIFIERS = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.ATTRIBUTE_MODIFIERS));
+            }catch (Throwable e){
+                throw new RuntimeException(e);
+            }
+        }else{
+            TYPE_TO_TOGGLEHELPERS = null;
+            HELPER_TRIM = null;
+            HELPER_DYED_COLOR = null;
+            HELPER_ENCHANTMENTS = null;
+            HELPER_UNBREAKABLE = null;
+            HELPER_CAN_BREAK = null;
+            HELPER_STORED_ENCHANTMENTS = null;
+            HELPER_CAN_PLACE_ON = null;
+            HELPER_ATTRIBUTE_MODIFIERS = null;
+
         }
-        List<Field> fields = ReflectUtils.getAllFieldsRecursively(clazz0).stream().filter(m-> Modifier.isStatic(m.getModifiers())).toList();
-        TYPE_TO_TOGGLEHELPERS = Utils.matchName(fields,"TOGGLES");
-        HELPER_TRIM = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.TRIM));
-       HELPER_DYED_COLOR = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.DYED_COLOR));
-       HELPER_ENCHANTMENTS = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.ENCHANTMENTS));
-       HELPER_UNBREAKABLE = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.UNBREAKABLE));
-       HELPER_CAN_BREAK = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.CAN_BREAK));
-       HELPER_STORED_ENCHANTMENTS = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.STORED_ENCHANTMENTS));
-       HELPER_CAN_PLACE_ON = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.CAN_PLACE_ON));
-       HELPER_ATTRIBUTE_MODIFIERS = Objects.requireNonNull( TYPE_TO_TOGGLEHELPERS.get(DataComponentEnum.ATTRIBUTE_MODIFIERS));
+
 
     }
 
-    private void setFlag(ItemFlag flag, boolean shouldDisplay){
+    protected void setFlag(ItemFlag flag, boolean shouldDisplay){
         Object type = null;
         switch (flag){
             case HIDE_ENCHANTS:
@@ -394,7 +412,7 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
                 throw new IllegalArgumentException("Unexpected item flag "+flag);
         }
     }
-    private boolean getVisibilityForFlag(ItemFlag flag){
+    protected boolean getVisibilityForFlag(ItemFlag flag){
         Object type = null;
         switch (flag){
             case HIDE_ENCHANTS:
@@ -841,7 +859,8 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
         if(mdMap.isEmpty()){
             HELPER.removeFromPatch(itemStack, DataComponentEnum.ATTRIBUTE_MODIFIERS);
         }else {
-            boolean showAttribute = this.getVisibilityForFlag(ItemFlag.HIDE_ATTRIBUTES);
+            //if tooltips field is absent, then all seen as show
+            boolean showAttribute = !hasTooltipField || this.getVisibilityForFlag(ItemFlag.HIDE_ATTRIBUTES);
             Object builder = DATA_TYPES.itemAttributeModifierBuilder();
             for(var entry: mdMap.entries()){
                 if(entry.getKey() == null|| entry.getValue() == null){

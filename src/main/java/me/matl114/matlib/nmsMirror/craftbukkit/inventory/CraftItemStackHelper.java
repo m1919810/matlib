@@ -83,15 +83,16 @@ public interface CraftItemStackHelper extends TargetDescriptor {
     @Note("new CraftItemStack using Item Registry")
     ItemStack asNewCraftStack(@RedirectType(Import.Item)Object item, int amount);
 
-    @MethodTarget(isStatic = true)
-    @Note("translate Enchantment nbt to bukkit, ImmutableMap")
-    Map<Enchantment, Integer> getEnchantments(@RedirectType(Import.ItemStack) Object item);
+//    @MethodTarget(isStatic = true)
+//    @Note("translate Enchantment nbt to bukkit, ImmutableMap")
+//    Map<Enchantment, Integer> getEnchantments(@RedirectType(Import.ItemStack) Object item);
 
     @MethodTarget(isStatic = true)
     boolean hasItemMeta(@RedirectType(Import.ItemStack)Object nmsItem);
 
     @MethodTarget(isStatic = true)
     @Note("create empty CompoundTag if absent, useless when upper 1_20_R4")
+    @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = false)
     boolean makeTag(@RedirectType(Import.ItemStack) Object nms);
 
     @MethodTarget(isStatic = true)

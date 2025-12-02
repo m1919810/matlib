@@ -486,6 +486,13 @@ public class ChatUtils {
         return HOVER_MAP.get(adventure);
     }
 
+    public static HoverEvent.Action fromNMSHoverAction(Object obj){
+        return HOVER_MAP.entrySet().stream().filter(i -> obj == i.getValue()).findAny().map(Map.Entry::getKey).orElseThrow();
+    }
+    public static ClickEvent.Action fromNMSClickEvent(Object obj){
+        return ClickEvent.Action.valueOf(((Enum)obj).name());
+    }
+
 
 
 

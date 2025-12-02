@@ -1,4 +1,4 @@
-package me.matl114.matlib.unitTest.demo;
+package me.matl114.matlib.unitTest.samples;
 
 public class DemoClass {
     public int a;

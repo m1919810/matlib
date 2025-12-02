@@ -3,7 +3,7 @@ package me.matl114.matlib.unitTest.autoTests.reflectionTests;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
-import me.matl114.matlib.unitTest.demo.DemoLoad;
+import me.matl114.matlib.unitTest.samples.DemoLoad;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import me.matl114.matlib.utils.reflect.descriptor.DescriptorProxyBuilder;
@@ -12,7 +12,6 @@ import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import me.matl114.matlib.utils.reflect.internel.ObfManager;
 import me.matl114.matlib.utils.reflect.proxy.ProxyBuilder;
-import me.matl114.matlib.utils.reflect.proxy.invocation.AdaptorInvocation;
 import me.matl114.matlib.utils.reflect.proxy.invocation.SimpleRemappingInvocation;
 import me.matl114.matlib.utils.reflect.wrapper.FieldAccess;
 import me.matl114.matlib.utils.reflect.wrapper.MethodAccess;
@@ -20,7 +19,6 @@ import me.matl114.matlibAdaptor.algorithms.dataStructures.LockFactory;
 import me.matl114.matlibAdaptor.algorithms.interfaces.Initialization;
 import org.bukkit.Location;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 

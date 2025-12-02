@@ -1,20 +1,12 @@
-package me.matl114.matlib.unitTest.demo;
+package me.matl114.matlib.unitTest.samples;
 
 import me.matl114.matlib.utils.Debug;
-import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
-import me.matl114.matlib.utils.reflect.descriptor.buildTools.DescriptorException;
-import me.matl114.matlib.utils.reflect.mixImpl.buildTools.MixBase;
 
-import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
 
 public final class DemoFinal implements DemoInterface {
     public static DemoFinal ins(){

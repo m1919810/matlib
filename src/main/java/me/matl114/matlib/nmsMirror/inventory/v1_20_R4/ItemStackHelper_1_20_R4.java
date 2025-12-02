@@ -12,6 +12,8 @@ import me.matl114.matlib.algorithms.dataStructures.frames.mmap.COWView;
 import me.matl114.matlib.algorithms.dataStructures.struct.State;
 import me.matl114.matlib.common.lang.annotations.NeedTest;
 import me.matl114.matlib.nmsMirror.core.v1_20_R4.DataComponentHolderHelper;
+import me.matl114.matlib.nmsMirror.impl.CodecEnum;
+import me.matl114.matlib.nmsMirror.impl.EmptyEnum;
 import me.matl114.matlib.nmsMirror.impl.Env;
 import me.matl114.matlib.nmsMirror.impl.NMSCore;
 import me.matl114.matlib.nmsMirror.inventory.ItemStackHelper;
@@ -21,6 +23,8 @@ import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.nmsMirror.nbt.TagEnum;
 import me.matl114.matlib.nmsUtils.serialize.CodecUtils;
 import me.matl114.matlib.nmsUtils.v1_20_R4.DataComponentUtils;
+import me.matl114.matlib.utils.Debug;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
@@ -99,12 +103,24 @@ public interface ItemStackHelper_1_20_R4 extends TargetDescriptor, ItemStackHelp
 
     @MethodTarget
     @RedirectName("save")
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R3, below = false)
     @Internal
-    Object saveV1_20_R4(Object stack,@RedirectType("Lnet/minecraft/core/HolderLookup$Provider;")Object registries,@RedirectType(Tag) Object tag );
+    default Object saveV1_20_R4(Object stack,@RedirectType("Lnet/minecraft/core/HolderLookup$Provider;")Object registries,@RedirectType(Tag) Object tag ){
+        if(isEmpty(stack)){
+            throw new IllegalArgumentException("Cannot encode empty ItemStack");
+        }else{
+            return CodecEnum.ITEMSTACK.encode(stack, NMSCore.REGISTRIES.provideRegistryForDynamicOp(registries, Env.NBT_OP), tag).getOrThrow();
+        }
+    }
 
     @MethodTarget(isStatic = true)
     @RedirectName("parseOptional")
-    Object parseV1_20_R4(@RedirectType("Lnet/minecraft/core/HolderLookup$Provider;")Object registries, @RedirectType(CompoundTag) Object nbt);
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R3, below = false)
+    default Object parseV1_20_R4(@RedirectType("Lnet/minecraft/core/HolderLookup$Provider;")Object registries, @RedirectType(CompoundTag) Object nbt){
+        return NMSCore.COMPOUND_TAG.isEmpty(nbt)?EmptyEnum.EMPTY_ITEMSTACK: CodecEnum.ITEMSTACK.parse(NMSCore.REGISTRIES.provideRegistryForDynamicOp(registries, Env.NBT_OP), nbt).resultOrPartial((s) -> {
+            Debug.severe( "Tried to load invalid item: '", s,"'");
+        }).orElse(EmptyEnum.EMPTY_ITEMSTACK);
+    }
 
     default Object saveNbtAsTag(Object itemStack){
         if(isEmpty(itemStack)){

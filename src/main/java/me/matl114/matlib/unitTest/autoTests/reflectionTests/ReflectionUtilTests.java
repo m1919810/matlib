@@ -1,8 +1,8 @@
 package me.matl114.matlib.unitTest.autoTests.reflectionTests;
 
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import me.matl114.matlib.unitTest.demo.DemoBase;
-import me.matl114.matlib.unitTest.demo.DemoDerivative;
+import me.matl114.matlib.unitTest.samples.DemoBase;
+import me.matl114.matlib.unitTest.samples.DemoDerivative;
 import me.matl114.matlib.unitTest.TestCase;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.utils.AddUtils;

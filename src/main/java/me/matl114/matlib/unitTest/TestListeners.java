@@ -2,6 +2,10 @@ package me.matl114.matlib.unitTest;
 
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
+import lombok.Getter;
+import lombok.With;
+import lombok.experimental.Accessors;
+import lombok.experimental.WithBy;
 import me.matl114.matlib.implement.slimefun.manager.BlockDataCache;
 import me.matl114.matlib.nmsMirror.core.PosEnum;
 import me.matl114.matlib.nmsMirror.impl.CraftBukkit;
@@ -19,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerLinksSendEvent;
 import org.bukkit.inventory.Inventory;
@@ -33,9 +38,13 @@ import java.util.HashMap;
 import static me.matl114.matlib.nmsMirror.impl.NMSItem.*;
 import static me.matl114.matlib.nmsMirror.impl.NMSLevel.*;
 
+@Accessors(fluent = true, prefix = {"shit"})
+@Getter
 public class TestListeners implements Listener {
     //@EventHandler
+    int shitA;
     public void checkClose(InventoryCloseEvent paper){
+
         Debug.logger("close Inventory here",paper.getInventory().getClass());
     }
    // @EventHandler
@@ -54,6 +63,11 @@ public class TestListeners implements Listener {
             event.getLinks().addLink(type, uri);
         }
     }
+//    @EventHandler
+//    public void checkElytra(EntityToggleGlideEvent event){
+//        Debug.logger("Toggle Glide", event.isGliding());
+//    }
+
 
 
     public static final Inventory EMPTY_INVENTORY = CraftBukkit.INVENTORYS.createCustomInventory(new InventoryHolder() {

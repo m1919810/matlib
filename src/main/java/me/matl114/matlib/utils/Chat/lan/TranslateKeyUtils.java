@@ -20,7 +20,7 @@ public class TranslateKeyUtils {
     private static final ConcurrentHashMap<String,String> CACHED_TRANSLATION = new ConcurrentHashMap<>();
     private static String translateKeyToDefault(String resourceKey){
         return CACHED_TRANSLATION.computeIfAbsent(resourceKey, key->{
-            TranslatableComponent component = Component.translatable(key,key);
+            TranslatableComponent component = Component.translatable(key, key);
             ItemMeta meta = TEMPLATE_STACK.get();
             meta.displayName(component);
             return meta.getDisplayName();

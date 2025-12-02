@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.matl114.matlib.common.lang.annotations.CodecLike;
+import me.matl114.matlib.nmsUtils.VersionedUtils;
 import me.matl114.matlib.utils.version.DependsOnVersion;
 import me.matl114.matlib.utils.version.Version;
 
@@ -14,7 +15,7 @@ public class ComponentCodecEnum {
     public static final Codec<Iterable<?>> CUSTOM_NAME = codec(DataComponentEnum.CUSTOM_NAME);
     public static final Codec<Iterable<?>> ITEM_NAME = codec(DataComponentEnum.ITEM_NAME);
     public static final Codec<Object> LORE = codec(DataComponentEnum.LORE);
-    @CodecLike(value = "int", instance = "CustomModelData")
+    @CodecLike(value = "int or Map", instance = "CustomModelData")
     public static final Codec<Object> CUSTOM_MODEL_DATA = codec(DataComponentEnum.CUSTOM_MODEL_DATA);
     public static final Codec<Object> TOOL = codec(DataComponentEnum.TOOL);
     public static final Codec<Object> FOOD = codec(DataComponentEnum.FOOD);
@@ -56,7 +57,8 @@ public class ComponentCodecEnum {
                // Debug.logger("Codec absent for",entry);
             }
         }
-
+        //todo: add version check for safety
+        VersionedUtils.checkVersionAnnotations(ComponentCodecEnum.class);
     }
 
     private static <T> Codec<T> codec(Object componentType){

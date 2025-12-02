@@ -2,6 +2,7 @@ package me.matl114.matlib.algorithms.dataStructures.struct;
 
 import me.matl114.matlib.common.functions.core.UnsafeBiFunction;
 import me.matl114.matlib.common.functions.core.UnsafeFunction;
+import org.apache.logging.log4j.core.appender.rolling.action.IfAll;
 
 import java.util.function.*;
 
@@ -157,6 +158,9 @@ class HolderImpl<T> implements Holder<T> ,Cloneable{
     public Holder<T> ifFail(Function<Throwable, T> defaultValue) {
         return this;
     }
+    public Holder<T> recover(Predicate<T> recover){
+        return this;
+    }
 
     @Override
     public Holder<T> shouldRecover(Predicate<Throwable> predicate) {
@@ -168,6 +172,15 @@ class HolderImpl<T> implements Holder<T> ,Cloneable{
         if(predicate.test(this.e)){
             throw new RuntimeException(this.e);
         }
+        return this;
+    }
+
+    @Override
+    public Holder<T> checkArgument(Predicate<T> predicate) {
+        if(predicate.test(this.value)){
+            return this;
+        }
+        this.e = new AssertionError(this.e);
         return this;
     }
 

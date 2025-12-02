@@ -24,7 +24,6 @@ public class Utils {
         }
 
     }
-
     public static <T> T matchNull(List<Field> fields, String name){
         Preconditions.checkArgument(!fields.isEmpty());
         try{

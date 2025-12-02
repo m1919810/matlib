@@ -128,7 +128,7 @@ public class NMSComponentBuilder extends ComponentVisitor {
         //builder.hoverEvent(hoverEvent);
         if(hoverEvent == HoverEvent.Action.SHOW_TEXT){
             if(CHATCOMPONENT.isComponent(rawData)){
-                Object hoverEvent0 = FORMAT.newHoverEvent(ChatUtils.toNMSHoverAction(HoverEvent.Action.SHOW_TEXT), rawData);
+                Object hoverEvent0 = FORMAT.createHoverEventByRaw(HoverEvent.Action.SHOW_TEXT, rawData);
                 if(constEvent){
                     thisBuilder.style().hoverEvent(hoverEvent0);
                 }else {
@@ -136,7 +136,8 @@ public class NMSComponentBuilder extends ComponentVisitor {
                 }
             }else if(rawData instanceof MutableBuilder builder){
                 Object comp = builder.toNMS();
-                Object hoverEvent0 = FORMAT.newHoverEvent(ChatUtils.toNMSHoverAction(HoverEvent.Action.SHOW_TEXT), comp);
+
+                Object hoverEvent0 = FORMAT.createHoverEventByRaw(HoverEvent.Action.SHOW_TEXT, comp);//  .newHoverEvent(ChatUtils.toNMSHoverAction(HoverEvent.Action.SHOW_TEXT), comp);
                 if(constEvent){
                     thisBuilder.style().hoverEvent(hoverEvent0);
                 }else {
@@ -146,10 +147,10 @@ public class NMSComponentBuilder extends ComponentVisitor {
                 eventProcessor.add((arg, sty)->{
                     Object optionalComp = processor.apply(arg);
                     if(CHATCOMPONENT.isComponent(optionalComp)){
-                        sty.hoverEvent(FORMAT.newHoverEvent(ChatUtils.toNMSHoverAction(HoverEvent.Action.SHOW_TEXT), optionalComp));
+                        sty.hoverEvent(FORMAT.createHoverEventByRaw(HoverEvent.Action.SHOW_TEXT, optionalComp));
                     }else if(optionalComp instanceof MutableBuilder builder){
                         Object comp = builder.toNMS();
-                        Object hoverEvent0 = FORMAT.newHoverEvent(ChatUtils.toNMSHoverAction(HoverEvent.Action.SHOW_TEXT), comp);
+                        Object hoverEvent0 = FORMAT.createHoverEventByRaw(HoverEvent.Action.SHOW_TEXT,  comp);
                         sty.hoverEvent(hoverEvent0);
                     }
                 });
@@ -158,8 +159,7 @@ public class NMSComponentBuilder extends ComponentVisitor {
         }else if(hoverEvent == HoverEvent.Action.SHOW_ITEM){
             if(rawData instanceof ItemStack stack){
                 Object nms = ItemUtils.unwrapHandle(stack);
-                Object itemInfo = FORMAT.newHoverEventItemInfo(nms);
-                Object hoverEventConst = FORMAT.newHoverEvent(ChatUtils.toNMSHoverAction(HoverEvent.Action.SHOW_ITEM), itemInfo);
+                Object hoverEventConst = FORMAT.createHoverEventByRaw(HoverEvent.Action.SHOW_ITEM, nms);
                 if(constEvent){
                     thisBuilder.style().hoverEvent(hoverEventConst);
                 }else {
@@ -170,8 +170,7 @@ public class NMSComponentBuilder extends ComponentVisitor {
                     ItemStack stack = arg.getAsItemStack(key);
                     if(stack != null){
                         Object nms = ItemUtils.unwrapHandle(stack);
-                        Object itemInfo = FORMAT.newHoverEventItemInfo(nms);
-                        Object hoverEvent0 = FORMAT.newHoverEvent(ChatUtils.toNMSHoverAction(HoverEvent.Action.SHOW_ITEM), itemInfo);
+                        Object hoverEvent0 = FORMAT.createHoverEventByRaw(HoverEvent.Action.SHOW_ITEM, nms);
                         sty.hoverEvent(hoverEvent0);
                     }
                 });
@@ -191,6 +190,7 @@ public class NMSComponentBuilder extends ComponentVisitor {
                 eventProcessor.add((arg,sty)->{
                     Entity entity = arg.getAsEntity(key);
                     if(entity != null){
+
                         Object handle = CraftBukkit.ENTITY.getHandle(entity);
                         Object hoverEvent0 = NMSEntity.ENTITY.createHoverEvent(handle);
                         sty.hoverEvent(hoverEvent0);

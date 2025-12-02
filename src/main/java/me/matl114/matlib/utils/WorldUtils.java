@@ -169,7 +169,17 @@ public class WorldUtils {
             return null;
         }
     }).v();
-    private static final FieldAccess tileEntityAccess = FieldAccess.ofName(craftBlockEntityStateClass,"tileEntity").printError(true);
+    private static final FieldAccess tileEntityAccess = Holder.of(FieldAccess.ofName(craftBlockEntityStateClass,"tileEntity"))
+        .thenPeek(FieldAccess::initWithNull)
+        .checkArgument(FieldAccess::successfullyInitialized)
+        .failHard()
+        .ifFail((v)->FieldAccess.ofName(craftBlockEntityStateClass,"blockEntity"))
+        .recover()
+        .thenPeek(FieldAccess::initWithNull)
+        .checkArgument(FieldAccess::successfullyInitialized)
+        .runException((w)-> {throw new RuntimeException("Failed to initialize CraftBlockEntityState.blockEntity VarHandle");})
+        .get()
+        ;
     @Getter
     private static final Class<?> tileEntityClass = new InitializeSafeProvider<>(Class.class,()->{
         Field tileEntityField = tileEntityAccess.getFieldOrDefault(()->null);

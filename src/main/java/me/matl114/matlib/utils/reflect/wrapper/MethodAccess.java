@@ -81,6 +81,9 @@ public class MethodAccess<T extends Object> {
         this.printError = printError;
         return this;
     }
+    public boolean successfullyInitialized(){
+        return this.field != null;
+    }
 
     public MethodAccess<T> init(Object obj) {
         if(this.field==null&&!failInitialization){

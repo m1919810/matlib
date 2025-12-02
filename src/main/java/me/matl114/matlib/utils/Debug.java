@@ -78,6 +78,7 @@ public class Debug {
     public static void severe(String message) {
         log.severe(s(message));
     }
+
     public static  void logger(int message) {
         logger(Integer.toString(message));
     }
@@ -95,6 +96,7 @@ public class Debug {
         severe(String.join(" ", Arrays.stream(msgs).map(Debug::s).toArray(String[]::new)));
     }
 
+
     public static void logger(Throwable t) {
         log.log(java.util.logging.Level.WARNING , (String) "Exception caught while running:",(Throwable)t);
     }
@@ -105,6 +107,7 @@ public class Debug {
     public static void severe(Throwable t){
         log.log(java.util.logging.Level.SEVERE , (String) "Error while running:",(Throwable)t);
     }
+
     public static void logger(Supplier<String> str){
         logger(s(str.get()));
     }

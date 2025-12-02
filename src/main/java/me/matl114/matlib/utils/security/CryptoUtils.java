@@ -3,21 +3,13 @@ package me.matl114.matlib.utils.security;
 import org.bukkit.plugin.Plugin;
 
 public class CryptoUtils {
-
-    public static void enableSecret(Plugin pl){
-
-    }
-
-
-
-
-    public static String codecode(String val, int time){
+    public static String illilili(String val, int time){
         for (var i = 0; i< time; ++i){
-            val = codeStr(val);
+            val = iIliIili(val);
         }
         return val;
     }
-    public static String codeStr(String val){
+    public static String iIliIili(String val){
         char[] result = new char[val.length()];
         int val11,val22;
         val11 = val22 = result.length - 1;

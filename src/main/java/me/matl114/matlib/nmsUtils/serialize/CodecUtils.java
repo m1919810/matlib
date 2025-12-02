@@ -59,13 +59,13 @@ public class CodecUtils {
     public static DynamicOps<JsonElement> jsonOp(){
         return JSON_OP_1_20_R4_CACHE;
     }
-    public static DynamicOps<?> createDefaultNbtOp(){
-        if(Version.getVersionInstance().isAtLeast(Version.v1_20_R4)){
-            return NMSCore.REGISTRIES.provideRegistryForDynamicOp(Env.REGISTRY_FROZEN, Env.NBT_OP);
-        }else {
-            return Env.NBT_OP;
-        }
-    }
+//    public static DynamicOps<?> createDefaultNbtOp(){
+//        if(Version.getVersionInstance().isAtLeast(Version.v1_20_R4)){
+//            return NMSCore.REGISTRIES.provideRegistryForDynamicOp(Env.REGISTRY_FROZEN, Env.NBT_OP);
+//        }else {
+//            return Env.NBT_OP;
+//        }
+//    }
 
 
 
