@@ -15,7 +15,8 @@ public class ChatEnum {
     public static final Object STYLE_EMPTY_COPY;
     public static final Object STYLE_LEGACY_EMPTY;
     public static final Object STYLE_RESET;
-    public static final Object FONT_DEFAULT ;
+    //remove because of shit
+//    public static final Object FONT_DEFAULT ;
     public static final Object PLAIN_TEXT_EMPTY;
     static{
         Class<?> clazz ;
@@ -26,7 +27,7 @@ public class ChatEnum {
         }
         List<Field > styleFields = ReflectUtils.getAllFieldsRecursively(clazz);
         STYLE_EMPTY = matchName(styleFields, "EMPTY");
-        FONT_DEFAULT = matchName(styleFields, "DEFAULT_FONT");
+
         STYLE_LEGACY_EMPTY = NMSChat.FORMAT.withItalic(STYLE_EMPTY, false);
         STYLE_EMPTY_COPY = NMSChat.FORMAT.newStyle(null,null,null,null,null,null,null,null,null,null);
         Object val = NMSChat.FORMAT.withBold(STYLE_EMPTY, false);

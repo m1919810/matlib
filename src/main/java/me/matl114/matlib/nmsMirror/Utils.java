@@ -7,13 +7,15 @@ import me.matl114.matlib.utils.reflect.internel.ObfManager;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 
 public class Utils {
-    public static <T> T matchName(List<Field> fields, String name){
+    public static <T> T matchName(List<Field> fields, String... name){
         Preconditions.checkArgument(!fields.isEmpty());
+        Set<String> set = Set.<String>of(name);
         try{
             return (T)fields.stream()
-                .filter( f -> ObfManager.getManager().deobfField(f).equals(name))
+                .filter( f -> set.contains(ObfManager.getManager().deobfField(f)))
                 .peek(f->f.setAccessible(true))
                 .findFirst()
                 .orElseThrow()
@@ -26,9 +28,10 @@ public class Utils {
     }
     public static <T> T matchNull(List<Field> fields, String name){
         Preconditions.checkArgument(!fields.isEmpty());
+        Set<String> set = Set.<String>of(name);
         try{
             Field field = fields.stream()
-                .filter( f -> ObfManager.getManager().deobfField(f).equals(name))
+                .filter( f -> set.contains(ObfManager.getManager().deobfField(f)))
                 .peek(f->f.setAccessible(true))
                 .findFirst().orElse(null);
             return field == null? null: (T)field.get(null);

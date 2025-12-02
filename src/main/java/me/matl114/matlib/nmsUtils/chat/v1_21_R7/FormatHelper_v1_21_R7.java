@@ -30,14 +30,16 @@ public interface FormatHelper_v1_21_R7 extends FormatHelper {
     @ConstructorTarget
     @RedirectClass(FontResource)
     Object newResource(@RedirectType(ResourceLocation)Object spriteId);
-
+    //null ptr
     default Object newStyle0(@RedirectType(TextColor)Object color, Integer shadowColor, @Nullable Boolean bold,
                             @Nullable Boolean italic,
                             @Nullable Boolean underlined,
                             @Nullable Boolean strikethrough,
                             @Nullable Boolean obfuscated, @RedirectType(ClickEvent)Object clickevent, @RedirectType(HoverEvent)Object hoverEvent, String insertion, @RedirectType(ResourceLocation)Object resourceLocation){
-        return newStyle00(color, shadowColor, bold, italic, underlined, strikethrough, obfuscated, clickevent, hoverEvent, insertion, newResource(resourceLocation));
+        return newStyle00(color, shadowColor, bold, italic, underlined, strikethrough, obfuscated, clickevent, hoverEvent, insertion, resourceLocation == null ? null : newResource(resourceLocation));
     }
+    @ConstructorTarget
+    @RedirectClass(Style)
     public Object newStyle00(@RedirectType(TextColor)Object color, Integer shadowColor, @Nullable Boolean bold,
                             @Nullable Boolean italic,
                             @Nullable Boolean underlined,

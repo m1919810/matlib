@@ -14,7 +14,7 @@ public interface TestCase extends TestResources{
         Preconditions.checkArgument(Objects.equals(val1, val2),"Assertion failed! not equal:"+val1+" "+val2);
     }
     default void AssertNEq(Object val1, Object val2){
-        Preconditions.checkArgument(!Objects.equals(val1, val2),"Assertion failed! equal:"+val1+" "+val2);
+        Preconditions.checkArgument(!Objects.equals(val1, val2),"Assertion failed! equal:"+val1+" AND "+val2);
     }
     default void AssertNN(Object expression){
         Preconditions.checkNotNull(expression,"Assertion failed!");

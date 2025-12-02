@@ -3,6 +3,7 @@ package me.matl114.matlib.utils.reflect.internel;
 import com.google.common.collect.ImmutableMap;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
+import me.matl114.matlib.utils.version.Version;
 import org.bukkit.Bukkit;
 
 import java.util.*;
@@ -51,16 +52,25 @@ public class SimpleObfManagerImpl implements SimpleObfManager {
             craftbukkitPackageName = originCraftbukkitPackageName;
         }
         try{
-            obfClass = Class.forName("io.papermc.paper.util.ObfHelper");
-            classMapperHelper = new ClassMapperHelperImpl();
-            Object obfIns = obfClass.getEnumConstants()[0];
-            var f1 = obfClass.getDeclaredField("mappingsByObfName");
-            f1.setAccessible(true);
-            mappingsByObfName = (Map<String, ?>) f1.get(obfIns);
-            var f2 = obfClass.getDeclaredField("mappingsByMojangName");
-            f2.setAccessible(true);
-            mappingsByMojangName = (Map<String, ?>) f2.get(obfIns);
-            ClassMapperHelperImpl classMapperHelper1 = (ClassMapperHelperImpl) classMapperHelper;
+            if(Version.getVersionInstance().isAtLeast(Version.v1_21_R7)){
+                //1.21.9  do not use obf anymore
+                obfClass = null;
+                classMapperHelper = null;
+                mappingsByObfName = Map.of();
+                mappingsByMojangName = Map.of();
+            }else{
+                obfClass = Class.forName("io.papermc.paper.util.ObfHelper");
+                classMapperHelper = new ClassMapperHelperImpl();
+                Object obfIns = obfClass.getEnumConstants()[0];
+                var f1 = obfClass.getDeclaredField("mappingsByObfName");
+                f1.setAccessible(true);
+                mappingsByObfName = (Map<String, ?>) f1.get(obfIns);
+                var f2 = obfClass.getDeclaredField("mappingsByMojangName");
+                f2.setAccessible(true);
+                mappingsByMojangName = (Map<String, ?>) f2.get(obfIns);
+                ClassMapperHelperImpl classMapperHelper1 = (ClassMapperHelperImpl) classMapperHelper;
+            }
+
         }catch (Throwable e){
             throw new RuntimeException(e);
         }
