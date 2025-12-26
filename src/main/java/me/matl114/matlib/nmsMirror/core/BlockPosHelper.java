@@ -10,6 +10,6 @@ public interface BlockPosHelper extends Vec3iHelper {
 
     @MethodTarget
     long asLong(Object obj);
-    //@MethodTarget
-    //Object rotate(Object pos, Object rotation );
+    // @MethodTarget
+    // Object rotate(Object pos, Object rotation );
 }

@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-
 public interface InventoryRecord {
     /**
      * get the Location, nonnull
@@ -35,23 +34,23 @@ public interface InventoryRecord {
      * check if inventory belongs to a Slimefun Block
      * @return
      */
-    default boolean isSlimefunInv(){
-        return invKind()==InventoryKind.PLUGIN_BLOCKMENU;
+    default boolean isSlimefunInv() {
+        return invKind() == InventoryKind.PLUGIN_BLOCKMENU;
     }
 
     /**
      * check if inventory belongs to a BlockState
      * @return
      */
-    default boolean isVanillaInv(){
-        return invKind()==InventoryKind.TILE_ENTITY_INVENTORY;
+    default boolean isVanillaInv() {
+        return invKind() == InventoryKind.TILE_ENTITY_INVENTORY;
     }
 
     /**
      * check if inventory are made of multi BlockState(DoubleChest)
      * @return
      */
-    default boolean isMultiBlockInv(){
+    default boolean isMultiBlockInv() {
         return false;
     }
 
@@ -59,8 +58,8 @@ public interface InventoryRecord {
      * check if inventory belongs to a Entity
      * @return
      */
-    default boolean isEntityInv(){
-        return invKind()==InventoryKind.ENTITY_INVENTORY;
+    default boolean isEntityInv() {
+        return invKind() == InventoryKind.ENTITY_INVENTORY;
     }
     /**
      * check if optionalHolder still presents,
@@ -75,10 +74,11 @@ public interface InventoryRecord {
      * check if data present
      * @return
      */
-    default boolean hasData(){
+    default boolean hasData() {
         return optionalHolder() != null;
     }
-    default boolean hasInv(){
+
+    default boolean hasInv() {
         return inventory() != null;
     }
     /**
@@ -87,12 +87,13 @@ public interface InventoryRecord {
      */
     @Experimental
     public Inventory getInventorySync();
-    //todo I have a big big big idea about this: fast access cache,
-    //first we need a ensureDelaySyncRunner class
+    // todo I have a big big big idea about this: fast access cache,
+    // first we need a ensureDelaySyncRunner class
     @ForceOnMainThread
     public boolean canPlayerOpen(Player p);
+
     @Internal
-    static enum InventoryKind{
+    static enum InventoryKind {
         TILE_ENTITY_INVENTORY,
         PLUGIN_BLOCKMENU,
         ENTITY_INVENTORY

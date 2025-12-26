@@ -1,6 +1,10 @@
 package me.matl114.matlib.utils.version;
 
 import com.google.common.base.Preconditions;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
+import java.lang.reflect.Field;
+import java.util.Objects;
 import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
 import me.matl114.matlib.utils.CraftUtils;
 import me.matl114.matlib.utils.Debug;
@@ -9,31 +13,29 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import java.lang.reflect.Field;
-import java.util.Objects;
-
 public abstract class VersionedMeta {
     private static VersionedMeta Instance;
-    public static VersionedMeta getInstance(){
-        if(Instance == null){
+
+    public static VersionedMeta getInstance() {
+        if (Instance == null) {
             init0();
         }
         return Instance;
     }
-    private static void init0(){
-        Instance = switch (Version.getVersionInstance()){
-            case v1_20_R4-> new v1_20_R4();
-            case v1_21_R1 ,v1_21_R2-> new v1_21_R1();
-            default -> new Default();
-        };
+
+    private static void init0() {
+        Instance = switch (Version.getVersionInstance()) {
+            case v1_20_R4 -> new v1_20_R4();
+            case v1_21_R1, v1_21_R2 -> new v1_21_R1();
+            default -> new Default();};
     }
-    public boolean comparePotionType(PotionMeta instanceOne, PotionMeta instanceTwo){
+
+    public boolean comparePotionType(PotionMeta instanceOne, PotionMeta instanceTwo) {
         return Objects.equals(instanceOne.getBasePotionData(), instanceTwo.getBasePotionData());
     }
-    public boolean comparePotionMeta(PotionMeta instanceOne, PotionMeta instanceTwo){
-        if(!comparePotionType(instanceOne, instanceTwo)){
+
+    public boolean comparePotionMeta(PotionMeta instanceOne, PotionMeta instanceTwo) {
+        if (!comparePotionType(instanceOne, instanceTwo)) {
             return false;
         }
         if (instanceOne.hasCustomEffects() != instanceTwo.hasCustomEffects()) {
@@ -50,7 +52,8 @@ public abstract class VersionedMeta {
         }
         return true;
     }
-    public boolean differentSpecialMeta(ItemMeta metaOne, ItemMeta metaTwo){
+
+    public boolean differentSpecialMeta(ItemMeta metaOne, ItemMeta metaTwo) {
         // Axolotl
         if (metaOne instanceof AxolotlBucketMeta instanceOne && metaTwo instanceof AxolotlBucketMeta instanceTwo) {
             if (instanceOne.hasVariant() != instanceTwo.hasVariant()) {
@@ -87,9 +90,7 @@ public abstract class VersionedMeta {
                 return true;
             }
 
-
-
-            if (!CraftUtils.matchBlockStateMetaField(instanceOne,instanceTwo)) {
+            if (!CraftUtils.matchBlockStateMetaField(instanceOne, instanceTwo)) {
                 return true;
             }
         }
@@ -138,7 +139,8 @@ public abstract class VersionedMeta {
             }
         }
         // Enchantment Storage
-        if (metaOne instanceof EnchantmentStorageMeta instanceOne && metaTwo instanceof EnchantmentStorageMeta instanceTwo) {
+        if (metaOne instanceof EnchantmentStorageMeta instanceOne
+                && metaTwo instanceof EnchantmentStorageMeta instanceTwo) {
             if (instanceOne.hasStoredEnchants() != instanceTwo.hasStoredEnchants()) {
                 return true;
             }
@@ -190,7 +192,7 @@ public abstract class VersionedMeta {
         }
         // Potion
         if (metaOne instanceof PotionMeta instanceOne && metaTwo instanceof PotionMeta instanceTwo) {
-            if(!comparePotionMeta(instanceOne,instanceTwo)){
+            if (!comparePotionMeta(instanceOne, instanceTwo)) {
                 return true;
             }
         }
@@ -205,7 +207,8 @@ public abstract class VersionedMeta {
         }
 
         // Fish Bucket
-        if (metaOne instanceof TropicalFishBucketMeta instanceOne && metaTwo instanceof TropicalFishBucketMeta instanceTwo) {
+        if (metaOne instanceof TropicalFishBucketMeta instanceOne
+                && metaTwo instanceof TropicalFishBucketMeta instanceTwo) {
             if (instanceOne.hasVariant() != instanceTwo.hasVariant()) {
                 return true;
             }
@@ -248,47 +251,57 @@ public abstract class VersionedMeta {
         return false;
     }
 
-    public boolean matchBlockStateMeta(BlockStateMeta meta1,BlockStateMeta meta2){
-        try{
+    public boolean matchBlockStateMeta(BlockStateMeta meta1, BlockStateMeta meta2) {
+        try {
             return matchBlockStateMeta0(meta1, meta2);
-        } catch (Throwable e){
+        } catch (Throwable e) {
             return Objects.equals(meta1, meta2);
         }
     }
-    protected abstract boolean matchBlockStateMeta0(BlockStateMeta meta1,BlockStateMeta meta2);
 
-
+    protected abstract boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2);
 
     static class Default extends VersionedMeta {
-        private static final VarHandle handle = new InitializeSafeProvider<>(()->{
-            ItemMeta meta = new ItemStack(Material.SPAWNER).getItemMeta();
-            BlockStateMeta blockState = (BlockStateMeta)meta;
-            var result= ReflectUtils.getFieldsRecursively(blockState.getClass(),"blockEntityTag");
-            Preconditions.checkArgument(result != null, "Field Absent!");
-            Field field = result.getA();
-            return MethodHandles.privateLookupIn(field.getDeclaringClass(),MethodHandles.lookup()).unreflectVarHandle(field);
-        }).runNonnullAndNoError(()-> Debug.logger("Successfully initialize CraftMetaBlockState.blockEntityTag VarHandle")).v();
-        protected boolean matchBlockStateMeta0(BlockStateMeta meta1,BlockStateMeta meta2){
-            return Objects.equals(handle.get(meta1),handle.get(meta2));
+        private static final VarHandle handle = new InitializeSafeProvider<>(() -> {
+                    ItemMeta meta = new ItemStack(Material.SPAWNER).getItemMeta();
+                    BlockStateMeta blockState = (BlockStateMeta) meta;
+                    var result = ReflectUtils.getFieldsRecursively(blockState.getClass(), "blockEntityTag");
+                    Preconditions.checkArgument(result != null, "Field Absent!");
+                    Field field = result.getA();
+                    return MethodHandles.privateLookupIn(field.getDeclaringClass(), MethodHandles.lookup())
+                            .unreflectVarHandle(field);
+                })
+                .runNonnullAndNoError(
+                        () -> Debug.logger("Successfully initialize CraftMetaBlockState.blockEntityTag VarHandle"))
+                .v();
+
+        protected boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2) {
+            return Objects.equals(handle.get(meta1), handle.get(meta2));
         }
     }
-    static class v1_20_R4 extends Default {
-        private static final VarHandle componentsHandle = new InitializeSafeProvider<>(()->{
-            ItemMeta meta = new ItemStack(Material.SPAWNER).getItemMeta();
-            BlockStateMeta blockState = (BlockStateMeta)meta;
-            Field targetField = ReflectUtils.getFieldsRecursively(blockState.getClass(),"components").getA();
-            return MethodHandles.privateLookupIn(targetField.getDeclaringClass(), MethodHandles.lookup()).unreflectVarHandle(targetField);
-        }).runNonnullAndNoError(()-> Debug.logger("Successfully initialize CraftMetaBlockState.components VarHandle")).v();
 
-        public boolean comparePotionType(PotionMeta instanceOne, PotionMeta instanceTwo){
+    static class v1_20_R4 extends Default {
+        private static final VarHandle componentsHandle = new InitializeSafeProvider<>(() -> {
+                    ItemMeta meta = new ItemStack(Material.SPAWNER).getItemMeta();
+                    BlockStateMeta blockState = (BlockStateMeta) meta;
+                    Field targetField = ReflectUtils.getFieldsRecursively(blockState.getClass(), "components")
+                            .getA();
+                    return MethodHandles.privateLookupIn(targetField.getDeclaringClass(), MethodHandles.lookup())
+                            .unreflectVarHandle(targetField);
+                })
+                .runNonnullAndNoError(
+                        () -> Debug.logger("Successfully initialize CraftMetaBlockState.components VarHandle"))
+                .v();
+
+        public boolean comparePotionType(PotionMeta instanceOne, PotionMeta instanceTwo) {
             return instanceOne.getBasePotionType() == instanceTwo.getBasePotionType();
         }
 
-        protected boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2){
-            if(!super.matchBlockStateMeta0(meta1, meta2)){
+        protected boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2) {
+            if (!super.matchBlockStateMeta0(meta1, meta2)) {
                 return false;
             }
-            return Objects.equals( componentsHandle.get(meta1), componentsHandle.get(meta2));
+            return Objects.equals(componentsHandle.get(meta1), componentsHandle.get(meta2));
         }
 
         @Override
@@ -336,9 +349,7 @@ public abstract class VersionedMeta {
                 return true;
             }
 
-
-
-            if( super.differentSpecialMeta(metaOne, metaTwo)){
+            if (super.differentSpecialMeta(metaOne, metaTwo)) {
                 return true;
             }
             if (metaOne instanceof WritableBookMeta instanceOne && metaTwo instanceof WritableBookMeta instanceTwo) {
@@ -352,23 +363,27 @@ public abstract class VersionedMeta {
             return false;
         }
     }
+
     static class v1_21_R1 extends v1_20_R4 {
-        private static final boolean hasShieldMetaInterface = new InitializeSafeProvider<>(()->{
-            Class<?> testClass = ShieldMeta.class;
-            Preconditions.checkArgument(testClass.isInterface());
-            return true;
-        },false).v();
+        private static final boolean hasShieldMetaInterface = new InitializeSafeProvider<>(
+                        () -> {
+                            Class<?> testClass = ShieldMeta.class;
+                            Preconditions.checkArgument(testClass.isInterface());
+                            return true;
+                        },
+                        false)
+                .v();
 
         @Override
         public boolean differentSpecialMeta(ItemMeta metaOne, ItemMeta metaTwo) {
             if (metaOne.hasJukeboxPlayable() && metaTwo.hasJukeboxPlayable()) {
-                if (!Objects.equals(metaOne.getJukeboxPlayable(),metaTwo.getJukeboxPlayable())) {
+                if (!Objects.equals(metaOne.getJukeboxPlayable(), metaTwo.getJukeboxPlayable())) {
                     return true;
                 }
             } else if (metaOne.hasJukeboxPlayable() != metaTwo.hasJukeboxPlayable()) {
                 return true;
             }
-            if(super.differentSpecialMeta(metaOne, metaTwo)){
+            if (super.differentSpecialMeta(metaOne, metaTwo)) {
                 return true;
             }
             if (metaOne instanceof OminousBottleMeta instanceOne && metaTwo instanceof OminousBottleMeta instanceTwo) {
@@ -381,22 +396,25 @@ public abstract class VersionedMeta {
                 }
             }
             // Shield
-            if (hasShieldMetaInterface && metaOne instanceof ShieldMeta instanceOne && metaTwo instanceof ShieldMeta instanceTwo) {
+            if (hasShieldMetaInterface
+                    && metaOne instanceof ShieldMeta instanceOne
+                    && metaTwo instanceof ShieldMeta instanceTwo) {
                 if (Objects.equals(instanceOne.getBaseColor(), instanceTwo.getBaseColor())) {
                     return true;
                 }
             }
             return false;
         }
-        protected boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2){
-            if(meta1.getClass()!=meta2.getClass()){
+
+        protected boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2) {
+            if (meta1.getClass() != meta2.getClass()) {
                 return false;
             }
-            if(hasShieldMetaInterface && (meta1 instanceof ShieldMeta meta11 && meta2 instanceof ShieldMeta meta22)){
-                return  true;//Objects.equals( meta11.getBaseColor(),meta22.getBaseColor())
-                //just let then gooooooooooooooooooooo fuck
+            if (hasShieldMetaInterface && (meta1 instanceof ShieldMeta meta11 && meta2 instanceof ShieldMeta meta22)) {
+                return true; // Objects.equals( meta11.getBaseColor(),meta22.getBaseColor())
+                // just let then gooooooooooooooooooooo fuck
                 // return ;
-            }else{
+            } else {
                 return super.matchBlockStateMeta0(meta1, meta2);
             }
         }

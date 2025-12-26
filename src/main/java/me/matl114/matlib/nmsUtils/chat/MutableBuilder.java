@@ -1,14 +1,12 @@
 package me.matl114.matlib.nmsUtils.chat;
 
-import lombok.*;
-import lombok.experimental.Accessors;
-import me.matl114.matlib.utils.Debug;
+import static me.matl114.matlib.nmsMirror.impl.NMSChat.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
-import static me.matl114.matlib.nmsMirror.impl.NMSChat.*;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 @Accessors(chain = true, fluent = true)
 @Getter
@@ -16,20 +14,20 @@ import static me.matl114.matlib.nmsMirror.impl.NMSChat.*;
 @AllArgsConstructor
 @ToString
 public class MutableBuilder implements Cloneable, BuildResult<Iterable<?>> {
-    private MutableBuilder(){
+    private MutableBuilder() {}
 
-    }
     StyleBuilder style;
-    List<MutableBuilder> siblings ;
+    List<MutableBuilder> siblings;
     ContentBuilder componentContent;
     private static final MutableBuilder INSTANCE = new MutableBuilder();
 
-    public static MutableBuilder builder(){
-        MutableBuilder builder= INSTANCE.copy0();
+    public static MutableBuilder builder() {
+        MutableBuilder builder = INSTANCE.copy0();
         builder.siblings = new ArrayList<>(2);
         return builder;
     }
-    protected MutableBuilder copy0(){
+
+    protected MutableBuilder copy0() {
         try {
             MutableBuilder clone = (MutableBuilder) super.clone();
             // TODO: copy mutable state here, so the clone can't change the internals of the original
@@ -41,10 +39,14 @@ public class MutableBuilder implements Cloneable, BuildResult<Iterable<?>> {
 
     @Override
     public MutableBuilder clone() {
-        return builder().style(this.style == null ? null: this.style.clone()).siblings(new ArrayList<>(siblings)).componentContent(this.componentContent == null? null: this.componentContent.clone());
+        return builder()
+                .style(this.style == null ? null : this.style.clone())
+                .siblings(new ArrayList<>(siblings))
+                .componentContent(this.componentContent == null ? null : this.componentContent.clone());
     }
+
     @AllArgsConstructor
-    private static class ImmutableBuilder extends MutableBuilder{
+    private static class ImmutableBuilder extends MutableBuilder {
         Iterable<?> value;
 
         @Override
@@ -57,7 +59,7 @@ public class MutableBuilder implements Cloneable, BuildResult<Iterable<?>> {
             return new ImmutableBuilder(value);
         }
 
-        public MutableBuilder toImmutable(){
+        public MutableBuilder toImmutable() {
             return this;
         }
 
@@ -66,33 +68,32 @@ public class MutableBuilder implements Cloneable, BuildResult<Iterable<?>> {
             return true;
         }
 
-        public String toString(){
-            return "Immutable("+value+")";
+        public String toString() {
+            return "Immutable(" + value + ")";
         }
-    };
+    }
+    ;
 
-    public static MutableBuilder immutable(Iterable<?> value){
+    public static MutableBuilder immutable(Iterable<?> value) {
         return new ImmutableBuilder(value);
     }
+
     @Override
     public MutableBuilder toImmutable() {
         Iterable<?> value = toNMS();
         return new ImmutableBuilder(value);
     }
 
-    public Iterable<?> toNMS(){
-        Iterable<?> value =  CHATCOMPONENT.create(this.componentContent.toNMS());
-        if(this.style != null){
+    public Iterable<?> toNMS() {
+        Iterable<?> value = CHATCOMPONENT.create(this.componentContent.toNMS());
+        if (this.style != null) {
             Object style = this.style.toNMS();
-            value =  CHATCOMPONENT.setStyle(value, style);
+            value = CHATCOMPONENT.setStyle(value, style);
         }
-        if(!this.siblings.isEmpty()){
+        if (!this.siblings.isEmpty()) {
             List<Iterable<?>> siblings1 = CHATCOMPONENT.getSiblings(value);
             this.siblings.stream().map(MutableBuilder::toNMS).forEach((Consumer<Iterable<?>>) siblings1::add);
         }
         return value;
     }
-
-
-
 }

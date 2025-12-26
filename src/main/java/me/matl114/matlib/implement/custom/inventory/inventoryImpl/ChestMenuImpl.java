@@ -6,7 +6,6 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -16,9 +15,9 @@ public class ChestMenuImpl implements InventoryBuilder<ChestMenu> {
     ScreenBuilder builder;
     int page;
 
-
     @Override
-    public void visitPage(ScreenBuilder builder, String optionalTitle, int pageIndex, int sizePerPage, int currentMaxPage) {
+    public void visitPage(
+            ScreenBuilder builder, String optionalTitle, int pageIndex, int sizePerPage, int currentMaxPage) {
         this.builder = builder;
         this.menu = new ChestMenu(optionalTitle, sizePerPage);
         this.page = pageIndex;
@@ -28,11 +27,11 @@ public class ChestMenuImpl implements InventoryBuilder<ChestMenu> {
     public void visitSlot(int index, ItemStack stack, InteractHandler handler) {
         Preconditions.checkNotNull(menu, "You should visitPage before visitSlot");
         menu.replaceExistingItem(index, stack);
-        menu.addMenuClickHandler(index, wrap( handler));
+        menu.addMenuClickHandler(index, wrap(handler));
     }
 
-    public static ChestMenu.MenuClickHandler wrap(InteractHandler handler){
-        return new ChestMenu.AdvancedMenuClickHandler(){
+    public static ChestMenu.MenuClickHandler wrap(InteractHandler handler) {
+        return new ChestMenu.AdvancedMenuClickHandler() {
 
             @Override
             public boolean onClick(Player player, int i, ItemStack itemStack, ClickAction clickAction) {
@@ -40,31 +39,35 @@ public class ChestMenuImpl implements InventoryBuilder<ChestMenu> {
             }
 
             @Override
-            public boolean onClick(InventoryClickEvent inventoryClickEvent, Player player, int i, ItemStack itemStack, ClickAction clickAction) {
-                return handler != null && handler.onClick(inventoryClickEvent.getClickedInventory(), player, inventoryClickEvent);
+            public boolean onClick(
+                    InventoryClickEvent inventoryClickEvent,
+                    Player player,
+                    int i,
+                    ItemStack itemStack,
+                    ClickAction clickAction) {
+                return handler != null
+                        && handler.onClick(inventoryClickEvent.getClickedInventory(), player, inventoryClickEvent);
             }
         };
     }
-    public static ChestMenu.MenuClickHandler wrapCommon(ChestMenu menu, InteractHandler handler){
+
+    public static ChestMenu.MenuClickHandler wrapCommon(ChestMenu menu, InteractHandler handler) {
         return ((player, i, itemStack, clickAction) -> {
-            if(clickAction.isRightClicked() ){
-                if(clickAction.isShiftClicked()){
+            if (clickAction.isRightClicked()) {
+                if (clickAction.isShiftClicked()) {
                     return handler.onClick(menu.getInventory(), player, i, ClickType.SHIFT_RIGHT);
-                }else {
+                } else {
                     return handler.onClick(menu.getInventory(), player, i, ClickType.RIGHT);
                 }
-            }else {
-                if(clickAction.isShiftClicked()){
+            } else {
+                if (clickAction.isShiftClicked()) {
                     return handler.onClick(menu.getInventory(), player, i, ClickType.SHIFT_LEFT);
-                }else {
+                } else {
                     return handler.onClick(menu.getInventory(), player, i, ClickType.LEFT);
                 }
             }
         });
     }
-
-
-
 
     @Override
     public void visitEnd() {
@@ -74,24 +77,21 @@ public class ChestMenuImpl implements InventoryBuilder<ChestMenu> {
     @Override
     public void visitOpen(ScreenOpenHandler handler) {
         Preconditions.checkNotNull(menu, "You should visitPage before visitOpen");
-        if(handler != null)
-            menu.addMenuOpeningHandler((p)->handler.handleOpen(p, menu.getInventory()));
+        if (handler != null) menu.addMenuOpeningHandler((p) -> handler.handleOpen(p, menu.getInventory()));
     }
 
     @Override
     public void visitClose(ScreenCloseHandler handler) {
         Preconditions.checkNotNull(menu, "You should visitPage before visitClose");
-        if(handler != null)
-            menu.addMenuCloseHandler((p)->handler.handleClose(p, menu.getInventory()));
+        if (handler != null) menu.addMenuCloseHandler((p) -> handler.handleClose(p, menu.getInventory()));
     }
 
     @Override
     public void visitScreenClick(InteractHandler handler) {
-        if(handler != null){
+        if (handler != null) {
             menu.addPlayerInventoryClickHandler(wrapCommon(menu, handler));
         }
     }
-
 
     @Override
     public ScreenBuilder getBuilder() {
@@ -113,7 +113,6 @@ public class ChestMenuImpl implements InventoryBuilder<ChestMenu> {
         menu.open(player);
     }
 
-
     @Override
     public Inventory getInventory() {
         return menu.getInventory();
@@ -126,7 +125,7 @@ public class ChestMenuImpl implements InventoryBuilder<ChestMenu> {
 
     public static InventoryFactory<ChestMenu, ChestMenuImpl> FACTORY = new Factory();
 
-    private static class Factory implements InventoryFactory<ChestMenu, ChestMenuImpl>{
+    private static class Factory implements InventoryFactory<ChestMenu, ChestMenuImpl> {
 
         @Override
         public ChestMenuImpl visitBuilder(ScreenBuilder builder) {

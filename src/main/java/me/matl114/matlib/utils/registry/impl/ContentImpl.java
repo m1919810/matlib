@@ -1,12 +1,10 @@
 package me.matl114.matlib.utils.registry.impl;
 
+import java.util.stream.Stream;
 import me.matl114.matlib.utils.registry.Content;
 import me.matl114.matlib.utils.registry.Group;
 import me.matl114.matlib.utils.registry.Registry;
 import org.bukkit.NamespacedKey;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.stream.Stream;
 
 public record ContentImpl<T>(T value, String namespace, String id) implements Content<T> {
     @Override
@@ -33,7 +31,6 @@ public record ContentImpl<T>(T value, String namespace, String id) implements Co
     public Stream<Group<T>> groups() {
         return Stream.empty();
     }
-
 
     @Override
     public String keyStr() {

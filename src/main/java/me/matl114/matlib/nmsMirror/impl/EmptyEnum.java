@@ -7,6 +7,7 @@ public class EmptyEnum {
     public static final Object EMPTY_ITEMSTACK;
     public static final Object ITEM_AIR;
     public static final Object BLOCK_AIR;
+
     static {
         try {
             Class<?> clazz1 = ObfManager.getManager().reobfClass("net.minecraft.world.item.ItemStack");
@@ -14,17 +15,17 @@ public class EmptyEnum {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-        try{
+        try {
             Class<?> clazz1 = ObfManager.getManager().reobfClass("net.minecraft.world.level.block.Blocks");
             BLOCK_AIR = Utils.deobfStatic(clazz1, "AIR");
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-        try{
+        try {
             Class<?> clazz1 = ObfManager.getManager().reobfClass("net.minecraft.world.item.Items");
             ITEM_AIR = Utils.deobfStatic(clazz1, "AIR");
 
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }

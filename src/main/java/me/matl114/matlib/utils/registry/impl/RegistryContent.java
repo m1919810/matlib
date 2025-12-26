@@ -1,12 +1,16 @@
 package me.matl114.matlib.utils.registry.impl;
 
 import com.google.common.base.Preconditions;
+import java.lang.ref.WeakReference;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import me.matl114.matlib.common.lang.annotations.Note;
-import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.registry.Content;
 import me.matl114.matlib.utils.registry.Group;
 import me.matl114.matlib.utils.registry.Registry;
@@ -14,43 +18,42 @@ import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import java.lang.ref.WeakReference;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Stream;
-
 @Accessors(fluent = true)
 public final class RegistryContent<T> implements Content<T> {
     Registry<? super T> owner;
-    @Nullable(value = "when not register")
-    String fullId;
+
+    @Nullable(value = "when not register") String fullId;
+
     @Nonnull
     final String keyId;
-    @Nullable(value = "when not register")
-    String namespace;
-    @Nullable(value = "when not register")
-    NamespacedKey nsKey;
+
+    @Nullable(value = "when not register") String namespace;
+
+    @Nullable(value = "when not register") NamespacedKey nsKey;
+
     final WeakReference<T> valueRefenrece;
     T value;
+
     @Setter(AccessLevel.PACKAGE)
     @Getter
     boolean onRegister;
+
     @Setter
     Set<Group<T>> tags = Set.of();
-    RegistryContent(Registry<T> owner, NamespacedKey key, T value){
+
+    RegistryContent(Registry<T> owner, NamespacedKey key, T value) {
         this.owner = owner;
         this.fullId = key.toString();
         this.namespace = key.getNamespace();
         this.keyId = key.getKey();
         this.nsKey = key;
-        this.valueRefenrece = new WeakReference<>( value);
+        this.valueRefenrece = new WeakReference<>(value);
         this.onRegister = true;
     }
 
-    void registerToOwner(Registry<? super T> owner ){
-        if(this.owner == owner)return;
-        Preconditions.checkArgument(!onRegister,"This registry content already has a owner");
+    void registerToOwner(Registry<? super T> owner) {
+        if (this.owner == owner) return;
+        Preconditions.checkArgument(!onRegister, "This registry content already has a owner");
         this.onRegister = true;
         this.owner = owner;
         this.namespace = owner.namespace();
@@ -58,8 +61,9 @@ public final class RegistryContent<T> implements Content<T> {
         this.fullId = this.nsKey.toString();
         this.value = Objects.requireNonNull(this.valueRefenrece.get());
     }
-    void unregister(Registry<? super T> owner){
-        Preconditions.checkArgument(onRegister , "This registry hasn't been registered");
+
+    void unregister(Registry<? super T> owner) {
+        Preconditions.checkArgument(onRegister, "This registry hasn't been registered");
         Preconditions.checkArgument(this.isIn(owner));
         this.onRegister = false;
         this.owner = null;
@@ -70,13 +74,12 @@ public final class RegistryContent<T> implements Content<T> {
     }
 
     @Note("create via outer access")
-    public RegistryContent(String name, T value){
-        this.keyId =name;
+    public RegistryContent(String name, T value) {
+        this.keyId = name;
         this.valueRefenrece = new WeakReference<>(value);
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public T value() {
         return this.value;
     }
@@ -88,7 +91,7 @@ public final class RegistryContent<T> implements Content<T> {
 
     @Override
     public boolean isIn(Registry<?> registry) {
-        return ((Registry)registry).containsValue(this);
+        return ((Registry) registry).containsValue(this);
     }
 
     @Override
@@ -116,14 +119,18 @@ public final class RegistryContent<T> implements Content<T> {
         return keyId;
     }
 
-    public NamespacedKey getKey(){
+    public NamespacedKey getKey() {
         return this.nsKey;
     }
 
-    public String getId(){
+    public String getId() {
         return this.fullId;
     }
-    public String toString(){
-        return onRegister ? ("Content{reg= "+owner.getId()+",id="+ this.owner.getOptionalId(value()).orElse(null) + "}") :( "Content{UNREGISTERED, id= "+this.keyId+"}");
+
+    public String toString() {
+        return onRegister
+                ? ("Content{reg= " + owner.getId() + ",id="
+                        + this.owner.getOptionalId(value()).orElse(null) + "}")
+                : ("Content{UNREGISTERED, id= " + this.keyId + "}");
     }
 }

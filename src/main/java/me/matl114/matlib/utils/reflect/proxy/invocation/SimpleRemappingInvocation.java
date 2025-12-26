@@ -1,9 +1,7 @@
 package me.matl114.matlib.utils.reflect.proxy.invocation;
 
-
-import me.matl114.matlib.utils.reflect.proxy.methodMap.MethodIndex;
-
 import java.util.Set;
+import me.matl114.matlib.utils.reflect.proxy.methodMap.MethodIndex;
 
 /**
  * it is asm-free
@@ -15,9 +13,9 @@ public class SimpleRemappingInvocation extends FastRemappingInvocation {
 
     @Override
     public Object invoke0(Object proxy, Object target, MethodIndex methodIndex, Object[] args) {
-        try{
+        try {
             return methodIndex.target().invoke(target, args);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }

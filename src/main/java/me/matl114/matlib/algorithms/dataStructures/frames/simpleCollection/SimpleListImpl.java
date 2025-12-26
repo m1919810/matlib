@@ -1,17 +1,16 @@
 package me.matl114.matlib.algorithms.dataStructures.frames.simpleCollection;
 
-import me.matl114.matlib.algorithms.dataStructures.frames.collection.ListMapView;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import me.matl114.matlib.algorithms.dataStructures.frames.collection.ListMapView;
+import org.jetbrains.annotations.NotNull;
 
-public class SimpleListImpl<T> extends SimpleCollectionImpl<List<T>,T> implements List<T>, ListMapView<T,T>, SimpleList<T> {
+public class SimpleListImpl<T> extends SimpleCollectionImpl<List<T>, T>
+        implements List<T>, ListMapView<T, T>, SimpleList<T> {
     public SimpleListImpl(List<T> value) {
         super(value);
     }
-
 
     @Override
     public boolean addAll(int index, @NotNull Collection<? extends T> c) {
@@ -20,12 +19,12 @@ public class SimpleListImpl<T> extends SimpleCollectionImpl<List<T>,T> implement
 
     @Override
     public T get(int index) {
-       return  this.delegate.get(index);
+        return this.delegate.get(index);
     }
 
     @Override
     public T set(int index, T element) {
-        return this.delegate.set(index,element);
+        return this.delegate.set(index, element);
     }
 
     @Override
@@ -48,21 +47,18 @@ public class SimpleListImpl<T> extends SimpleCollectionImpl<List<T>,T> implement
         return this.delegate.lastIndexOf(o);
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public ListIterator<T> listIterator() {
         return this.delegate.listIterator();
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public ListIterator<T> listIterator(int index) {
         return this.delegate.listIterator(index);
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        return this.delegate.subList(fromIndex,toIndex);
+        return this.delegate.subList(fromIndex, toIndex);
     }
 }

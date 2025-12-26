@@ -1,32 +1,31 @@
 package me.matl114.matlib.nmsUtils.nbt;
 
+import static me.matl114.matlib.nmsMirror.impl.NMSCore.COMPOUND_TAG;
+import static me.matl114.matlib.nmsMirror.impl.NMSCore.TAGS;
+
+import java.util.Objects;
 import me.matl114.matlib.nmsMirror.impl.Env;
 import me.matl114.matlib.nmsMirror.impl.NMSItem;
 import me.matl114.matlib.nmsMirror.inventory.ItemStackHelperDefault;
 import me.matl114.matlib.nmsMirror.nbt.TagEnum;
 import me.matl114.matlib.nmsUtils.serialize.TypeOps;
 
-import java.util.Objects;
-
-import static me.matl114.matlib.nmsMirror.impl.NMSCore.COMPOUND_TAG;
-import static me.matl114.matlib.nmsMirror.impl.NMSCore.TAGS;
-
-class ItemDataValueReadRemoveImpl implements ItemDataValue{
+class ItemDataValueReadRemoveImpl implements ItemDataValue {
     final String[] path;
 
     ItemDataValueReadRemoveImpl(String path) {
         Objects.requireNonNull(path);
-        this.path =path.split("\\.");
-        if(HELPER == null){
+        this.path = path.split("\\.");
+        if (HELPER == null) {
             HELPER = (ItemStackHelperDefault) NMSItem.ITEMSTACK;
         }
     }
-    protected static ItemStackHelperDefault HELPER;
 
+    protected static ItemStackHelperDefault HELPER;
 
     @Override
     public String getPath() {
-        return String.join(".",path);
+        return String.join(".", path);
     }
 
     @Override
@@ -64,42 +63,48 @@ class ItemDataValueReadRemoveImpl implements ItemDataValue{
         throw new UnsupportedOperationException("ReadRemove");
     }
 
-    protected Object getTagBefore(Object nbt){
-        int i=0;
-        for (; i< this.path.length - 1; ++i){
-            if(nbt != null && COMPOUND_TAG.isCompound(nbt) && COMPOUND_TAG.contains(nbt, this.path[i], TagEnum.TAG_COMPOUND)){
+    protected Object getTagBefore(Object nbt) {
+        int i = 0;
+        for (; i < this.path.length - 1; ++i) {
+            if (nbt != null
+                    && COMPOUND_TAG.isCompound(nbt)
+                    && COMPOUND_TAG.contains(nbt, this.path[i], TagEnum.TAG_COMPOUND)) {
                 nbt = COMPOUND_TAG.getCompound(nbt, this.path[i]);
-            }else {
+            } else {
                 return null;
-                //break;
+                // break;
             }
         }
         return nbt;
     }
 
-
-    protected Object getOrCreateTagBefore(Object nbt){
-        int i=0;
-        for (; i< this.path.length - 1; ++i){
+    protected Object getOrCreateTagBefore(Object nbt) {
+        int i = 0;
+        for (; i < this.path.length - 1; ++i) {
             nbt = COMPOUND_TAG.getOrNewCompound(nbt, this.path[i]);
         }
         return nbt;
     }
+
     @Override
     public void removeFromStack(Object itemStack) {
         Object nbt = HELPER.getCustomTag(itemStack);
         nbt = getTagBefore(nbt);
-        if(nbt != null && TAGS.isCompound(nbt)){
-            COMPOUND_TAG.remove(nbt, this.path[this.path.length-1]);
+        if (nbt != null && TAGS.isCompound(nbt)) {
+            COMPOUND_TAG.remove(nbt, this.path[this.path.length - 1]);
         }
     }
 
     @Override
     public Object getFromStack(Object itemStack) {
         Object nbt = HELPER.getCustomTag(itemStack);
-        if(nbt == null)return null;
+        if (nbt == null) return null;
         nbt = getTagBefore(nbt);
-        return nbt == null? null:(COMPOUND_TAG.contains(nbt, this.path[this.path.length - 1])?  Env.NBT_OP.convertTo(TypeOps.I, nbt): null);
+        return nbt == null
+                ? null
+                : (COMPOUND_TAG.contains(nbt, this.path[this.path.length - 1])
+                        ? Env.NBT_OP.convertTo(TypeOps.I, nbt)
+                        : null);
     }
 
     @Override

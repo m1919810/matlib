@@ -7,5 +7,5 @@ public interface Screen {
 
     public void openPageWithHistory(InventoryBuilder.InventoryFactory screenType, Player player, int page);
 
-    public <T extends Screen> T  relateToHistory(ScreenHistoryStack stack);
+    public <T extends Screen> T relateToHistory(ScreenHistoryStack stack);
 }

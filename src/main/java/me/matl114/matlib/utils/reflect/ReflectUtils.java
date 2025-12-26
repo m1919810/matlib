@@ -1,18 +1,17 @@
 package me.matl114.matlib.utils.reflect;
 
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
-import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
-import me.matl114.matlib.common.lang.annotations.NotRecommended;
-import me.matl114.matlib.common.lang.annotations.Note;
-import me.matl114.matlib.common.lang.annotations.UnsafeOperation;
-import sun.misc.Unsafe;
-
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
+import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
+import me.matl114.matlib.common.lang.annotations.NotRecommended;
+import me.matl114.matlib.common.lang.annotations.Note;
+import me.matl114.matlib.common.lang.annotations.UnsafeOperation;
+import sun.misc.Unsafe;
 
 public class ReflectUtils {
     /**
@@ -27,8 +26,8 @@ public class ReflectUtils {
      * @param value The value to set the field to
      * @return true if the field was found and set successfully, false otherwise
      */
-    public static boolean setFieldRecursively(Object target,  String declared,Object value){
-        return setFieldRecursively(target,target.getClass(),declared,value);
+    public static boolean setFieldRecursively(Object target, String declared, Object value) {
+        return setFieldRecursively(target, target.getClass(), declared, value);
     }
     /**
      * Sets a field value recursively by searching through a specific class and its superclasses.
@@ -43,19 +42,19 @@ public class ReflectUtils {
      * @param value The value to set the field to
      * @return true if the field was found and set successfully, false otherwise
      */
-    public static boolean setFieldRecursively(Object target, Class clazz, String decleared, Object value){
-        try{
-            Field _hasType=clazz.getDeclaredField(decleared);
+    public static boolean setFieldRecursively(Object target, Class clazz, String decleared, Object value) {
+        try {
+            Field _hasType = clazz.getDeclaredField(decleared);
             _hasType.setAccessible(true);
-            _hasType.set(target,value);
+            _hasType.set(target, value);
             return true;
-        }catch (Throwable e){
+        } catch (Throwable e) {
         }
-        clazz=clazz.getSuperclass();
-        if(clazz==null){
+        clazz = clazz.getSuperclass();
+        if (clazz == null) {
             return false;
-        }else {
-            return setFieldRecursively(target,clazz,decleared,value);
+        } else {
+            return setFieldRecursively(target, clazz, decleared, value);
         }
     }
     /**
@@ -69,17 +68,17 @@ public class ReflectUtils {
      * @param fieldName The name of the field to find
      * @return A Pair containing the field and the class where it was found, or null if not found
      */
-    public static Pair<Field,Class> getFieldsRecursively(Class clazz, String fieldName){
-        try{
-            Field field=clazz.getDeclaredField(fieldName);
+    public static Pair<Field, Class> getFieldsRecursively(Class clazz, String fieldName) {
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
-            return Pair.of(field,clazz);
-        }catch (Throwable e){
-            clazz=clazz.getSuperclass();
-            if(clazz==null){
+            return Pair.of(field, clazz);
+        } catch (Throwable e) {
+            clazz = clazz.getSuperclass();
+            if (clazz == null) {
                 return null;
-            }else{
-                return getFieldsRecursively(clazz,fieldName);
+            } else {
+                return getFieldsRecursively(clazz, fieldName);
             }
         }
     }
@@ -93,21 +92,21 @@ public class ReflectUtils {
      * @param clazz The class to get fields from
      * @return A list of all accessible fields from the class hierarchy
      */
-    public static List<Field> getAllFieldsRecursively(Class clazz){
-        List<Field> fieldList=new ArrayList<>();
-        if(clazz==null){
+    public static List<Field> getAllFieldsRecursively(Class clazz) {
+        List<Field> fieldList = new ArrayList<>();
+        if (clazz == null) {
             return fieldList;
         }
-        Field[] fields=clazz.getDeclaredFields();
-        for(Field f:fields){
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field f : fields) {
             fieldList.add(f);
-            try{
+            try {
                 f.setAccessible(true);
-            }catch (Throwable e){
+            } catch (Throwable e) {
                 continue;
             }
         }
-        for (Class<?> classes :clazz.getInterfaces()){
+        for (Class<?> classes : clazz.getInterfaces()) {
             fieldList.addAll(getAllFieldsRecursively(classes));
         }
         fieldList.addAll(getAllFieldsRecursively(clazz.getSuperclass()));
@@ -123,22 +122,22 @@ public class ReflectUtils {
      * @param clazz The class to get methods from
      * @return A list of all accessible methods from the class hierarchy
      */
-    public static List<Method> getAllMethodsRecursively(Class clazz){
-        List<Method> fieldList=new ArrayList<>();
-        if(clazz==null){
+    public static List<Method> getAllMethodsRecursively(Class clazz) {
+        List<Method> fieldList = new ArrayList<>();
+        if (clazz == null) {
             return fieldList;
         }
-        Method[] fields=clazz.getDeclaredMethods();
-        for(Method f:fields){
+        Method[] fields = clazz.getDeclaredMethods();
+        for (Method f : fields) {
             fieldList.add(f);
-            try{
+            try {
                 f.setAccessible(true);
-            }catch (Throwable e){
+            } catch (Throwable e) {
                 continue;
             }
         }
         for (Class<?> iface : clazz.getInterfaces()) {
-            //should include abstract methods as well ,
+            // should include abstract methods as well ,
             fieldList.addAll(getAllMethodsRecursively(iface));
         }
         fieldList.addAll(getAllMethodsRecursively(clazz.getSuperclass()));
@@ -153,18 +152,18 @@ public class ReflectUtils {
      * @param iface The interface to get methods from
      * @return A list of all default, private, and static methods from the interface hierarchy
      */
-    public static List<Method> getAllDefaultMethodRecursively(Class iface){
+    public static List<Method> getAllDefaultMethodRecursively(Class iface) {
         List<Method> methodList = new ArrayList<>();
         for (Method method : iface.getMethods()) {
             int mod = method.getModifiers();
-            if (method.isDefault() || Modifier.isPrivate(mod) ||Modifier.isStatic(mod) ) { // 只添加 在当前类已经实现的 方法
+            if (method.isDefault() || Modifier.isPrivate(mod) || Modifier.isStatic(mod)) { // 只添加 在当前类已经实现的 方法
                 try {
                     methodList.add(method);
                 } catch (Throwable ignored) {
                 }
             }
         }
-        for (var iiface :iface.getInterfaces()){
+        for (var iiface : iface.getInterfaces()) {
             methodList.addAll(getAllDefaultMethodRecursively(iiface));
         }
         return methodList;
@@ -179,13 +178,13 @@ public class ReflectUtils {
      * @param clazz The class to get interfaces from
      * @return A list of all directly implemented interfaces from the class hierarchy
      */
-    public static List<Class> getAllInterfacesRecursively(Class clazz){
-        List<Class> fieldList=new ArrayList<>();
-        if(clazz==null){
+    public static List<Class> getAllInterfacesRecursively(Class clazz) {
+        List<Class> fieldList = new ArrayList<>();
+        if (clazz == null) {
             return fieldList;
         }
-        Class[] fields=clazz.getInterfaces();
-        for(Class f:fields){
+        Class[] fields = clazz.getInterfaces();
+        for (Class f : fields) {
             fieldList.add(f);
         }
         fieldList.addAll(getAllInterfacesRecursively(clazz.getSuperclass()));
@@ -200,13 +199,13 @@ public class ReflectUtils {
      * @param clazz The class to get assignable interfaces from
      * @return A list of all assignable interfaces from the class hierarchy
      */
-    public static List<Class> getAllAssignableInterface(Class clazz){
-        Set<Class> fieldList=new HashSet<>();
-        if(clazz==null){
+    public static List<Class> getAllAssignableInterface(Class clazz) {
+        Set<Class> fieldList = new HashSet<>();
+        if (clazz == null) {
             return fieldList.stream().toList();
         }
-        Class[] fields=clazz.getInterfaces();
-        for(Class f:fields){
+        Class[] fields = clazz.getInterfaces();
+        for (Class f : fields) {
             fieldList.addAll(getAllAssignableInterface(f));
         }
         fieldList.addAll(getAllAssignableInterface(clazz.getSuperclass()));
@@ -221,13 +220,13 @@ public class ReflectUtils {
      * @param clazz The class to get superclasses from
      * @return A list of all superclasses including the class itself
      */
-    public static List<Class> getAllSuperClassRecursively(Class clazz){
-        List<Class> fieldList=new ArrayList<>();
-        while (clazz!=null){
+    public static List<Class> getAllSuperClassRecursively(Class clazz) {
+        List<Class> fieldList = new ArrayList<>();
+        while (clazz != null) {
             fieldList.add(clazz);
-            clazz=clazz.getSuperclass();
-
-        };
+            clazz = clazz.getSuperclass();
+        }
+        ;
         return fieldList;
     }
     /**
@@ -242,23 +241,23 @@ public class ReflectUtils {
      * @param parameterTypes The parameter types of the method
      * @return A Pair containing the method and the class where it was found, or null if not found
      */
-    public static Pair<Method,Class> getMethodsRecursively(Class clazz, String fieldName, Class[] parameterTypes){
-        try{
-            Method field=clazz.getDeclaredMethod(fieldName,parameterTypes);
+    public static Pair<Method, Class> getMethodsRecursively(Class clazz, String fieldName, Class[] parameterTypes) {
+        try {
+            Method field = clazz.getDeclaredMethod(fieldName, parameterTypes);
             field.setAccessible(true);
-            return Pair.of(field,clazz);
-        }catch (Throwable e){
-            for (var itf: clazz.getInterfaces()){
+            return Pair.of(field, clazz);
+        } catch (Throwable e) {
+            for (var itf : clazz.getInterfaces()) {
                 var re = getMethodsRecursively(itf, fieldName, parameterTypes);
-                if(re != null){
+                if (re != null) {
                     return re;
                 }
             }
-            clazz=clazz.getSuperclass();
-            if(clazz==null){
+            clazz = clazz.getSuperclass();
+            if (clazz == null) {
                 return null;
-            }else{
-                return getMethodsRecursively(clazz,fieldName,parameterTypes);
+            } else {
+                return getMethodsRecursively(clazz, fieldName, parameterTypes);
             }
         }
     }
@@ -273,37 +272,36 @@ public class ReflectUtils {
      * @param fieldName The name of the method to find
      * @return A Pair containing the method and the class where it was found, or null if not found
      */
-    public static Pair<Method,Class> getMethodsByName(Class clazz, String fieldName){
+    public static Pair<Method, Class> getMethodsByName(Class clazz, String fieldName) {
 
-        Method[] field=clazz.getDeclaredMethods();
-        for(Method m:field){
-            try{
-                if(m.getName().equals(fieldName)){
+        Method[] field = clazz.getDeclaredMethods();
+        for (Method m : field) {
+            try {
+                if (m.getName().equals(fieldName)) {
                     m.setAccessible(true);
-                    return Pair.of(m,clazz);
+                    return Pair.of(m, clazz);
                 }
-            }catch (Throwable e){
+            } catch (Throwable e) {
             }
         }
 
-
-        clazz=clazz.getSuperclass();
-        if(clazz==null){
+        clazz = clazz.getSuperclass();
+        if (clazz == null) {
             return null;
-        }else{
-            return getMethodsByName(clazz,fieldName);
+        } else {
+            return getMethodsByName(clazz, fieldName);
         }
     }
 
-    public static Map<Field, Object> dumpObject(Object value){
+    public static Map<Field, Object> dumpObject(Object value) {
         List<Field> fields = getAllFieldsRecursively(value.getClass());
         Map<Field, Object> re = new HashMap<>();
-        for (var f : fields){
-            if(!Modifier.isStatic(f.getModifiers())){
-                try{
+        for (var f : fields) {
+            if (!Modifier.isStatic(f.getModifiers())) {
+                try {
                     f.setAccessible(true);
                     re.put(f, f.get(value));
-                }catch (Throwable e){
+                } catch (Throwable e) {
                     re.put(f, "Error while dumping: " + e.getMessage());
                 }
             }
@@ -311,8 +309,8 @@ public class ReflectUtils {
         return re;
     }
 
-    public static Map<Field, Object> dumpObjectRecursively(Object value){
-        //todo left as not done
+    public static Map<Field, Object> dumpObjectRecursively(Object value) {
+        // todo left as not done
         return dumpObject(value);
     }
 
@@ -322,7 +320,7 @@ public class ReflectUtils {
      * @param val The string to check
      * @return true if the string represents a primitive type, false otherwise
      */
-    public static boolean isPrimitiveType(String val){
+    public static boolean isPrimitiveType(String val) {
         return switch (val) {
             case "int", "void", "boolean", "long", "double", "float", "short", "byte", "char" -> true;
             default -> false;
@@ -337,14 +335,14 @@ public class ReflectUtils {
     public static boolean isBoxedPrimitive(String className) {
         return switch (className) {
             case "java/lang/Integer",
-                 "java/lang/Boolean",
-                 "java/lang/Long",
-                 "java/lang/Double",
-                 "java/lang/Float",
-                 "java/lang/Short",
-                 "java/lang/Byte",
-                 "java/lang/Character",
-                 "java/lang/Void"-> true;
+                    "java/lang/Boolean",
+                    "java/lang/Long",
+                    "java/lang/Double",
+                    "java/lang/Float",
+                    "java/lang/Short",
+                    "java/lang/Byte",
+                    "java/lang/Character",
+                    "java/lang/Void" -> true;
             default -> false;
         };
     }
@@ -357,15 +355,15 @@ public class ReflectUtils {
      */
     public static String getUnboxedClass(String boxedClassName) {
         return switch (boxedClassName) {
-            case "java/lang/Integer"   -> "int";
-            case "java/lang/Boolean"   -> "boolean";
-            case "java/lang/Long"      -> "long";
-            case "java/lang/Double"    -> "double";
-            case "java/lang/Float"     -> "float";
-            case "java/lang/Short"     -> "short";
-            case "java/lang/Byte"      -> "byte";
+            case "java/lang/Integer" -> "int";
+            case "java/lang/Boolean" -> "boolean";
+            case "java/lang/Long" -> "long";
+            case "java/lang/Double" -> "double";
+            case "java/lang/Float" -> "float";
+            case "java/lang/Short" -> "short";
+            case "java/lang/Byte" -> "byte";
             case "java/lang/Character" -> "char";
-            case "java/lang/Void"      -> "void";
+            case "java/lang/Void" -> "void";
             default -> throw new IllegalArgumentException("Not a boxed primitive class: " + boxedClassName);
         };
     }
@@ -395,7 +393,7 @@ public class ReflectUtils {
             case "char":
                 return "java/lang/Character";
             case "void":
-                return "java/lang/Void";  // 注意：void 也有对应的包装类 Void
+                return "java/lang/Void"; // 注意：void 也有对应的包装类 Void
             default:
                 throw new IllegalArgumentException("Unsupported primitive type: " + primitive);
         }
@@ -412,37 +410,40 @@ public class ReflectUtils {
      * @param parameterTypes The parameter types of the method
      * @return A Pair containing the method and the class where it was found, or null if not found
      */
-    public static Pair< Method,Class> getMethodByParams(Class clazz, String methodName, Class[] parameterTypes){
-        try{
-            Method[] methods=clazz.getDeclaredMethods();
-            for(Method m:methods){
-                Class[] params=m.getParameterTypes();
-                if(!methodName.equals(m.getName())){
+    public static Pair<Method, Class> getMethodByParams(Class clazz, String methodName, Class[] parameterTypes) {
+        try {
+            Method[] methods = clazz.getDeclaredMethods();
+            for (Method m : methods) {
+                Class[] params = m.getParameterTypes();
+                if (!methodName.equals(m.getName())) {
                     continue;
                 }
-                boolean match=true;
-                if(params.length==parameterTypes.length){
-                    int len=params.length;
-                    for(int i=0;i<len;i++){
-                        if(params[i]==parameterTypes[i]||params[i].isAssignableFrom(parameterTypes[i])){
+                boolean match = true;
+                if (params.length == parameterTypes.length) {
+                    int len = params.length;
+                    for (int i = 0; i < len; i++) {
+                        if (params[i] == parameterTypes[i] || params[i].isAssignableFrom(parameterTypes[i])) {
                             continue;
-                        }else{
-                            match=false;
+                        } else {
+                            match = false;
                         }
                     }
-                }else {
-                    match=false;
+                } else {
+                    match = false;
                 }
-                if(match){
+                if (match) {
                     m.setAccessible(true);
 
-                    return Pair.of(m,clazz);
+                    return Pair.of(m, clazz);
                 }
             }
-        }catch (Throwable e){}
-        clazz=clazz.getSuperclass();
-        if(clazz==null){return null;}
-        return getMethodByParams(clazz,methodName,parameterTypes);
+        } catch (Throwable e) {
+        }
+        clazz = clazz.getSuperclass();
+        if (clazz == null) {
+            return null;
+        }
+        return getMethodByParams(clazz, methodName, parameterTypes);
     }
     /**
      * Gets a constructor by parameter types.
@@ -455,23 +456,22 @@ public class ReflectUtils {
      * @param parameterTypes The parameter types of the constructor
      * @return The matching constructor, or null if not found
      */
-    public static Constructor getConstructorByParams(Class clazz, Class... parameterTypes){
-        Constructor[] constructors=clazz.getDeclaredConstructors();
-        for(Constructor c:constructors){
-            Class[] params=c.getParameterTypes();
-            boolean match=true;
-            if(params.length==parameterTypes.length){
-                int len=params.length;
-                for(int i=0;i<len;i++){
-                    if(params[i]==parameterTypes[i]||params[i].isAssignableFrom(parameterTypes[i])){
+    public static Constructor getConstructorByParams(Class clazz, Class... parameterTypes) {
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+        for (Constructor c : constructors) {
+            Class[] params = c.getParameterTypes();
+            boolean match = true;
+            if (params.length == parameterTypes.length) {
+                int len = params.length;
+                for (int i = 0; i < len; i++) {
+                    if (params[i] == parameterTypes[i] || params[i].isAssignableFrom(parameterTypes[i])) {
 
-                    }else
-                        match=false;
+                    } else match = false;
                 }
-            }else {
-                match=false;
+            } else {
+                match = false;
             }
-            if(match){
+            if (match) {
                 c.setAccessible(true);
                 return c;
             }
@@ -488,14 +488,14 @@ public class ReflectUtils {
      * @param s The suffix to check for
      * @return true if the class or any superclass name ends with the suffix, false otherwise
      */
-    public static boolean isExtendedFrom(Class clazz,String s){
-        if(clazz==null){
+    public static boolean isExtendedFrom(Class clazz, String s) {
+        if (clazz == null) {
             return false;
-        }else {
-            if(clazz.getName().endsWith(s)){
+        } else {
+            if (clazz.getName().endsWith(s)) {
                 return true;
-            }else {
-                return isExtendedFrom(clazz.getSuperclass(),s);
+            } else {
+                return isExtendedFrom(clazz.getSuperclass(), s);
             }
         }
     }
@@ -510,18 +510,19 @@ public class ReflectUtils {
      * @param fieldType The type that the field should be assignable to
      * @return The first matching field, or null if not found
      */
-    public static Field getFirstFitField(Class<?> clazz,Class<?> fieldType) {
-        try{
+    public static Field getFirstFitField(Class<?> clazz, Class<?> fieldType) {
+        try {
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
-                if(fieldType.isAssignableFrom(field.getType())){
+                if (fieldType.isAssignableFrom(field.getType())) {
                     field.setAccessible(true);
                     return field;
                 }
             }
-        }catch(Exception e){}
-        if(clazz.getSuperclass().getSuperclass()!=null){
-            return getFirstFitField(clazz.getSuperclass(),fieldType);
+        } catch (Exception e) {
+        }
+        if (clazz.getSuperclass().getSuperclass() != null) {
+            return getFirstFitField(clazz.getSuperclass(), fieldType);
         }
         return null;
     }
@@ -537,18 +538,20 @@ public class ReflectUtils {
      * @param isStatic Whether the field should be static (true) or non-static (false)
      * @return The first matching field, or null if not found
      */
-    public static Field getFirstFitField(Class<?> clazz,Class<?> fieldType,boolean isStatic) {
-        try{
+    public static Field getFirstFitField(Class<?> clazz, Class<?> fieldType, boolean isStatic) {
+        try {
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
-                if((Modifier.isStatic(field.getModifiers())==isStatic)&& fieldType.isAssignableFrom(field.getType())){
+                if ((Modifier.isStatic(field.getModifiers()) == isStatic)
+                        && fieldType.isAssignableFrom(field.getType())) {
                     field.setAccessible(true);
                     return field;
                 }
             }
-        }catch(Exception e){}
-        if(clazz.getSuperclass().getSuperclass()!=null){
-            return getFirstFitField(clazz.getSuperclass(),fieldType);
+        } catch (Exception e) {
+        }
+        if (clazz.getSuperclass().getSuperclass() != null) {
+            return getFirstFitField(clazz.getSuperclass(), fieldType);
         }
         return null;
     }
@@ -563,15 +566,15 @@ public class ReflectUtils {
      * @param fieldType The type that the field should be assignable to
      * @return The field value, or null if not found or an error occurs
      */
-    public static Object getFieldValue(Object object,Class<?> clazz,Class<?> fieldType){
-        try{
-            if(object!=null&&!clazz.isInstance(object)){
+    public static Object getFieldValue(Object object, Class<?> clazz, Class<?> fieldType) {
+        try {
+            if (object != null && !clazz.isInstance(object)) {
                 return false;
             }
-            Field field=getFirstFitField(clazz,fieldType);
+            Field field = getFirstFitField(clazz, fieldType);
             field.setAccessible(true);
             return field.get(object);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             e.printStackTrace();
             return null;
         }
@@ -587,18 +590,19 @@ public class ReflectUtils {
      * @param fieldType The type that the fields should be assignable to
      * @return An array of all matching fields
      */
-    public static Field[] getAllFitFields(Class<?> clazz,Class<?> fieldType){
-        if(clazz==null){
+    public static Field[] getAllFitFields(Class<?> clazz, Class<?> fieldType) {
+        if (clazz == null) {
             return new Field[0];
         }
         List<Field> fields = new ArrayList<>();
-        for(Field field:clazz.getDeclaredFields()){
-            if(fieldType.isAssignableFrom(field.getType())){
+        for (Field field : clazz.getDeclaredFields()) {
+            if (fieldType.isAssignableFrom(field.getType())) {
                 field.setAccessible(true);
                 fields.add(field);
             }
         }
-        fields.addAll(Arrays.stream(getAllFitFields(clazz.getSuperclass(),fieldType)).toList());
+        fields.addAll(
+                Arrays.stream(getAllFitFields(clazz.getSuperclass(), fieldType)).toList());
         return fields.toArray(Field[]::new);
     }
     /**
@@ -613,15 +617,15 @@ public class ReflectUtils {
      * @param isStatic Whether the field should be static (true) or non-static (false)
      * @return The field value, or null if not found or an error occurs
      */
-    public static Object getFieldValue(Object object,Class<?> clazz,Class<?> fieldType,boolean isStatic){
-        try{
-            if(object!=null&&!clazz.isInstance(object)){
+    public static Object getFieldValue(Object object, Class<?> clazz, Class<?> fieldType, boolean isStatic) {
+        try {
+            if (object != null && !clazz.isInstance(object)) {
                 return false;
             }
-            Field field=getFirstFitField(clazz,fieldType,isStatic);
+            Field field = getFirstFitField(clazz, fieldType, isStatic);
             field.setAccessible(true);
             return field.get(object);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             e.printStackTrace();
             return null;
         }
@@ -638,16 +642,16 @@ public class ReflectUtils {
      * @param fieldType The type that the field should be assignable to
      * @return true if the field was found and set successfully, false otherwise
      */
-    public static boolean setFirstFitField(Object object,Object tar,Class<?> clazz,Class<?> fieldType){
-        try{
-            if(object!=null&&!clazz.isInstance(object)){
+    public static boolean setFirstFitField(Object object, Object tar, Class<?> clazz, Class<?> fieldType) {
+        try {
+            if (object != null && !clazz.isInstance(object)) {
                 return false;
             }
-            Field field=getFirstFitField(clazz,fieldType);
+            Field field = getFirstFitField(clazz, fieldType);
             field.setAccessible(true);
-            field.set(object,tar);
+            field.set(object, tar);
             return true;
-        }catch (Throwable e){
+        } catch (Throwable e) {
             e.printStackTrace();
             return false;
         }
@@ -665,16 +669,17 @@ public class ReflectUtils {
      * @param isStatic Whether the field should be static (true) or non-static (false)
      * @return true if the field was found and set successfully, false otherwise
      */
-    public static boolean setFirstFitField(Object object,Object tar,Class<?> clazz,Class<?> fieldType,boolean isStatic){
-        try{
-            if(object!=null&&!clazz.isInstance(object)){
+    public static boolean setFirstFitField(
+            Object object, Object tar, Class<?> clazz, Class<?> fieldType, boolean isStatic) {
+        try {
+            if (object != null && !clazz.isInstance(object)) {
                 return false;
             }
-            Field field=getFirstFitField(clazz,fieldType,isStatic);
+            Field field = getFirstFitField(clazz, fieldType, isStatic);
             field.setAccessible(true);
-            field.set(object,tar);
+            field.set(object, tar);
             return true;
-        }catch (Throwable e){
+        } catch (Throwable e) {
             e.printStackTrace();
             return false;
         }
@@ -691,8 +696,8 @@ public class ReflectUtils {
      * @param fieldType The type that the field should be assignable to
      * @return true if the field was found and copied successfully, false otherwise
      */
-    public static boolean copyFirstField(Object to,Object from,Class<?> clazz,Class<?> fieldType){
-        return setFirstFitField(to,getFieldValue(from,clazz,fieldType),clazz,fieldType);
+    public static boolean copyFirstField(Object to, Object from, Class<?> clazz, Class<?> fieldType) {
+        return setFirstFitField(to, getFieldValue(from, clazz, fieldType), clazz, fieldType);
     }
 
     /**
@@ -701,10 +706,10 @@ public class ReflectUtils {
      * @param name The fully qualified class name
      * @return The Class object, or null if the class cannot be found
      */
-    public static Class<?> findClass(String name){
-        try{
+    public static Class<?> findClass(String name) {
+        try {
             return Class.forName(name);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -717,10 +722,10 @@ public class ReflectUtils {
      * @param clazzs The parameter types of the method
      * @return The Method object, or null if the method cannot be found
      */
-    public static Method getMethod(Class<?> clazz, String name, Class<?>... clazzs){
-        try{
+    public static Method getMethod(Class<?> clazz, String name, Class<?>... clazzs) {
+        try {
             return clazz.getMethod(name, clazzs);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -732,10 +737,10 @@ public class ReflectUtils {
      * @param clazzes The parameter types of the method
      * @return The Method object, or null if the method cannot be found
      */
-    public static Method getMethodPrivate(Class<?> clazz, String name, Class<?>... clazzes){
-        try{
+    public static Method getMethodPrivate(Class<?> clazz, String name, Class<?>... clazzes) {
+        try {
             return clazz.getDeclaredMethod(name, clazzes);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -748,11 +753,11 @@ public class ReflectUtils {
      * @param argments The parameter types of the method
      * @return The MethodHandle, or null if the method cannot be found
      */
-    public static MethodHandle getMethodHandle(Class<?> clazz, String name, Class<?>... argments){
-        try{
+    public static MethodHandle getMethodHandle(Class<?> clazz, String name, Class<?>... argments) {
+        try {
             Method method = clazz.getMethod(name, argments);
             return MethodHandles.lookup().unreflect(method);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -765,11 +770,11 @@ public class ReflectUtils {
      * @param argments The parameter types of the method
      * @return The MethodHandle, or null if the method cannot be found
      */
-    public static MethodHandle getMethodHandlePrivate(Class<?> clazz, String name, Class<?>... argments){
-        try{
+    public static MethodHandle getMethodHandlePrivate(Class<?> clazz, String name, Class<?>... argments) {
+        try {
             Method method = clazz.getDeclaredMethod(name, argments);
             return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflect(method);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -781,11 +786,11 @@ public class ReflectUtils {
      * @param name The name of the field
      * @return The VarHandle, or null if the field cannot be found
      */
-    public static VarHandle getVarHandle(Class<?> clazz, String name){
-        try{
-            Field field = clazz.getField( name);
+    public static VarHandle getVarHandle(Class<?> clazz, String name) {
+        try {
+            Field field = clazz.getField(name);
             return MethodHandles.lookup().unreflectVarHandle(field);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -797,11 +802,11 @@ public class ReflectUtils {
      * @param name The name of the field
      * @return The VarHandle, or null if the field cannot be found
      */
-    public static VarHandle getVarHandlePrivate(Class<?> clazz, String name){
-        try{
+    public static VarHandle getVarHandlePrivate(Class<?> clazz, String name) {
+        try {
             Field field = clazz.getDeclaredField(name);
             return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflectVarHandle(field);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -813,43 +818,43 @@ public class ReflectUtils {
      * @param args The parameter types of the method
      * @return The MethodHandle, or null if the method cannot be found
      */
-    public static MethodHandle getPrivateMethodHandle(Class<?> clazz, String name, Class<?>... args){
-        try{
+    public static MethodHandle getPrivateMethodHandle(Class<?> clazz, String name, Class<?>... args) {
+        try {
             Method method = clazz.getDeclaredMethod(name, args);
             return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflect(method);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }
-
-
 
     /**
      * Callback interface for initializing objects allocated with Unsafe.
      *
      * @param <T> The type of object to initialize
      */
-    public static interface UnsafeAllocateCallback<T extends Object>{
+    public static interface UnsafeAllocateCallback<T extends Object> {
         /**
          * Initializes a newly allocated object.
          *
          * @param unsafe The Unsafe instance
          * @param newInstance The newly allocated object to initialize
          */
-        public void init(Unsafe unsafe,T newInstance);
+        public void init(Unsafe unsafe, T newInstance);
     }
-    private static final Unsafe theUnsafe =  new InitializeSafeProvider<>(()->{
-        Field field = Unsafe.class.getDeclaredField("theUnsafe");
-        field.setAccessible(true);
-        return (Unsafe)field.get(null);
-    }).v();
+
+    private static final Unsafe theUnsafe = new InitializeSafeProvider<>(() -> {
+                Field field = Unsafe.class.getDeclaredField("theUnsafe");
+                field.setAccessible(true);
+                return (Unsafe) field.get(null);
+            })
+            .v();
 
     /**
      * Gets the Unsafe instance.
      *
      * @return The Unsafe instance
      */
-    public static Unsafe getUnsafe(){
+    public static Unsafe getUnsafe() {
         return theUnsafe;
     }
     /**
@@ -868,36 +873,41 @@ public class ReflectUtils {
      */
     @UnsafeOperation
     @NotRecommended
-    public static <T extends Enum<T>> T addEnumConst(Class<T> enumClass, String name, UnsafeAllocateCallback<T> initCallback,@Note("expanding array may cause jvm explode") boolean expandOriginalArray) throws Throwable{
+    public static <T extends Enum<T>> T addEnumConst(
+            Class<T> enumClass,
+            String name,
+            UnsafeAllocateCallback<T> initCallback,
+            @Note("expanding array may cause jvm explode") boolean expandOriginalArray)
+            throws Throwable {
         Unsafe unsafe = getUnsafe();
         Field valuesField = enumClass.getDeclaredField("$VALUES");
-        //ensure clinit
+        // ensure clinit
         Object[] valuesClone = (Object[]) enumClass.getMethod("values").invoke(null);
-        Object valuesShared = unsafe.getObject( unsafe.staticFieldBase(valuesField), unsafe.staticFieldOffset(valuesField));
-        //force change array length
+        Object valuesShared =
+                unsafe.getObject(unsafe.staticFieldBase(valuesField), unsafe.staticFieldOffset(valuesField));
+        // force change array length
 
-
-        T newEnum = (T)unsafe.allocateInstance(enumClass);
+        T newEnum = (T) unsafe.allocateInstance(enumClass);
         Field nameField = Enum.class.getDeclaredField("name");
         unsafe.putObject(newEnum, unsafe.objectFieldOffset(nameField), name);
         Field oridinalField = Enum.class.getDeclaredField("ordinal");
         unsafe.putInt(newEnum, unsafe.objectFieldOffset(oridinalField), valuesClone.length);
         initCallback.init(unsafe, newEnum);
-        if(expandOriginalArray){
-            resizeArray(valuesShared, valuesClone.length+1);
+        if (expandOriginalArray) {
+            resizeArray(valuesShared, valuesClone.length + 1);
             Array.set(valuesShared, valuesClone.length, newEnum);
         }
 
-        //successfully injected
+        // successfully injected
         Field enumDict = Class.class.getDeclaredField("enumConstantDirectory");
         Map enumDictInstance = (Map) unsafe.getObject(enumClass, unsafe.objectFieldOffset(enumDict));
-        if(enumDictInstance != null){
+        if (enumDictInstance != null) {
             enumDictInstance.put(name, newEnum);
         }
         Field enumList = Class.class.getDeclaredField("enumConstants");
         Object enumArray = unsafe.getObject(enumClass, unsafe.objectFieldOffset(enumList));
-        if(enumArray != null && expandOriginalArray){
-            resizeArray(enumArray, valuesClone.length+1);
+        if (enumArray != null && expandOriginalArray) {
+            resizeArray(enumArray, valuesClone.length + 1);
             Array.set(enumArray, valuesClone.length, newEnum);
         }
         return newEnum;
@@ -913,17 +923,32 @@ public class ReflectUtils {
      */
     @UnsafeOperation
     @NotRecommended
-    public static void resizeArray(Object array, int size){
+    public static void resizeArray(Object array, int size) {
         Unsafe unsafe = getUnsafe();
-        unsafe.putInt(array, unsafe.arrayBaseOffset(array.getClass())-4, size);
+        unsafe.putInt(array, unsafe.arrayBaseOffset(array.getClass()) - 4, size);
     }
 
-
-
-    public static final Map<String,Integer> objectInvocationIndex = Map.of(
-        "getClass",-1,"hashCode",-2,"equals",-3,"clone",-4,"toString",-5,"notify",-6,
-        "notifyAll",-7,"wait",-8,"wait0",-9,"finalize",-10
-    ) ;
+    public static final Map<String, Integer> objectInvocationIndex = Map.of(
+            "getClass",
+            -1,
+            "hashCode",
+            -2,
+            "equals",
+            -3,
+            "clone",
+            -4,
+            "toString",
+            -5,
+            "notify",
+            -6,
+            "notifyAll",
+            -7,
+            "wait",
+            -8,
+            "wait0",
+            -9,
+            "finalize",
+            -10);
 
     /**
      * Checks if a method is a base Object method.
@@ -931,8 +956,8 @@ public class ReflectUtils {
      * @param method The method to check
      * @return true if the method is a base Object method, false otherwise
      */
-    public static boolean isBaseMethod(Method method){
-        return objectInvocationIndex.containsKey(method.getName()); //Object.class.equals(method.getDeclaringClass());
+    public static boolean isBaseMethod(Method method) {
+        return objectInvocationIndex.containsKey(method.getName()); // Object.class.equals(method.getDeclaringClass());
     }
     /**
      * Gets the index of a base Object method.
@@ -941,11 +966,11 @@ public class ReflectUtils {
      * @return The index of the base method
      * @throws IllegalArgumentException if the method is not a base Object method
      */
-    public static int getBaseMethodIndex(Method method){
+    public static int getBaseMethodIndex(Method method) {
         String methodName = method.getName();
-        if(objectInvocationIndex.containsKey(methodName)){
+        if (objectInvocationIndex.containsKey(methodName)) {
             return objectInvocationIndex.get(methodName);
-        }else {
+        } else {
             throw new IllegalArgumentException("Not a base Method!");
         }
     }
@@ -961,25 +986,46 @@ public class ReflectUtils {
      * @return The result of the method invocation, or null for void methods
      * @throws IllegalArgumentException if the index is not valid or the method is not supported
      */
-    public static Object invokeBaseMethod(Object target,int index,Object[] args){
-        switch (index){
-            case -1:return target.getClass();
-            case -2:return target.hashCode();
-            case -3:return target.equals(args[0]);
-            case -4:throw new IllegalStateException("clone method not supported");
-            case -5:return target.toString();
-            case -6:target.notify();return null;
-            case -7:target.notifyAll();return null;
-            case -8:try{ switch (args.length){
-                case 0:target.wait();return null;
-                case 1:target.wait((Long) args[0]);return null;
-                case 2:target.wait();return null;
-                default:throw new IllegalArgumentException("Wrong argument count for wait!");
-            }}catch (InterruptedException e){
-            }
+    public static Object invokeBaseMethod(Object target, int index, Object[] args) {
+        switch (index) {
+            case -1:
+                return target.getClass();
+            case -2:
+                return target.hashCode();
+            case -3:
+                return target.equals(args[0]);
+            case -4:
+                throw new IllegalStateException("clone method not supported");
+            case -5:
+                return target.toString();
+            case -6:
+                target.notify();
                 return null;
-            case -9:throw new IllegalArgumentException("wait0 method not supported");
-            case -10:throw new IllegalArgumentException("finalize method not supported");
+            case -7:
+                target.notifyAll();
+                return null;
+            case -8:
+                try {
+                    switch (args.length) {
+                        case 0:
+                            target.wait();
+                            return null;
+                        case 1:
+                            target.wait((Long) args[0]);
+                            return null;
+                        case 2:
+                            target.wait();
+                            return null;
+                        default:
+                            throw new IllegalArgumentException("Wrong argument count for wait!");
+                    }
+                } catch (InterruptedException e) {
+                }
+                return null;
+            case -9:
+                throw new IllegalArgumentException("wait0 method not supported");
+            case -10:
+                throw new IllegalArgumentException("finalize method not supported");
         }
         return null;
     }
@@ -990,7 +1036,8 @@ public class ReflectUtils {
      * @param clazz The enum class
      * @return A map where keys are enum constant names and values are the enum constants
      */
-    public static Map<String, Enum> getEnumMap(Class<?> clazz){
-        return Arrays.stream(clazz.getEnumConstants()).collect(Collectors.toMap(i->((Enum)i).name(), Enum.class::cast));
+    public static Map<String, Enum> getEnumMap(Class<?> clazz) {
+        return Arrays.stream(clazz.getEnumConstants())
+                .collect(Collectors.toMap(i -> ((Enum) i).name(), Enum.class::cast));
     }
 }

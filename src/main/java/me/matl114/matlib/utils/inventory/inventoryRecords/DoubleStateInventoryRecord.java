@@ -10,19 +10,20 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-public record DoubleStateInventoryRecord(DoubleChestInventory inventory,
-                                                                                TileState left,TileState right) implements InventoryRecord {
-    public static InventoryRecord ofDoubleChest(DoubleChestInventory inventory){
-//        Location locationLeft = inventory.getLeftSide().getLocation();
-//        Location locationRight = inventory.getRightSide().getLocation();
-//        if(locationLeft==null || locationRight==null) return new DoubleStateInventoryRecord(inventory,null,null);
+public record DoubleStateInventoryRecord(DoubleChestInventory inventory, TileState left, TileState right)
+        implements InventoryRecord {
+    public static InventoryRecord ofDoubleChest(DoubleChestInventory inventory) {
+        //        Location locationLeft = inventory.getLeftSide().getLocation();
+        //        Location locationRight = inventory.getRightSide().getLocation();
+        //        if(locationLeft==null || locationRight==null) return new
+        // DoubleStateInventoryRecord(inventory,null,null);
 
         InventoryHolder holderLeft = inventory.getLeftSide().getHolder(false);
         InventoryHolder holderRight = inventory.getRightSide().getHolder(false);
-        if(holderLeft instanceof TileState tileLeft && holderRight instanceof TileState tileRight){
-            return new DoubleStateInventoryRecord(inventory,tileLeft,tileRight);
-        }else{
-            return new DoubleStateInventoryRecord(inventory,null,null);
+        if (holderLeft instanceof TileState tileLeft && holderRight instanceof TileState tileRight) {
+            return new DoubleStateInventoryRecord(inventory, tileLeft, tileRight);
+        } else {
+            return new DoubleStateInventoryRecord(inventory, null, null);
         }
     }
 
@@ -48,7 +49,10 @@ public record DoubleStateInventoryRecord(DoubleChestInventory inventory,
 
     @Override
     public boolean stillValid() {
-        return left != null && WorldUtils.isTileEntityStillValid(left) && right != null && WorldUtils.isTileEntityStillValid(right);
+        return left != null
+                && WorldUtils.isTileEntityStillValid(left)
+                && right != null
+                && WorldUtils.isTileEntityStillValid(right);
     }
 
     @Override
@@ -57,17 +61,19 @@ public record DoubleStateInventoryRecord(DoubleChestInventory inventory,
         WorldUtils.tileEntitySetChange(right);
     }
 
-    public boolean canPlayerOpen(Player p){
+    public boolean canPlayerOpen(Player p) {
         return stillValid();
     }
 
     @Override
     public Inventory getInventorySync() {
-        if(inventory != null){
+        if (inventory != null) {
             return inventory;
-        }else {
+        } else {
             Preconditions.checkArgument(Bukkit.isPrimaryThread());
-            return left instanceof InventoryHolder lholder? lholder.getInventory():(right instanceof InventoryHolder rholder?rholder.getInventory():null);
+            return left instanceof InventoryHolder lholder
+                    ? lholder.getInventory()
+                    : (right instanceof InventoryHolder rholder ? rholder.getInventory() : null);
         }
     }
 }

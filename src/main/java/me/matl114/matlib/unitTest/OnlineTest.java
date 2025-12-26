@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OnlineTest {
     boolean async() default true;
+
     String name();
+
     boolean automatic() default true;
 }

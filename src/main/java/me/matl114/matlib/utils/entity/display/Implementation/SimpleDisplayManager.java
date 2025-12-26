@@ -1,7 +1,13 @@
 package me.matl114.matlib.utils.entity.display.Implementation;
 
-import me.matl114.matlib.utils.ThreadUtils;
+import static me.matl114.matlib.algorithms.algorithm.TransformationUtils.*;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 import me.matl114.matlib.common.lang.annotations.ForceOnMainThread;
+import me.matl114.matlib.utils.ThreadUtils;
 import me.matl114.matlib.utils.entity.display.DisplayManager;
 import me.matl114.matlib.utils.entity.groups.EntityGroup;
 import me.matl114.matlib.utils.entity.groups.implement.SingleGroupManager;
@@ -9,54 +15,45 @@ import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.joml.Vector3f;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
-
-import static me.matl114.matlib.algorithms.algorithm.TransformationUtils.*;
-
 @Deprecated(forRemoval = true)
 public class SimpleDisplayManager extends SingleGroupManager<EntityGroup<Display>> implements DisplayManager {
     Location core;
-    Map<String,DisplayPart> partMap;
+    Map<String, DisplayPart> partMap;
     Deque<LCTransformation> transformationStack;
     Vector3f reshape = ID_SCALE;
     private static final int MAX_STACK_SIZE = 32;
+
     public SimpleDisplayManager() {
         this.partMap = new HashMap<>();
         this.transformationStack = new ArrayDeque<>();
         this.transformationStack.addLast(LCTransformation.ofIdentical());
-
     }
 
     private void addLastInternal(LCTransformation transformation) {
-        if(this.transformationStack.size() > MAX_STACK_SIZE) {
+        if (this.transformationStack.size() > MAX_STACK_SIZE) {
             this.transformationStack.pollFirst();
         }
         this.transformationStack.addLast(transformation);
     }
-//    public void setDisplayGroup(EntityGroup<Display> group) {
-//        this.setHandle(group);
-//    }
+    //    public void setDisplayGroup(EntityGroup<Display> group) {
+    //        this.setHandle(group);
+    //    }
     @Override
     public Location getCoreLocation() {
         return core;
     }
 
     @Override
-
     public void setCoreLocation(Location location) {
         core = location;
         updateEntityLocation();
     }
 
-    public void updateEntityLocation(){
+    public void updateEntityLocation() {
         ThreadUtils.executeSync(this::updateLocation);
     }
 
-
-    public SimpleDisplayManager addDisplayPart(DisplayPart part){
+    public SimpleDisplayManager addDisplayPart(DisplayPart part) {
         partMap.put(part.partIdentifier, part);
         return this;
     }
@@ -72,7 +69,6 @@ public class SimpleDisplayManager extends SingleGroupManager<EntityGroup<Display
         return this;
     }
 
-
     @Override
     public Map<String, DisplayPart> getDisplayParts() {
         return partMap;
@@ -83,21 +79,20 @@ public class SimpleDisplayManager extends SingleGroupManager<EntityGroup<Display
         return getHandle();
     }
 
-
     @Override
-    public void reshapeBase(Vector3f scale,boolean forceEntityUpdate) {
+    public void reshapeBase(Vector3f scale, boolean forceEntityUpdate) {
         reshape = cloneVec(scale);
         updateStatus(forceEntityUpdate);
     }
 
-    public boolean isShrinkable(){
+    public boolean isShrinkable() {
         return true;
     }
 
     @Override
     public void undo() {
         LCTransformation lastTran = transformationStack.pollLast();
-        if(lastTran==null){
+        if (lastTran == null) {
             transformationStack.addLast(LCTransformation.ofIdentical());
         }
         updateStatus(true);
@@ -111,12 +106,10 @@ public class SimpleDisplayManager extends SingleGroupManager<EntityGroup<Display
         updateStatus(true);
     }
 
-
-
     @Override
     public LCTransformation getCurrentTransformation() {
         LCTransformation ltran = transformationStack.peekLast();
-        if(ltran==null){
+        if (ltran == null) {
             ltran = LCTransformation.ofIdentical();
         }
         return ltran;
@@ -127,11 +120,11 @@ public class SimpleDisplayManager extends SingleGroupManager<EntityGroup<Display
         addLastInternal(transformation);
     }
 
-    public Vector3f getCurrentReshape(){
+    public Vector3f getCurrentReshape() {
         return reshape;
     }
-    public void setCurrentReshape(Vector3f reshape){
+
+    public void setCurrentReshape(Vector3f reshape) {
         this.reshape = cloneVec(reshape);
     }
-
 }

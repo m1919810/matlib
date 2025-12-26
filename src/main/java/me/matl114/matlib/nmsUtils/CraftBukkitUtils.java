@@ -7,20 +7,22 @@ import org.bukkit.persistence.PersistentDataAdapterContext;
 public class CraftBukkitUtils {
     private static final Object DATA_TYPE_REGISTRY;
     private static final PersistentDataAdapterContext PDC_ADAPTOR_CONTEXT;
-    public static Object getPdcDataTypeRegistry(){
+
+    public static Object getPdcDataTypeRegistry() {
         return DATA_TYPE_REGISTRY;
     }
-    public static PersistentDataAdapterContext getPdcAdaptorContext(){
+
+    public static PersistentDataAdapterContext getPdcAdaptorContext() {
         return PDC_ADAPTOR_CONTEXT;
     }
 
-    public static Pair<Object, PersistentDataAdapterContext> newPdcContext(){
+    public static Pair<Object, PersistentDataAdapterContext> newPdcContext() {
         var registry = CraftBukkit.PERSISTENT_DATACONTAINER.createRegistry();
         PersistentDataAdapterContext pdcAdaptor = CraftBukkit.PERSISTENT_DATACONTAINER.createAdaptorContext(registry);
         return Pair.of(registry, pdcAdaptor);
     }
 
-    static{
+    static {
         DATA_TYPE_REGISTRY = CraftBukkit.PERSISTENT_DATACONTAINER.createRegistry();
         PDC_ADAPTOR_CONTEXT = CraftBukkit.PERSISTENT_DATACONTAINER.createAdaptorContext(DATA_TYPE_REGISTRY);
     }

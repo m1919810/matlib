@@ -1,9 +1,8 @@
 package me.matl114.matlib.utils.command.interruption;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.bukkit.command.CommandSender;
-
-import java.util.Optional;
 
 @AllArgsConstructor
 public class PermissionDenyError extends ArgumentException {

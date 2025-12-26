@@ -1,19 +1,19 @@
 package me.matl114.matlib.nmsMirror.nbt.v1_21_R4;
 
+import static me.matl114.matlib.nmsMirror.Import.NumericTag;
+
 import me.matl114.matlib.nmsMirror.nbt.TagAPI;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 
-import static me.matl114.matlib.nmsMirror.Import.NumericTag;
-
 @MultiDescriptive(targetDefault = "net.minecraft.nbt.Tag")
 public interface TagAPI_v1_21_R4 extends TagAPI {
     @MethodTarget()
     @RedirectClass(NumericTag)
     @RedirectName("longValue")
-    public abstract long getAsLong(Object tag) ;
+    public abstract long getAsLong(Object tag);
 
     @MethodTarget()
     @RedirectClass(NumericTag)

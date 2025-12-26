@@ -1,12 +1,12 @@
 package me.matl114.matlib.nmsMirror.network;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
 
 @MultiDescriptive
 public interface SyncherHelper extends TargetDescriptor {
@@ -24,6 +24,4 @@ public interface SyncherHelper extends TargetDescriptor {
     @MethodTarget
     @RedirectName("serializer")
     Object entityDataValue$serializer(Object data);
-
-
 }

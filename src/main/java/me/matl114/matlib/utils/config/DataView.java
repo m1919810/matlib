@@ -1,17 +1,14 @@
 package me.matl114.matlib.utils.config;
 
-import me.matl114.matlib.common.lang.exceptions.DoNotCallException;
-
-import java.util.List;
-
 public interface DataView<T> extends View {
     public T get();
-//    public boolean set(T value);
+    //    public boolean set(T value);
     NodeReference<T> getDelegate();
+
     public Type getType();
 
-
     boolean setString(String val);
+
     static enum Type {
         INT_RANGE,
         LONG_RANGE,
@@ -22,18 +19,18 @@ public interface DataView<T> extends View {
         SUB_CONFIG_VIEW,
         NULL,
         CUSTOM_VIEW,
-        UNDEFINED
-        ;
+        UNDEFINED;
     }
-    default String getAsString(){
+
+    default String getAsString() {
         return String.valueOf(get());
     }
-    default DataView<T> validate(Class<?> clazz){
-        if(clazz == this.getClass()){
+
+    default DataView<T> validate(Class<?> clazz) {
+        if (clazz == this.getClass()) {
             return this;
-        }else {
+        } else {
             throw new IllegalArgumentException("Type view mismatch in config value!");
         }
     }
-
 }

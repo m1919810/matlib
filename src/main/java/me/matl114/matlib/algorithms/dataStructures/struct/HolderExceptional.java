@@ -1,16 +1,16 @@
 package me.matl114.matlib.algorithms.dataStructures.struct;
 
+import java.util.function.*;
+import javax.annotation.Nonnull;
 import me.matl114.matlib.common.functions.core.UnsafeBiFunction;
 import me.matl114.matlib.common.functions.core.UnsafeFunction;
 
-import javax.annotation.Nonnull;
-import java.util.function.*;
-
-class HolderExceptional<T> implements Holder<T>, Cloneable{
+class HolderExceptional<T> implements Holder<T>, Cloneable {
     final Throwable e;
     T value;
     boolean answered = false;
-    HolderExceptional(T value, @Nonnull Throwable e){
+
+    HolderExceptional(T value, @Nonnull Throwable e) {
         this.value = value;
         this.e = e;
     }
@@ -29,7 +29,6 @@ class HolderExceptional<T> implements Holder<T>, Cloneable{
     public Holder<T> thenRun(Runnable task) {
         return this;
     }
-
 
     @Override
     public Holder<T> thenPeek(Consumer<T> task) {
@@ -68,8 +67,8 @@ class HolderExceptional<T> implements Holder<T>, Cloneable{
 
     @Override
     public Holder<T> runException(Consumer<Throwable> exceptionHandler) {
-        if(!answered){
-            exceptionHandler.accept( e);
+        if (!answered) {
+            exceptionHandler.accept(e);
             answered = true;
         }
         return this;
@@ -121,13 +120,14 @@ class HolderExceptional<T> implements Holder<T>, Cloneable{
         this.value = defaultValue.apply(this.e);
         return this;
     }
-    public Holder<T> recover(Predicate<T> recover){
+
+    public Holder<T> recover(Predicate<T> recover) {
         return Holder.of(this.value);
     }
 
     @Override
     public Holder<T> shouldRecover(Predicate<Throwable> predicate) {
-        if(predicate.test(this.e)){
+        if (predicate.test(this.e)) {
             return Holder.of(this.value);
         }
         return this;
@@ -135,7 +135,7 @@ class HolderExceptional<T> implements Holder<T>, Cloneable{
 
     @Override
     public Holder<T> throwException(Predicate<Throwable> predicate) {
-        if(predicate.test(this.e)){
+        if (predicate.test(this.e)) {
             throw new RuntimeException(this.e);
         }
         return this;
@@ -143,12 +143,11 @@ class HolderExceptional<T> implements Holder<T>, Cloneable{
 
     @Override
     public Holder<T> checkArgument(Predicate<T> predicate) {
-        if(predicate.test(this.value)){
+        if (predicate.test(this.value)) {
             return this;
         }
         return this.clone();
     }
-
 
     @Override
     protected HolderExceptional<T> clone() {

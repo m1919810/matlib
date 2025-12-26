@@ -2,9 +2,13 @@ package me.matl114.matlib.implement.bukkit.chat;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.*;
 import lombok.Getter;
-import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.core.Manager;
+import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.ThreadUtils;
 import me.matl114.matlibAdaptor.implement.bukkit.InputManager;
 import org.bukkit.entity.Player;
@@ -15,15 +19,12 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.*;
-
-public class ChatInputManager implements Manager, Listener , InputManager {
+public class ChatInputManager implements Manager, Listener, InputManager {
     private boolean registered = false;
+
     @Getter
     private static ChatInputManager manager;
+
     private Plugin pl;
     protected Map<UUID, Deque<InputCatcher>> inputCatchers;
     protected Set<InputListener> inputListeners;
@@ -35,18 +36,21 @@ public class ChatInputManager implements Manager, Listener , InputManager {
         this.chatListeners = ConcurrentHashMap.newKeySet();
         manager = this;
     }
-    private ChatInputManager registerFunctional(){
-        Preconditions.checkState(!registered,"ChatInputManager functional have already been registered!");
+
+    private ChatInputManager registerFunctional() {
+        Preconditions.checkState(!registered, "ChatInputManager functional have already been registered!");
         this.pl.getServer().getPluginManager().registerEvents(this, pl);
         this.registered = true;
         return this;
     }
-    private ChatInputManager unregisterFunctional(){
-        Preconditions.checkState(registered,"ChatInputManager functional haven't been registered!");
+
+    private ChatInputManager unregisterFunctional() {
+        Preconditions.checkState(registered, "ChatInputManager functional haven't been registered!");
         HandlerList.unregisterAll(this);
         this.registered = false;
         return this;
     }
+
     @Override
     public ChatInputManager init(Plugin pl, String... path) {
         this.pl = pl;
@@ -82,99 +86,111 @@ public class ChatInputManager implements Manager, Listener , InputManager {
     public void onKick(PlayerKickEvent e) {
         this.inputCatchers.remove(e.getPlayer().getUniqueId());
     }
-    @EventHandler( priority = EventPriority.LOWEST )
+
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onChat(AsyncPlayerChatEvent e) {
         String msg = e.getMessage().replace('§', '&');
-        this.checkInput(e, e.getPlayer(), msg,e.getRecipients());
+        this.checkInput(e, e.getPlayer(), msg, e.getRecipients());
         AtomicReference<String> reference = new AtomicReference<>(e.getMessage());
         this.listenInput(e, e.getPlayer(), reference, e.getRecipients());
         e.setMessage(reference.get());
         this.listenChat(e);
     }
+
     private static final Set<Player> NO_PLAYERS = ImmutableSet.of();
-    public boolean isCommandRecipient(Set<Player> players){
+
+    public boolean isCommandRecipient(Set<Player> players) {
         return isCommandRecipients(players);
     }
-    public static boolean isCommandRecipients(Set<Player> players){
-        return players==NO_PLAYERS;
+
+    public static boolean isCommandRecipients(Set<Player> players) {
+        return players == NO_PLAYERS;
     }
+
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
-        this.checkInput(e, e.getPlayer(), e.getMessage(),NO_PLAYERS);
+        this.checkInput(e, e.getPlayer(), e.getMessage(), NO_PLAYERS);
         AtomicReference<String> reference = new AtomicReference<>(e.getMessage());
         this.listenInput(e, e.getPlayer(), reference, NO_PLAYERS);
         e.setMessage(reference.get());
     }
-    private void checkInput(Cancellable e, Player p, String msg,Set<Player> recipients) {
+
+    private void checkInput(Cancellable e, Player p, String msg, Set<Player> recipients) {
         Deque<InputCatcher> callbacks = this.inputCatchers.get(p.getUniqueId());
         if (callbacks != null && !callbacks.isEmpty()) {
-            do{
+            do {
                 InputCatcher last = callbacks.pollFirst();
-                if(last != null ){
+                if (last != null) {
                     e.setCancelled(true);
-                    ThreadUtils.runWithRequest(last.getRunningRequest(),()->last.onChat(p,msg,recipients));
+                    ThreadUtils.runWithRequest(last.getRunningRequest(), () -> last.onChat(p, msg, recipients));
                     return;
                 }
-            }while(!callbacks.isEmpty());
+            } while (!callbacks.isEmpty());
         }
-
     }
 
-    private void listenInput(Cancellable e,Player p,AtomicReference<String> msg,Set<Player> recipients){
+    private void listenInput(Cancellable e, Player p, AtomicReference<String> msg, Set<Player> recipients) {
         Iterator<InputListener> listeners = this.inputListeners.iterator();
         boolean isCancel = e.isCancelled();
-        while (listeners.hasNext()){
+        while (listeners.hasNext()) {
             InputListener listener = listeners.next();
-            if(isCancel && listener.ignoreCancel()){
+            if (isCancel && listener.ignoreCancel()) {
                 continue;
             }
-            Result re = listener.onChat(p,msg,recipients,isCancel);
-            if(re.isRemove()){
+            Result re = listener.onChat(p, msg, recipients, isCancel);
+            if (re.isRemove()) {
                 listeners.remove();
             }
-            isCancel = ! re.isAccept();
+            isCancel = !re.isAccept();
         }
         e.setCancelled(isCancel);
     }
-    private void listenChat(AsyncPlayerChatEvent event){
+
+    private void listenChat(AsyncPlayerChatEvent event) {
         Iterator<ChatListener> listeners = this.chatListeners.iterator();
-        while (listeners.hasNext()){
+        while (listeners.hasNext()) {
             ChatListener listener = listeners.next();
-            if(event.isCancelled() && listener.ignoreCancel()){
+            if (event.isCancelled() && listener.ignoreCancel()) {
                 continue;
             }
             boolean removal = listener.onChat(event);
-            if(removal){
+            if (removal) {
                 listeners.remove();
             }
         }
     }
 
-    public void awatInputForPlayer(Player player,InputCatcher catcher){
-        this.inputCatchers.computeIfAbsent(player.getUniqueId(),(u)->new ArrayDeque<>()) .addLast(catcher);
+    public void awatInputForPlayer(Player player, InputCatcher catcher) {
+        this.inputCatchers
+                .computeIfAbsent(player.getUniqueId(), (u) -> new ArrayDeque<>())
+                .addLast(catcher);
     }
 
     @Override
-    public void registerInputListener(BiFunction<Player, AtomicReference<String>, Integer> returnCode, boolean isCancel) {
+    public void registerInputListener(
+            BiFunction<Player, AtomicReference<String>, Integer> returnCode, boolean isCancel) {
         registerInputListener(new InputListener() {
-            public Result onChat(Player player, AtomicReference<String> message, Set<Player> recipients, boolean isCancel) {
-                try{
-                    int returned = returnCode.apply(player,message);
+            public Result onChat(
+                    Player player, AtomicReference<String> message, Set<Player> recipients, boolean isCancel) {
+                try {
+                    int returned = returnCode.apply(player, message);
                     return Result.values()[returned];
-                }catch (Throwable e){
-                    Debug.logger(e,"Error while inputListener"+returnCode+("(Class:")+returnCode.getClass()+") handle the input message:");
+                } catch (Throwable e) {
+                    Debug.logger(
+                            e,
+                            "Error while inputListener" + returnCode + ("(Class:") + returnCode.getClass()
+                                    + ") handle the input message:");
                     return Result.REJECT_AND_REMOVE;
                 }
             }
         });
     }
 
-    public void registerInputListener(InputListener listener){
+    public void registerInputListener(InputListener listener) {
         this.inputListeners.add(listener);
     }
-    public void registerChatListener(ChatListener listener){
+
+    public void registerChatListener(ChatListener listener) {
         this.chatListeners.add(listener);
     }
-
-
 }

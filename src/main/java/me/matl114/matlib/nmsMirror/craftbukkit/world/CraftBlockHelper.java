@@ -6,8 +6,8 @@ import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import org.bukkit.block.Block;
 
-@Descriptive(target = "org.bukkit.craftbukkit.block.CraftBlock" )
-public interface CraftBlockHelper  extends TargetDescriptor {
+@Descriptive(target = "org.bukkit.craftbukkit.block.CraftBlock")
+public interface CraftBlockHelper extends TargetDescriptor {
     @MethodTarget
     Object getNMS(Block block);
 
@@ -17,5 +17,4 @@ public interface CraftBlockHelper  extends TargetDescriptor {
     @Note("return levelAccessor")
     @MethodTarget
     Object getHandle(Block block);
-
 }

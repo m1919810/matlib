@@ -11,7 +11,6 @@ public record PlayerInventoryRecord(Player player, Inventory inventory) implemen
         return player.getLocation();
     }
 
-
     @Override
     public InventoryHolder optionalHolder() {
         return player;
@@ -21,14 +20,15 @@ public record PlayerInventoryRecord(Player player, Inventory inventory) implemen
     public InventoryKind invKind() {
         return InventoryKind.ENTITY_INVENTORY;
     }
+
     @Override
     public boolean stillValid() {
         return player.isOnline();
     }
-    @Override
-    public void setChange() {
 
-    }
+    @Override
+    public void setChange() {}
+
     @Override
     public Inventory getInventorySync() {
         return player.getInventory();
@@ -38,7 +38,8 @@ public record PlayerInventoryRecord(Player player, Inventory inventory) implemen
     public boolean canPlayerOpen(Player p) {
         return true;
     }
+
     public static InventoryRecord ofPlayer(Player p) {
-        return new PlayerInventoryRecord(p,p.getInventory());
+        return new PlayerInventoryRecord(p, p.getInventory());
     }
 }

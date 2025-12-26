@@ -5,8 +5,9 @@ public interface BuildResult<R> {
 
     public Object clone();
 
-    default boolean isImmutable(){
+    default boolean isImmutable() {
         return false;
     }
-    public  <T extends BuildResult<R>> T toImmutable();
+
+    public <T extends BuildResult<R>> T toImmutable();
 }

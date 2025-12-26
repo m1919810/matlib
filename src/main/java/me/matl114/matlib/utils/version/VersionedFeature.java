@@ -1,5 +1,7 @@
 package me.matl114.matlib.utils.version;
 
+import java.util.UUID;
+import java.util.function.Consumer;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,34 +18,50 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.UUID;
-import java.util.function.Consumer;
-
 public interface VersionedFeature {
 
     static VersionedFeature feature = new VersionedFeatureImpl();
-    static VersionedFeature getFeature(){
+
+    static VersionedFeature getFeature() {
         return feature;
     }
-    public Version getVersion();
-    public Enchantment getEnchantment(String name);
-    public Material getMaterial(String name);
-    public boolean comparePotionMeta(PotionMeta meta1,PotionMeta meta2);
-    public BlockState copyBlockStateTo(BlockState state1, Block block);
-    public boolean differentSpecialMeta(ItemMeta meta1, ItemMeta meta2);
-    public EntityType getEntityType(String name);
-    public AttributeModifier createAttributeModifier(UUID uuid, String name, double amount, AttributeModifier.Operation operation, EquipmentSlot slot);
-    public String getAttributeModifierName(AttributeModifier modifier);
-    public boolean setAttributeModifierValue(AttributeModifier modifier, double value);
-    public UUID getAttributeModifierUid(AttributeModifier modifier);
-    public EquipmentSlot getAttributeModifierSlot(AttributeModifier modifier);
-    public boolean matchBlockStateMeta(BlockStateMeta meta1,BlockStateMeta meta2);
-    public PotionEffectType getPotionEffectType(String key);
-    public <T extends Entity> T spawnEntity(Location location, Class<T> clazz, Consumer<T> consumer, CreatureSpawnEvent.SpawnReason reason);
 
-    static   class VersionedFeatureImpl implements VersionedFeature{
+    public Version getVersion();
+
+    public Enchantment getEnchantment(String name);
+
+    public Material getMaterial(String name);
+
+    public boolean comparePotionMeta(PotionMeta meta1, PotionMeta meta2);
+
+    public BlockState copyBlockStateTo(BlockState state1, Block block);
+
+    public boolean differentSpecialMeta(ItemMeta meta1, ItemMeta meta2);
+
+    public EntityType getEntityType(String name);
+
+    public AttributeModifier createAttributeModifier(
+            UUID uuid, String name, double amount, AttributeModifier.Operation operation, EquipmentSlot slot);
+
+    public String getAttributeModifierName(AttributeModifier modifier);
+
+    public boolean setAttributeModifierValue(AttributeModifier modifier, double value);
+
+    public UUID getAttributeModifierUid(AttributeModifier modifier);
+
+    public EquipmentSlot getAttributeModifierSlot(AttributeModifier modifier);
+
+    public boolean matchBlockStateMeta(BlockStateMeta meta1, BlockStateMeta meta2);
+
+    public PotionEffectType getPotionEffectType(String key);
+
+    public <T extends Entity> T spawnEntity(
+            Location location, Class<T> clazz, Consumer<T> consumer, CreatureSpawnEvent.SpawnReason reason);
+
+    static class VersionedFeatureImpl implements VersionedFeature {
         @Getter
         protected Version version;
+
         VersionedRegistry registry;
         VersionedAttribute attribute;
         VersionedMeta meta;
@@ -56,33 +74,34 @@ public interface VersionedFeature {
             world = VersionedWorld.getInstance();
         }
 
-//    protected final EnumSet<Material> blockItemWithDifferentId=EnumSet.noneOf(Material.class);
+        //    protected final EnumSet<Material> blockItemWithDifferentId=EnumSet.noneOf(Material.class);
 
         @Override
         public Enchantment getEnchantment(String name) {
             return registry.getEnchantment(name);
         }
+
         public Material getMaterial(String name) {
             return registry.getMaterial(name);
         }
 
-
-
-        public EntityType getEntityType(String name){
+        public EntityType getEntityType(String name) {
             return registry.getEntityType(name);
         }
 
-        public PotionEffectType getPotionEffectType(String key){
+        public PotionEffectType getPotionEffectType(String key) {
             return registry.getPotionEffectType(key);
         }
 
         @Override
-        public <T extends Entity> T spawnEntity(Location location, Class<T> clazz, Consumer<T> consumer, CreatureSpawnEvent.SpawnReason reason) {
+        public <T extends Entity> T spawnEntity(
+                Location location, Class<T> clazz, Consumer<T> consumer, CreatureSpawnEvent.SpawnReason reason) {
             return world.spawnEntity(location, clazz, consumer, reason);
         }
 
         @Override
-        public AttributeModifier createAttributeModifier(UUID uuid, String name, double amount, AttributeModifier.Operation operation, EquipmentSlot slot) {
+        public AttributeModifier createAttributeModifier(
+                UUID uuid, String name, double amount, AttributeModifier.Operation operation, EquipmentSlot slot) {
             return attribute.createAttributeModifier(uuid, name, amount, operation, slot);
         }
 
@@ -125,7 +144,5 @@ public interface VersionedFeature {
         public boolean differentSpecialMeta(ItemMeta meta1, ItemMeta meta2) {
             return meta.differentSpecialMeta(meta1, meta2);
         }
-
-
     }
 }

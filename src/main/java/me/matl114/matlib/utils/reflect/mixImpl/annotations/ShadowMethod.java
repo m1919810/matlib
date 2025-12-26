@@ -1,10 +1,9 @@
 package me.matl114.matlib.utils.reflect.mixImpl.annotations;
 
-import me.matl114.matlib.common.lang.annotations.Note;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import me.matl114.matlib.common.lang.annotations.Note;
 
 /**
  * 捕获方法
@@ -21,6 +20,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Target({ElementType.METHOD})
 public @interface ShadowMethod {
-    @Note("This parameter controls whether create impl for the method, if NOT, the method will be used as PlaceHolder of target Method, and method body will be replaced by MixImplException.placeholder() if not default")
+    @Note(
+            "This parameter controls whether create impl for the method, if NOT, the method will be used as PlaceHolder of target Method, and method body will be replaced by MixImplException.placeholder() if not default")
     boolean create() default false;
 }

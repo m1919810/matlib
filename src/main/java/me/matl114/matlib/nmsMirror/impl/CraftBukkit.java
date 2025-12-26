@@ -11,21 +11,21 @@ import me.matl114.matlib.nmsMirror.craftbukkit.persistence.CraftPersistentDataCo
 import me.matl114.matlib.nmsMirror.craftbukkit.utils.MagicNumberAPI;
 import me.matl114.matlib.nmsMirror.craftbukkit.world.CraftBlockHelper;
 import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
-import org.bukkit.inventory.Inventory;
 
 public class CraftBukkit {
 
-    public static final MagicNumberAPI MAGIC_NUMBERS ;
+    public static final MagicNumberAPI MAGIC_NUMBERS;
     public static final CraftItemStackHelper ITEMSTACK;
     public static final CraftBlockHelper BLOCK;
     public static final InventoryAPI INVENTORYS;
-    public static final SpigotWorldConfigHelper SPIGOT_CONFIG ;
+    public static final SpigotWorldConfigHelper SPIGOT_CONFIG;
     public static final CraftEntityHelper ENTITY;
     public static final PaperAdventureAPI ADVENTURE;
-    public static final CraftRegistryHelper REGISTRY ;
-    public static final ItemMetaAPI META ;
-    //should have a persistentDataContainerHelper
+    public static final CraftRegistryHelper REGISTRY;
+    public static final ItemMetaAPI META;
+    // should have a persistentDataContainerHelper
     public static final CraftPersistentDataContainerHelper PERSISTENT_DATACONTAINER;
+
     static {
         MAGIC_NUMBERS = DescriptorImplBuilder.createMultiHelper(MagicNumberAPI.class);
         ITEMSTACK = DescriptorImplBuilder.createHelperImpl(CraftItemStackHelper.class);

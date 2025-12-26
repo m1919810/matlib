@@ -5,24 +5,30 @@ package me.matl114.matlib.common.lang.exceptions;
  */
 public class Abort extends Throwable {
     private static final Abort INSTANCE = new Abort();
-    public Abort getInstance(){
+
+    public Abort getInstance() {
         return INSTANCE;
     }
-    public Abort(){
+
+    public Abort() {
         super();
     }
-    public Abort(String message){
+
+    public Abort(String message) {
         super(message);
     }
-    public Abort(String message, Throwable cause){
+
+    public Abort(String message, Throwable cause) {
         super(message, cause);
     }
-    public Abort(Throwable cause){
+
+    public Abort(Throwable cause) {
         super(cause);
     }
+
     @Override
     public synchronized Throwable fillInStackTrace() {
-        //override this method to avoid fill stacktrace when create Abort
+        // override this method to avoid fill stacktrace when create Abort
         return this;
     }
 }

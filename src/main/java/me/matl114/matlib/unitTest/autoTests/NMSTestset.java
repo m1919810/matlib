@@ -6,9 +6,9 @@ import me.matl114.matlib.unitTest.autoTests.nmsTests.ItemCodecTests;
 
 public class NMSTestset extends TestSet {
     {
-       // addTest(new CoreTests());
-//        addTest(new LevelTests());
-       // addTest(new InventoryTests());
+        // addTest(new CoreTests());
+        //        addTest(new LevelTests());
+        // addTest(new InventoryTests());
         addTest(new CraftBukkitUtilTests());
         addTest(new NMSNetworkTest());
         addTest(new ChatTests());

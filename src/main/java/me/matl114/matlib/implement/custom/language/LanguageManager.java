@@ -16,12 +16,10 @@ public class LanguageManager implements Manager {
     }
 
     @Override
-    public  LanguageManager reload() {
+    public LanguageManager reload() {
         return null;
     }
 
     @Override
-    public void deconstruct() {
-
-    }
+    public void deconstruct() {}
 }

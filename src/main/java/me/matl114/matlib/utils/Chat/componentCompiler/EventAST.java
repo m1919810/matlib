@@ -1,86 +1,82 @@
 package me.matl114.matlib.utils.chat.componentCompiler;
 
-import lombok.AllArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 import me.matl114.matlib.algorithms.dataStructures.frames.collection.SimpleLinkList;
 import me.matl114.matlib.common.lang.exceptions.CompileError;
 import me.matl114.matlib.utils.chat.ComponentContentType;
 import me.matl114.matlib.utils.chat.component.ComponentVisitor;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.StyleBuilderApplicable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public interface EventAST<T>{
+public interface EventAST<T> {
     static EventAST resolve(String type, SimpleLinkList<MutableComponentAST> base) {
-        //todo left as not done
-        //todo left as not done
-        if(type.startsWith("hover")){
+        // todo left as not done
+        // todo left as not done
+        if (type.startsWith("hover")) {
             return new HoverEventAST(type, base);
-        }else {
-            return new ClickEventAST(type,base);
+        } else {
+            return new ClickEventAST(type, base);
         }
-
     }
+
     T getEvent();
+
     public void accept(ComponentVisitor visitor);
 
-    public static class HoverEventAST  implements EventAST<HoverEvent.Action>{
+    public static class HoverEventAST implements EventAST<HoverEvent.Action> {
         public HoverEvent.Action actionType;
         public Object content;
-        public HoverEventAST(String type, SimpleLinkList<MutableComponentAST> base){
+
+        public HoverEventAST(String type, SimpleLinkList<MutableComponentAST> base) {
             MutableComponentAST ast;
-            actionType =  switch (type){
+            actionType = switch (type) {
                 case "hover_text:":
                     content = base;
                     yield HoverEvent.Action.SHOW_TEXT;
                 case "hover_item:":
                     ast = base.getFirst();
-                    if(ast != null){
+                    if (ast != null) {
                         var texts = ast.conponentContent;
-                        if(texts != null && !texts.isEmpty()){
-                            content = (String)texts.getFirst().rawData;
+                        if (texts != null && !texts.isEmpty()) {
+                            content = (String) texts.getFirst().rawData;
                         }
                     }
                     yield HoverEvent.Action.SHOW_ITEM;
                 case "hover_entity:":
                     ast = base.getFirst();
-                    if(ast != null){
+                    if (ast != null) {
                         var texts = ast.conponentContent;
-                        if(texts != null && !texts.isEmpty()){
-                            content = (String)texts.getFirst().rawData;
+                        if (texts != null && !texts.isEmpty()) {
+                            content = (String) texts.getFirst().rawData;
                         }
                     }
                     yield HoverEvent.Action.SHOW_ENTITY;
-                default:  throw new CompileError(CompileError.CompilePeriod.SDT_TRANSLATE, -1, "No such event type: "+ type);
-            };
+                default:
+                    throw new CompileError(CompileError.CompilePeriod.SDT_TRANSLATE, -1, "No such event type: " + type);};
         }
-        //todo complete hoverEvent
-
+        // todo complete hoverEvent
 
         @Override
         public HoverEvent.Action getEvent() {
             return actionType;
         }
 
-        public void accept(ComponentVisitor visitor){
-            if(content instanceof SimpleLinkList<?> textlist){
-                var newBuilder = visitor.visitHoverEventComponent(obj->visitor.visitHoverEvent(actionType, obj));
-                newBuilder.visitComponentContent(ComponentContentType.LITERAL)
-                    .visitEnd();
-                for (Object var0: textlist){
+        public void accept(ComponentVisitor visitor) {
+            if (content instanceof SimpleLinkList<?> textlist) {
+                var newBuilder = visitor.visitHoverEventComponent(obj -> visitor.visitHoverEvent(actionType, obj));
+                newBuilder.visitComponentContent(ComponentContentType.LITERAL).visitEnd();
+                for (Object var0 : textlist) {
                     MutableComponentAST sub = (MutableComponentAST) var0;
                     var compBuilder = newBuilder.visitSibling();
                     sub.accept(compBuilder);
                 }
                 newBuilder.visitListEnd();
                 newBuilder.visitEnd();
-            }else {
+            } else {
                 visitor.visitHoverEvent(actionType, content);
             }
         }
-
 
         public Object getRawData() {
             return content;
@@ -88,28 +84,29 @@ public interface EventAST<T>{
 
         @Override
         public String toString() {
-            return "Hover:"+ content;
+            return "Hover:" + content;
         }
     }
 
     public static class ClickEventAST implements EventAST<ClickEvent.Action> {
         ClickEvent.Action actionType;
         List<BaseTypeAST> content;
-        public ClickEventAST(String type, SimpleLinkList<MutableComponentAST> base){
+
+        public ClickEventAST(String type, SimpleLinkList<MutableComponentAST> base) {
             content = new ArrayList<>(8);
-            for (var con: base){
-                if(con.styleAst != null){
-                    for (var st: con.styleAst){
+            for (var con : base) {
+                if (con.styleAst != null) {
+                    for (var st : con.styleAst) {
                         content.add(st);
                     }
                 }
-                if(con.conponentContent != null){
-                    for (var st: con.conponentContent){
+                if (con.conponentContent != null) {
+                    for (var st : con.conponentContent) {
                         content.add(st);
                     }
                 }
             }
-            actionType = switch (type){
+            actionType = switch (type) {
                 case "click_url:":
                     yield ClickEvent.Action.OPEN_URL;
                 case "click_run:":
@@ -119,16 +116,16 @@ public interface EventAST<T>{
                 case "click_copy:":
                     yield ClickEvent.Action.COPY_TO_CLIPBOARD;
                 default:
-                    throw new CompileError(CompileError.CompilePeriod.SDT_TRANSLATE, -1, "No such event type: "+ type);
-            };
+                    throw new CompileError(CompileError.CompilePeriod.SDT_TRANSLATE, -1, "No such event type: " + type);};
         }
-        //todo complete ClickEvent
+        // todo complete ClickEvent
 
         @Override
         public ClickEvent.Action getEvent() {
             return actionType;
         }
-        public void accept(ComponentVisitor visitor){
+
+        public void accept(ComponentVisitor visitor) {
             visitor.visitClickEvent(actionType, content);
         }
 
@@ -138,7 +135,7 @@ public interface EventAST<T>{
 
         @Override
         public String toString() {
-            return "Click:"+content;
+            return "Click:" + content;
         }
     }
 }

@@ -1,47 +1,44 @@
 package me.matl114.matlib.algorithms.dataStructures.frames.cowCollection;
 
-import me.matl114.matlib.algorithms.dataStructures.frames.dirtyCollection.DirtyCollection;
+import java.lang.invoke.VarHandle;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 import me.matl114.matlib.algorithms.dataStructures.struct.State;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
-import java.util.function.Function;
-
-public class COWImmutableCollectionViewImpl<S extends Collection<V>,V> implements Collection<V>,  COWImmutableCollectionView<S> {
+public class COWImmutableCollectionViewImpl<S extends Collection<V>, V>
+        implements Collection<V>, COWImmutableCollectionView<S> {
     protected volatile State<S> delegate;
-    protected Function<S,S> copyFunction;
-    public COWImmutableCollectionViewImpl(S value, Function<S,S> toMutableCopyFunction){
-        this.delegate =State.newInstance();
+    protected Function<S, S> copyFunction;
+
+    public COWImmutableCollectionViewImpl(S value, Function<S, S> toMutableCopyFunction) {
+        this.delegate = State.newInstance();
         this.delegate.value = value;
         this.delegate.state = true;
         this.copyFunction = toMutableCopyFunction;
-
     }
-    //make
-    protected static final VarHandle UPDATER = Objects.requireNonNull(ReflectUtils.getVarHandlePrivate(COWImmutableCollectionViewImpl.class,"delegate")).withInvokeExactBehavior();
-//    protected static final AtomicReferenceFieldUpdater<COWImmutableCollectionViewImpl, State> UPDATER = AtomicReferenceFieldUpdater.newUpdater(COWImmutableCollectionViewImpl.class, State.class, "delegate");
+    // make
+    protected static final VarHandle UPDATER = Objects.requireNonNull(
+                    ReflectUtils.getVarHandlePrivate(COWImmutableCollectionViewImpl.class, "delegate"))
+            .withInvokeExactBehavior();
+    //    protected static final AtomicReferenceFieldUpdater<COWImmutableCollectionViewImpl, State> UPDATER =
+    // AtomicReferenceFieldUpdater.newUpdater(COWImmutableCollectionViewImpl.class, State.class, "delegate");
 
-
-    protected void preWrite(){
+    protected void preWrite() {
         State<S> oldValue;
         State<S> newValue;
-        do{
+        do {
             oldValue = this.delegate;
-            if(!oldValue.state)return;
-            
+            if (!oldValue.state) return;
+
             newValue = State.newInstance();
             newValue.value = copyFunction.apply(oldValue.value);
-        }while (!UPDATER.compareAndSet( (COWImmutableCollectionViewImpl)this, (State)oldValue,(State)newValue));
+        } while (!UPDATER.compareAndSet((COWImmutableCollectionViewImpl) this, (State) oldValue, (State) newValue));
     }
 
     @Override
@@ -64,13 +61,10 @@ public class COWImmutableCollectionViewImpl<S extends Collection<V>,V> implement
         return this.delegate.value.contains(o);
     }
 
-
-    @NotNull
-    @Override
+    @NotNull @Override
     public Object[] toArray() {
         return this.delegate.value.toArray();
     }
-
 
     @Override
     public <T> T[] toArray(T[] a) {
@@ -90,7 +84,7 @@ public class COWImmutableCollectionViewImpl<S extends Collection<V>,V> implement
     }
 
     @Override
-    public boolean containsAll( Collection<?> c) {
+    public boolean containsAll(Collection<?> c) {
         return this.delegate.value.containsAll(c);
     }
 
@@ -101,22 +95,23 @@ public class COWImmutableCollectionViewImpl<S extends Collection<V>,V> implement
     }
 
     @Override
-    public boolean retainAll( Collection<?> c) {
+    public boolean retainAll(Collection<?> c) {
         preWrite();
         return this.delegate.value.retainAll(c);
     }
 
     @Override
-    public boolean removeAll( Collection<?> c) {
+    public boolean removeAll(Collection<?> c) {
         preWrite();
         return this.delegate.value.removeAll(c);
     }
 
     @Override
     public void clear() {
-        if(!this.delegate.value.isEmpty()){
+        if (!this.delegate.value.isEmpty()) {
             preWrite();
-            this.delegate.value.clear();;
+            this.delegate.value.clear();
+            ;
         }
     }
 
@@ -130,14 +125,9 @@ public class COWImmutableCollectionViewImpl<S extends Collection<V>,V> implement
         return this.delegate.value.hashCode();
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     @Note("we could not make random access to any collection, but list can")
     public Iterator<V> iterator() {
         return this.delegate.value.iterator();
     }
-
-
-
 }
-

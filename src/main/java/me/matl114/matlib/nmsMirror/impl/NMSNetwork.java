@@ -8,11 +8,12 @@ public class NMSNetwork {
     public static final ConnectionHelper CONNECTION;
     public static final PacketAPI PACKETS;
     public static final ServerGamePacketListenerImplHelper PLAY;
-    public static final SyncherHelper SYNCHER ;
+    public static final SyncherHelper SYNCHER;
+
     static {
         SERVER_CONNECTION = DescriptorImplBuilder.createMultiHelper(ServerConnectionHelper.class);
-        CONNECTION =DescriptorImplBuilder.createMultiHelper(ConnectionHelper.class);
-        PACKETS =DescriptorImplBuilder.createMultiHelper(PacketAPI.class);
+        CONNECTION = DescriptorImplBuilder.createMultiHelper(ConnectionHelper.class);
+        PACKETS = DescriptorImplBuilder.createMultiHelper(PacketAPI.class);
         PLAY = DescriptorImplBuilder.createHelperImpl(ServerGamePacketListenerImplHelper.class);
         SYNCHER = DescriptorImplBuilder.createMultiHelper(SyncherHelper.class);
     }

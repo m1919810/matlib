@@ -11,11 +11,18 @@ import org.joml.Vector3f;
  */
 public interface RobotConfigure {
     public Location getRootLocation();
+
     public void setRootLocation(Location loc);
+
     public double getRotationAngle(String val);
+
     public Vector3f getRotationAxis(String val);
+
     public void updateConfiguration();
+
     public void appendAngleConfiguration(Object2DoubleOpenHashMap<String> jointArguments);
+
     public void applyAngleConfiguration(Object2DoubleOpenHashMap<String> config);
+
     public void killGroup();
 }

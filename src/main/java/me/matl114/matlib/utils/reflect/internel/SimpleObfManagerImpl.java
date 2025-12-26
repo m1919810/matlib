@@ -1,64 +1,72 @@
 package me.matl114.matlib.utils.reflect.internel;
 
 import com.google.common.collect.ImmutableMap;
-import me.matl114.matlib.utils.Debug;
+import java.util.*;
+import java.util.stream.Collectors;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 import me.matl114.matlib.utils.version.Version;
 import org.bukkit.Bukkit;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class SimpleObfManagerImpl implements SimpleObfManager {
-    final Class<?> obfClass ;
-    final ClassMapperHelper classMapperHelper ;
+    final Class<?> obfClass;
+    final ClassMapperHelper classMapperHelper;
     final Map<String, ?> mappingsByObfName;
     final Map<String, ?> mappingsByMojangName;
     static final String originCraftbukkitPackageName = "org.bukkit.craftbukkit";
     final String craftbukkitPackageName;
-    //map from higher version to lower version
-    //we all use high version mojang name here
+    // map from higher version to lower version
+    // we all use high version mojang name here
     //
-    private static Map<String,String> build(String... values){
+    private static Map<String, String> build(String... values) {
         Iterator<String> value = Arrays.stream(values).iterator();
-        ImmutableMap.Builder<String,String> builder = ImmutableMap.builder();
-        while (value.hasNext()){
-             builder.put(value.next(), value.next());
+        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        while (value.hasNext()) {
+            builder.put(value.next(), value.next());
         }
         return builder.build();
     }
-    final Map<String,String> mojangVersionedPath = build(
-        "net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus",
-        "net.minecraft.network.protocol.login.ClientboundLoginFinishedPacket", "net.minecraft.network.protocol.login.ClientboundGameProfilePacket",
-        "net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket", "net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket",
-        "net.minecraft.network.protocol.game.ServerboundChatCommandSignedPacket","net.minecraft.network.protocol.game.ServerboundChatCommandPacket",
-        "net.minecraft.network.chat.contents.PlainTextContents$LiteralContents","net.minecraft.network.chat.contents.LiteralContents",
-        "net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket","net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket",
-        "net.minecraft.network.protocol.common.ServerboundKeepAlivePacket","net.minecraft.network.protocol.game.ServerboundKeepAlivePacket",
-        "net.minecraft.network.protocol.common.ServerboundPongPacket","net.minecraft.network.protocol.game.ServerboundPongPacket",
-        "net.minecraft.network.protocol.common.ServerboundResourcePackPacket","net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket",
-        "net.minecraft.network.protocol.common.ServerboundClientInformationPacket","net.minecraft.network.protocol.game.ServerboundClientInformationPacket",
-        "net.minecraft.world.item.equipment.trim.ArmorTrim","net.minecraft.world.item.armortrim.ArmorTrim",
-        "net.minecraft.network.chat.contents.data.DataSource", "net.minecraft.network.chat.contents.DataSource"
-    );
+
+    final Map<String, String> mojangVersionedPath = build(
+            "net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus",
+            "net.minecraft.network.protocol.login.ClientboundLoginFinishedPacket",
+                    "net.minecraft.network.protocol.login.ClientboundGameProfilePacket",
+            "net.minecraft.network.protocol.game.ClientboundSetHeldSlotPacket",
+                    "net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket",
+            "net.minecraft.network.protocol.game.ServerboundChatCommandSignedPacket",
+                    "net.minecraft.network.protocol.game.ServerboundChatCommandPacket",
+            "net.minecraft.network.chat.contents.PlainTextContents$LiteralContents",
+                    "net.minecraft.network.chat.contents.LiteralContents",
+            "net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket",
+                    "net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket",
+            "net.minecraft.network.protocol.common.ServerboundKeepAlivePacket",
+                    "net.minecraft.network.protocol.game.ServerboundKeepAlivePacket",
+            "net.minecraft.network.protocol.common.ServerboundPongPacket",
+                    "net.minecraft.network.protocol.game.ServerboundPongPacket",
+            "net.minecraft.network.protocol.common.ServerboundResourcePackPacket",
+                    "net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket",
+            "net.minecraft.network.protocol.common.ServerboundClientInformationPacket",
+                    "net.minecraft.network.protocol.game.ServerboundClientInformationPacket",
+            "net.minecraft.world.item.equipment.trim.ArmorTrim", "net.minecraft.world.item.armortrim.ArmorTrim",
+            "net.minecraft.network.chat.contents.data.DataSource", "net.minecraft.network.chat.contents.DataSource");
     final Map<String, String> mojangVersionedPathMapper;
     final Map<String, String> mojangVersionedPathMapperInverse;
-    SimpleObfManagerImpl(){
-        String[] path= Bukkit.getServer().getClass().getPackage().getName().split("\\.");
-        if(path.length >= 4){
+
+    SimpleObfManagerImpl() {
+        String[] path = Bukkit.getServer().getClass().getPackage().getName().split("\\.");
+        if (path.length >= 4) {
             craftbukkitPackageName = Bukkit.getServer().getClass().getPackage().getName();
-        }else {
-            //upper than 1_20_v4, paper no longer relocation craftbukkit package , at least through reflection
+        } else {
+            // upper than 1_20_v4, paper no longer relocation craftbukkit package , at least through reflection
             craftbukkitPackageName = originCraftbukkitPackageName;
         }
-        try{
-            if(Version.getVersionInstance().isAtLeast(Version.v1_21_R7)){
-                //1.21.9  do not use obf anymore
+        try {
+            if (Version.getVersionInstance().isAtLeast(Version.v1_21_R7)) {
+                // 1.21.9  do not use obf anymore
                 obfClass = null;
                 classMapperHelper = null;
                 mappingsByObfName = Map.of();
                 mappingsByMojangName = Map.of();
-            }else{
+            } else {
                 obfClass = Class.forName("io.papermc.paper.util.ObfHelper");
                 classMapperHelper = new ClassMapperHelperImpl();
                 Object obfIns = obfClass.getEnumConstants()[0];
@@ -71,50 +79,51 @@ public class SimpleObfManagerImpl implements SimpleObfManager {
                 ClassMapperHelperImpl classMapperHelper1 = (ClassMapperHelperImpl) classMapperHelper;
             }
 
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-        Map<String,String> pathValidation = new HashMap<>();
+        Map<String, String> pathValidation = new HashMap<>();
         b(pathValidation);
         mojangVersionedPathMapper = Collections.unmodifiableMap(pathValidation);
-        mojangVersionedPathMapperInverse = Collections.unmodifiableMap(
-            pathValidation.entrySet().stream()
-                .collect(Collectors.toUnmodifiableMap(entry-> entry.getValue(), entry->entry.getKey(), (oldvalue, newValue)->oldvalue))
-        );
+        mojangVersionedPathMapperInverse = Collections.unmodifiableMap(pathValidation.entrySet().stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        entry -> entry.getValue(), entry -> entry.getKey(), (oldvalue, newValue) -> oldvalue)));
     }
-    private void b(Map<String,String> map){
-        for (var pathPair :mojangVersionedPath.entrySet()){
+
+    private void b(Map<String, String> map) {
+        for (var pathPair : mojangVersionedPath.entrySet()) {
             Object reobfName0 = this.mappingsByMojangName.get(pathPair.getKey());
             String realPathKey = reobfName0 == null ? pathPair.getKey() : classMapperHelper.obfNameGetter(reobfName0);
-            try{
+            try {
                 Class.forName(realPathKey);
-                //if key occurs, we should not register this
+                // if key occurs, we should not register this
                 continue;
-            }catch (Throwable e){
+            } catch (Throwable e) {
 
             }
             Object reobfName = this.mappingsByMojangName.get(pathPair.getValue());
             String realPath = reobfName == null ? pathPair.getValue() : classMapperHelper.obfNameGetter(reobfName);
-            try{
+            try {
                 Class.forName(realPath);
-            }catch (Throwable e){
-               // Debug.logger("Error pair",pathPair);
+            } catch (Throwable e) {
+                // Debug.logger("Error pair",pathPair);
                 continue;
             }
-           // Debug.logger("Accept pair",pathPair);
-            //valid versioned path
+            // Debug.logger("Accept pair",pathPair);
+            // valid versioned path
             map.put(pathPair.getKey(), pathPair.getValue());
         }
     }
 
-    public String demapCraftBukkitAndMojangVersionedPath(String currentName){
-        if(currentName.startsWith(craftbukkitPackageName)){
+    public String demapCraftBukkitAndMojangVersionedPath(String currentName) {
+        if (currentName.startsWith(craftbukkitPackageName)) {
             return currentName.replaceFirst(craftbukkitPackageName, originCraftbukkitPackageName);
         }
         return mojangVersionedPathMapperInverse.getOrDefault(currentName, currentName);
     }
-    public String remapCraftBukkitAndMojangVersionedPath(String currentName){
-        if(currentName.startsWith(originCraftbukkitPackageName)){
+
+    public String remapCraftBukkitAndMojangVersionedPath(String currentName) {
+        if (currentName.startsWith(originCraftbukkitPackageName)) {
             return currentName.replaceFirst(originCraftbukkitPackageName, craftbukkitPackageName);
         }
 
@@ -132,7 +141,7 @@ public class SimpleObfManagerImpl implements SimpleObfManager {
             return demapCraftBukkitAndMojangVersionedPath(currentName);
         }
 
-        return demapCraftBukkitAndMojangVersionedPath( classMapperHelper.mojangNameGetter(map));
+        return demapCraftBukkitAndMojangVersionedPath(classMapperHelper.mojangNameGetter(map));
     }
 
     @Override
@@ -155,14 +164,13 @@ public class SimpleObfManagerImpl implements SimpleObfManager {
         if (this.mappingsByMojangName == null) {
             return methodName;
         }
-        //using versioned path of mojang name
-        final Object map = this.mappingsByMojangName.get(remapCraftBukkitAndMojangVersionedPath( reobfClassName) );
-        if(map == null){
-            //no obf,
+        // using versioned path of mojang name
+        final Object map = this.mappingsByMojangName.get(remapCraftBukkitAndMojangVersionedPath(reobfClassName));
+        if (map == null) {
+            // no obf,
             return methodName;
         }
-        final Map<String,String> methodMapping = classMapperHelper.methodsByObf(map);
+        final Map<String, String> methodMapping = classMapperHelper.methodsByObf(map);
         return methodMapping.getOrDefault(methodDescriptor, methodName);
     }
-
 }

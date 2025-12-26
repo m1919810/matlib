@@ -1,30 +1,30 @@
 package me.matl114.matlib.common.lang.enums;
 
 public enum Flags {
-    //time unit
+    // time unit
     UNIT_SEC(),
     UNIT_SFT(),
     UNIT_TICK(),
-    //order
+    // order
     SEQUENTIAL(),
     REVERSE(),
-    //transport direction
+    // transport direction
     GRAB(),
     PUSH(),
-    //lifecycle
+    // lifecycle
     INIT(),
     RUN(),
     DECON(),
-    //string utils
+    // string utils
     PREFIX(),
     SUFFIX(),
-    //menu view
+    // menu view
     OUTPUT(),
     INPUT(),
-    //reflect
+    // reflect
     METHOD(),
     FIELD(),
-    //match result
+    // match result
     REJECT(),
     IGNORED(),
     ACCEPT();

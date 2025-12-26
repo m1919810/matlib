@@ -11,7 +11,10 @@ import me.matl114.matlib.utils.version.VersionAtLeast;
 @VersionAtLeast(Version.v1_20_R4)
 public class Env1_20_R4 {
     public static final CustomDataHelper ICUSTOMDATA = DescriptorImplBuilder.createHelperImpl(CustomDataHelper.class);
-    public static final ItemDataComponentMapHelper ICOMPONENT = DescriptorImplBuilder.createHelperImpl(ItemDataComponentMapHelper.class);
-    public static final DataComponentPatchHelper COMPONENT_PATCH = DescriptorImplBuilder.createMultiHelper(DataComponentPatchHelper.class);
-    public static final DataComponentTypeAPI DATA_TYPES = DescriptorImplBuilder.createMultiHelper(DataComponentTypeAPI.class);
+    public static final ItemDataComponentMapHelper ICOMPONENT =
+            DescriptorImplBuilder.createHelperImpl(ItemDataComponentMapHelper.class);
+    public static final DataComponentPatchHelper COMPONENT_PATCH =
+            DescriptorImplBuilder.createMultiHelper(DataComponentPatchHelper.class);
+    public static final DataComponentTypeAPI DATA_TYPES =
+            DescriptorImplBuilder.createMultiHelper(DataComponentTypeAPI.class);
 }

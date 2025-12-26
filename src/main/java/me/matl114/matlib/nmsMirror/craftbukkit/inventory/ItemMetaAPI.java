@@ -1,9 +1,11 @@
 package me.matl114.matlib.nmsMirror.craftbukkit.inventory;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+
 import com.google.common.collect.Multimap;
-import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import me.matl114.matlib.common.lang.annotations.Internal;
-import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
@@ -16,50 +18,59 @@ import me.matl114.matlib.utils.version.Version;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
-
 @MultiDescriptive(targetDefault = "org.bukkit.craftbukkit.inventory.CraftMetaItem")
 public interface ItemMetaAPI extends TargetDescriptor {
-    default Multimap<Attribute, AttributeModifier> buildModifiersFromRaw(Object unknown){
-        if(ATTR_META_KEY!= null){
+    default Multimap<Attribute, AttributeModifier> buildModifiersFromRaw(Object unknown) {
+        if (ATTR_META_KEY != null) {
             return buildModifiers(unknown, ATTR_META_KEY);
-        }else {
+        } else {
             return buildModifiers(unknown);
         }
     }
-    static Object ATTR_META_KEY = me.matl114.matlib.algorithms.dataStructures.struct.Holder.empty()
-        .thenApplyCaught((i)->{
-            return ObfManager.getManager().reobfClass("org.bukkit.craftbukkit.inventory.CraftMetaItem");
-        })
-        .thenApplyCaught(i-> Arrays.stream(i.getDeclaredFields())
-            .filter(s-> Modifier.isStatic(s.getModifiers()))
-            .filter(s->s.getName().equals("ATTRIBUTES"))
-            .filter(s->s.getType().getSimpleName().equals("ItemMetaKey"))
-            .findAny()
-            .map(f->{
-                f.setAccessible(true);return f;
+
+    static Object ATTR_META_KEY = me.matl114
+            .matlib
+            .algorithms
+            .dataStructures
+            .struct
+            .Holder
+            .empty()
+            .thenApplyCaught((i) -> {
+                return ObfManager.getManager().reobfClass("org.bukkit.craftbukkit.inventory.CraftMetaItem");
             })
-            .orElseThrow().get(null)
-        )
-        .valException(null)
-        .get();
-    @Internal
-    @MethodTarget(isStatic = true)
-    @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = false)
-    public Multimap<Attribute, AttributeModifier> buildModifiers(@RedirectType(CompoundTag)Object nbt, @RedirectType("Lorg/bukkit/craftbukkit/inventory/CraftMetaItem$ItemMetaKey;")Object metaKey);
-    @Internal
-    @MethodTarget(isStatic = true)
-    @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = true)
-    public Multimap<Attribute, AttributeModifier> buildModifiers(@RedirectType(ItemAttributeModifiers)Object nbt);
+            .thenApplyCaught(i -> Arrays.stream(i.getDeclaredFields())
+                    .filter(s -> Modifier.isStatic(s.getModifiers()))
+                    .filter(s -> s.getName().equals("ATTRIBUTES"))
+                    .filter(s -> s.getType().getSimpleName().equals("ItemMetaKey"))
+                    .findAny()
+                    .map(f -> {
+                        f.setAccessible(true);
+                        return f;
+                    })
+                    .orElseThrow()
+                    .get(null))
+            .valException(null)
+            .get();
 
     @Internal
     @MethodTarget(isStatic = true)
     @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = false)
-    void applyModifiers(Multimap<Attribute, AttributeModifier> modifiers,@RedirectType( CompoundTag)Object tag, @RedirectType("Lorg/bukkit/craftbukkit/inventory/CraftMetaItem$ItemMetaKey;")Object key);
+    public Multimap<Attribute, AttributeModifier> buildModifiers(
+            @RedirectType(CompoundTag) Object nbt,
+            @RedirectType("Lorg/bukkit/craftbukkit/inventory/CraftMetaItem$ItemMetaKey;") Object metaKey);
+
+    @Internal
+    @MethodTarget(isStatic = true)
+    @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = true)
+    public Multimap<Attribute, AttributeModifier> buildModifiers(@RedirectType(ItemAttributeModifiers) Object nbt);
+
+    @Internal
+    @MethodTarget(isStatic = true)
+    @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = false)
+    void applyModifiers(
+            Multimap<Attribute, AttributeModifier> modifiers,
+            @RedirectType(CompoundTag) Object tag,
+            @RedirectType("Lorg/bukkit/craftbukkit/inventory/CraftMetaItem$ItemMetaKey;") Object key);
 
     @MethodTarget(isStatic = true)
     @RedirectClass(CraftAttributeInstance)

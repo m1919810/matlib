@@ -25,5 +25,4 @@ public interface RegistryLocalizationHelper {
     String getPotionEffectTypeName(PotionEffectType type);
 
     String getDyeColorName(DyeColor color);
-
 }

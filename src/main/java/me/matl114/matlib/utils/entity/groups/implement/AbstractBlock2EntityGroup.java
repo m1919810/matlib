@@ -1,15 +1,14 @@
 package me.matl114.matlib.utils.entity.groups.implement;
 
-import me.matl114.matlib.utils.AddUtils;
+import java.util.function.Function;
 import me.matl114.matlib.utils.TextUtils;
 import me.matl114.matlib.utils.entity.entityRecords.EntityRecord;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import java.util.function.Function;
-
 public abstract class AbstractBlock2EntityGroup<T extends Entity> extends ListedEntityGroup<T> {
-    Location blockPos ;
+    Location blockPos;
+
     public AbstractBlock2EntityGroup(Function<T, EntityRecord<T>> recorder, Location blockPos) {
         super(recorder);
         this.blockPos = blockPos.toBlockLocation();
@@ -19,8 +18,9 @@ public abstract class AbstractBlock2EntityGroup<T extends Entity> extends Listed
     public String getGroupIdentifier() {
         return identifierOfBlockPos(blockPos);
     }
+
     public static String identifierOfBlockPos(Location blockPos) {
-        return "Smp_"+ TextUtils.blockLocationToString(blockPos);
+        return "Smp_" + TextUtils.blockLocationToString(blockPos);
     }
 
     public boolean autoRemovalOnShutdown() {
@@ -28,7 +28,8 @@ public abstract class AbstractBlock2EntityGroup<T extends Entity> extends Listed
     }
 
     @Override
-    public abstract void postAddSyncTask(String childName, T entityChild) ;
+    public abstract void postAddSyncTask(String childName, T entityChild);
+
     @Override
     public abstract void postRemoveSyncTask(String childName, T entityChild);
 }

@@ -1,11 +1,13 @@
 package me.matl114.matlib.utils.config;
 
-public class BoolView implements DataView<Boolean>{
+public class BoolView implements DataView<Boolean> {
     private final NodeReference<Boolean> parent;
+
     public BoolView(NodeReference<Boolean> parent) {
         this.parent = parent;
     }
-    public boolean getAsBoolean(){
+
+    public boolean getAsBoolean() {
         return parent.get();
     }
 
@@ -28,5 +30,4 @@ public class BoolView implements DataView<Boolean>{
     public Type getType() {
         return Type.BOOLEAN;
     }
-
 }

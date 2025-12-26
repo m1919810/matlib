@@ -1,15 +1,14 @@
 package me.matl114.matlib.utils.reflect.reflectasm;
 
-import me.matl114.matlib.common.lang.annotations.Note;
-import me.matl114.matlib.utils.reflect.asm.CustomClassLoader;
-import org.objectweb.asm.*;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import me.matl114.matlib.common.lang.annotations.Note;
+import me.matl114.matlib.utils.reflect.asm.CustomClassLoader;
+import org.objectweb.asm.*;
 
 @Deprecated
 @Note("copied from com.esotericsoftware.reflectasm")
@@ -18,8 +17,7 @@ public abstract class MethodAccess {
     private Class[][] parameterTypes;
     private Class[] returnTypes;
 
-    public MethodAccess() {
-    }
+    public MethodAccess() {}
 
     public abstract Object invoke(Object var1, int var2, Object... var3);
 
@@ -34,7 +32,7 @@ public abstract class MethodAccess {
     public int getIndex(String methodName) {
         int i = 0;
 
-        for(int n = this.methodNames.length; i < n; ++i) {
+        for (int n = this.methodNames.length; i < n; ++i) {
             if (this.methodNames[i].equals(methodName)) {
                 return i;
             }
@@ -46,25 +44,27 @@ public abstract class MethodAccess {
     public int getIndex(String methodName, Class... paramTypes) {
         int i = 0;
 
-        for(int n = this.methodNames.length; i < n; ++i) {
+        for (int n = this.methodNames.length; i < n; ++i) {
             if (this.methodNames[i].equals(methodName) && Arrays.equals(paramTypes, this.parameterTypes[i])) {
                 return i;
             }
         }
 
-        throw new IllegalArgumentException("Unable to find non-private method: " + methodName + " " + Arrays.toString(paramTypes));
+        throw new IllegalArgumentException(
+                "Unable to find non-private method: " + methodName + " " + Arrays.toString(paramTypes));
     }
 
     public int getIndex(String methodName, int paramsCount) {
         int i = 0;
 
-        for(int n = this.methodNames.length; i < n; ++i) {
+        for (int n = this.methodNames.length; i < n; ++i) {
             if (this.methodNames[i].equals(methodName) && this.parameterTypes[i].length == paramsCount) {
                 return i;
             }
         }
 
-        throw new IllegalArgumentException("Unable to find non-private method: " + methodName + " with " + paramsCount + " params.");
+        throw new IllegalArgumentException(
+                "Unable to find non-private method: " + methodName + " with " + paramsCount + " params.");
     }
 
     public String[] getMethodNames() {
@@ -78,10 +78,13 @@ public abstract class MethodAccess {
     public Class[] getReturnTypes() {
         return this.returnTypes;
     }
+
     private static Map<Class<?>, MethodAccess> CACHE = new LinkedHashMap<>();
-    public static synchronized MethodAccess get(Class type){
+
+    public static synchronized MethodAccess get(Class type) {
         return CACHE.computeIfAbsent(type, MethodAccess::get0);
     }
+
     private static MethodAccess get0(Class type) {
         boolean isInterface = type.isInterface();
         if (!isInterface && type.getSuperclass() == null && type != Object.class) {
@@ -89,7 +92,7 @@ public abstract class MethodAccess {
         } else {
             ArrayList<Method> methods = new ArrayList();
             if (!isInterface) {
-                for(Class nextClass = type; nextClass != Object.class; nextClass = nextClass.getSuperclass()) {
+                for (Class nextClass = type; nextClass != Object.class; nextClass = nextClass.getSuperclass()) {
                     addDeclaredMethodsToList(nextClass, methods);
                 }
             } else {
@@ -101,8 +104,8 @@ public abstract class MethodAccess {
             Class[][] parameterTypes = new Class[n][];
             Class[] returnTypes = new Class[n];
 
-            for(int i = 0; i < n; ++i) {
-                Method method = (Method)methods.get(i);
+            for (int i = 0; i < n; ++i) {
+                Method method = (Method) methods.get(i);
                 methodNames[i] = method.getName();
                 parameterTypes[i] = method.getParameterTypes();
                 returnTypes[i] = method.getReturnType();
@@ -116,21 +119,32 @@ public abstract class MethodAccess {
 
             CustomClassLoader loader = CustomClassLoader.getInstance();
             Class accessClass;
-            synchronized(loader) {
+            synchronized (loader) {
                 accessClass = loader.loadAccessClass(accessClassName);
                 if (accessClass == null) {
                     String accessClassNameInternal = accessClassName.replace('.', '/');
                     String classNameInternal = className.replace('.', '/');
                     ClassWriter cw = new ClassWriter(1);
-                    cw.visit(Opcodes.V21, 33, accessClassNameInternal, (String)null, Type.getInternalName(MethodAccess.class), (String[])null);
-                    MethodVisitor mv = cw.visitMethod(1, "<init>", "()V", (String)null, (String[])null);
+                    cw.visit(
+                            Opcodes.V21,
+                            33,
+                            accessClassNameInternal,
+                            (String) null,
+                            Type.getInternalName(MethodAccess.class),
+                            (String[]) null);
+                    MethodVisitor mv = cw.visitMethod(1, "<init>", "()V", (String) null, (String[]) null);
                     mv.visitCode();
                     mv.visitVarInsn(25, 0);
                     mv.visitMethodInsn(183, Type.getInternalName(MethodAccess.class), "<init>", "()V");
                     mv.visitInsn(177);
                     mv.visitMaxs(0, 0);
                     mv.visitEnd();
-                    mv = cw.visitMethod(129, "invoke", "(Ljava/lang/Object;I[Ljava/lang/Object;)Ljava/lang/Object;", (String)null, (String[])null);
+                    mv = cw.visitMethod(
+                            129,
+                            "invoke",
+                            "(Ljava/lang/Object;I[Ljava/lang/Object;)Ljava/lang/Object;",
+                            (String) null,
+                            (String[]) null);
                     mv.visitCode();
                     if (!methods.isEmpty()) {
                         mv.visitVarInsn(25, 1);
@@ -139,7 +153,7 @@ public abstract class MethodAccess {
                         mv.visitVarInsn(21, 2);
                         Label[] labels = new Label[n];
 
-                        for(int i = 0; i < n; ++i) {
+                        for (int i = 0; i < n; ++i) {
                             labels[i] = new Label();
                         }
 
@@ -147,12 +161,12 @@ public abstract class MethodAccess {
                         mv.visitTableSwitchInsn(0, labels.length - 1, defaultLabel, labels);
                         StringBuilder buffer = new StringBuilder(128);
 
-                        for(int i = 0; i < n; ++i) {
+                        for (int i = 0; i < n; ++i) {
                             mv.visitLabel(labels[i]);
                             if (i == 0) {
-                                mv.visitFrame(1, 1, new Object[]{classNameInternal}, 0, (Object[])null);
+                                mv.visitFrame(1, 1, new Object[] {classNameInternal}, 0, (Object[]) null);
                             } else {
-                                mv.visitFrame(3, 0, (Object[])null, 0, (Object[])null);
+                                mv.visitFrame(3, 0, (Object[]) null, 0, (Object[]) null);
                             }
 
                             mv.visitVarInsn(25, 4);
@@ -161,7 +175,7 @@ public abstract class MethodAccess {
                             Class[] paramTypes = parameterTypes[i];
                             Class returnType = returnTypes[i];
 
-                            for(int paramIndex = 0; paramIndex < paramTypes.length; ++paramIndex) {
+                            for (int paramIndex = 0; paramIndex < paramTypes.length; ++paramIndex) {
                                 mv.visitVarInsn(25, 3);
                                 mv.visitIntInsn(16, paramIndex);
                                 mv.visitInsn(50);
@@ -214,7 +228,7 @@ public abstract class MethodAccess {
                             short invoke;
                             if (isInterface) {
                                 invoke = 185;
-                            } else if (Modifier.isStatic(((Method)methods.get(i)).getModifiers())) {
+                            } else if (Modifier.isStatic(((Method) methods.get(i)).getModifiers())) {
                                 invoke = 184;
                             } else {
                                 invoke = 182;
@@ -229,7 +243,8 @@ public abstract class MethodAccess {
                                     mv.visitMethodInsn(184, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;");
                                     break;
                                 case 2:
-                                    mv.visitMethodInsn(184, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;");
+                                    mv.visitMethodInsn(
+                                            184, "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;");
                                     break;
                                 case 3:
                                     mv.visitMethodInsn(184, "java/lang/Byte", "valueOf", "(B)Ljava/lang/Byte;");
@@ -253,7 +268,7 @@ public abstract class MethodAccess {
                         }
 
                         mv.visitLabel(defaultLabel);
-                        mv.visitFrame(3, 0, (Object[])null, 0, (Object[])null);
+                        mv.visitFrame(3, 0, (Object[]) null, 0, (Object[]) null);
                     }
 
                     mv.visitTypeInsn(187, "java/lang/IllegalArgumentException");
@@ -276,7 +291,7 @@ public abstract class MethodAccess {
             }
 
             try {
-                MethodAccess access = (MethodAccess)accessClass.newInstance();
+                MethodAccess access = (MethodAccess) accessClass.newInstance();
                 access.methodNames = methodNames;
                 access.parameterTypes = parameterTypes;
                 access.returnTypes = returnTypes;
@@ -292,14 +307,13 @@ public abstract class MethodAccess {
         Method[] declaredMethods = type.getDeclaredMethods();
         int i = 0;
 
-        for(int n = declaredMethods.length; i < n; ++i) {
+        for (int n = declaredMethods.length; i < n; ++i) {
             Method method = declaredMethods[i];
             int modifiers = method.getModifiers();
             if (!Modifier.isPrivate(modifiers)) {
                 methods.add(method);
             }
         }
-
     }
 
     private static void recursiveAddInterfaceMethodsToList(Class interfaceType, ArrayList<Method> methods) {
@@ -307,10 +321,9 @@ public abstract class MethodAccess {
         Class[] var2 = interfaceType.getInterfaces();
         int var3 = var2.length;
 
-        for(int var4 = 0; var4 < var3; ++var4) {
+        for (int var4 = 0; var4 < var3; ++var4) {
             Class nextInterface = var2[var4];
             recursiveAddInterfaceMethodsToList(nextInterface, methods);
         }
-
     }
 }

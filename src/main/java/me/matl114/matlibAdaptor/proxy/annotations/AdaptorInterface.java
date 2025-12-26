@@ -14,5 +14,4 @@ public @interface AdaptorInterface {
      * via proxy Utils, any package can get an adaptor to a class object in another package implementing different interface of same definition
      * any of the method (in annotated class and its super interfaces) which is not marked as {@link InternalMethod}, must not contains any class definition in matlib,otherwise {@link ClassCastException} may be thrown
      */
-
 }

@@ -1,8 +1,7 @@
 package me.matl114.matlib.utils.reflect.exceptions;
 
 public class ReflectRuntimeException extends RuntimeException {
-    public ReflectRuntimeException() {
-    }
+    public ReflectRuntimeException() {}
 
     public ReflectRuntimeException(String message) {
         super(message);
@@ -16,7 +15,8 @@ public class ReflectRuntimeException extends RuntimeException {
         super(cause);
     }
 
-    public ReflectRuntimeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public ReflectRuntimeException(
+            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

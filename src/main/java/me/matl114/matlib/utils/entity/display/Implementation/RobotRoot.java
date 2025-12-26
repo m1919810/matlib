@@ -12,13 +12,15 @@ import org.joml.Vector3f;
 
 public class RobotRoot extends LinkDisplayGroup implements RobotConfigure {
     public RobotRoot(String namespace, @NotNull Marker entityParent, String robotId) {
-        super(namespace, entityParent, robotId +"_root");
+        super(namespace, entityParent, robotId + "_root");
         this.parentLink = null;
         this.robotId = robotId;
     }
+
     final String robotId;
     Object2DoubleOpenHashMap<String> jointAngleArguments = new Object2DoubleOpenHashMap<>();
     Object2ObjectOpenHashMap<String, Vector3f> jointAxisArguments = new Object2ObjectOpenHashMap<>();
+
     @Override
     public Location getRootLocation() {
         return this.getCoreLocation();
@@ -26,8 +28,8 @@ public class RobotRoot extends LinkDisplayGroup implements RobotConfigure {
 
     @Override
     public void setRootLocation(Location loc) {
-       setCoreLocation(loc);
-       updateConfiguration();
+        setCoreLocation(loc);
+        updateConfiguration();
     }
 
     @Override
@@ -40,24 +42,27 @@ public class RobotRoot extends LinkDisplayGroup implements RobotConfigure {
         return jointAxisArguments.getOrDefault(val, Vectors.ZERO);
     }
 
-    public void appendAngleConfiguration(Object2DoubleOpenHashMap<String> jointArguments){
+    public void appendAngleConfiguration(Object2DoubleOpenHashMap<String> jointArguments) {
         this.jointAngleArguments.putAll(jointArguments);
         updateConfiguration();
     }
 
-    public void applyAngleConfiguration(Object2DoubleOpenHashMap<String> jointArguments){
+    public void applyAngleConfiguration(Object2DoubleOpenHashMap<String> jointArguments) {
         this.jointAngleArguments = jointArguments;
         updateConfiguration();
     }
-    public void updateConfiguration(){
+
+    public void updateConfiguration() {
         var stack = new MatrixStack(getCurrentTransformation());
         this.forwardKinematics(stack, this);
     }
-    public void appendAxisConfiguration(Object2ObjectOpenHashMap<String,Vector3f> jointAxisArguments){
+
+    public void appendAxisConfiguration(Object2ObjectOpenHashMap<String, Vector3f> jointAxisArguments) {
         this.jointAxisArguments.putAll(jointAxisArguments);
         updateConfiguration();
     }
-    public void applyAxisConfiguration(Object2ObjectOpenHashMap<String,Vector3f> jointAxisArguments){
+
+    public void applyAxisConfiguration(Object2ObjectOpenHashMap<String, Vector3f> jointAxisArguments) {
         this.jointAxisArguments = jointAxisArguments;
         updateConfiguration();
     }

@@ -1,8 +1,12 @@
 package me.matl114.matlib.nmsUtils.nbt;
 
+import static me.matl114.matlib.nmsMirror.impl.CraftBukkit.ADVENTURE;
+import static me.matl114.matlib.nmsMirror.impl.NMSCore.*;
+
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import it.unimi.dsi.fastutil.objects.*;
+import java.util.*;
 import me.matl114.matlib.nmsMirror.craftbukkit.inventory.ItemMetaAPI;
 import me.matl114.matlib.nmsMirror.impl.CraftBukkit;
 import me.matl114.matlib.nmsMirror.impl.NMSItem;
@@ -26,34 +30,30 @@ import org.bukkit.inventory.meta.components.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-
-import static me.matl114.matlib.nmsMirror.impl.NMSCore.*;
-
-import static me.matl114.matlib.nmsMirror.impl.CraftBukkit.ADVENTURE;
-
 class ItemMetaViewImpl extends AbstractItemMetaView {
     public ItemMetaViewImpl(Object itemStack) {
         super(itemStack);
-        if(ITEMSTACK == null){
+        if (ITEMSTACK == null) {
             ITEMSTACK = (ItemStackHelperDefault) NMSItem.ITEMSTACK;
         }
     }
+
     public static ItemStackHelperDefault ITEMSTACK;
+
     @Override
     protected Object2IntMap<Enchantment> initMap() {
         Object nbt1 = ITEMSTACK.getCustomTag(itemStack);
         Object2IntMap<Enchantment> map0 = new Object2IntAVLTreeMap<>(ENCH_SORTOR);
-        if(nbt1 == null){
+        if (nbt1 == null) {
             return map0;
         }
-        AbstractList<?> nbt2 = COMPOUND_TAG.getList(nbt1, "Enchantments",10);
-        for (var i = 0; i< nbt2.size(); ++i){
+        AbstractList<?> nbt2 = COMPOUND_TAG.getList(nbt1, "Enchantments", 10);
+        for (var i = 0; i < nbt2.size(); ++i) {
             Object ench1 = nbt2.get(i);
             String id = COMPOUND_TAG.getString(ench1, "id");
-            int level = 255 & COMPOUND_TAG.getShort(ench1,"lvl");
+            int level = 255 & COMPOUND_TAG.getShort(ench1, "lvl");
             Enchantment bukkit = Enchantment.getByKey(KeyUtils.fromString(id));
-            if(bukkit != null){
+            if (bukkit != null) {
                 map0.put(bukkit, level);
             }
         }
@@ -63,7 +63,7 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
     @Override
     protected Multimap<Attribute, AttributeModifier> initModifiers() {
         Object nbt = ITEMSTACK.getCustomTag(itemStack);
-        if(nbt != null){
+        if (nbt != null) {
             return CraftBukkit.META.buildModifiersFromRaw(nbt);
         }
         return LinkedHashMultimap.create();
@@ -72,13 +72,13 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
     @Override
     protected void syncModifierChange() {
         Multimap<Attribute, AttributeModifier> mdMap = this.modifierMultimap;
-        if(mdMap == null)return;
-        if(mdMap.isEmpty()){
+        if (mdMap == null) return;
+        if (mdMap.isEmpty()) {
             Object nbt = ITEMSTACK.getCustomTag(itemStack);
-            if(nbt != null){
+            if (nbt != null) {
                 COMPOUND_TAG.remove(nbt, "AttributeModifiers");
             }
-        }else{
+        } else {
             Object nbt1 = ITEMSTACK.getOrCreateCustomTag(itemStack);
             CraftBukkit.META.applyModifiers(mdMap, nbt1, ItemMetaAPI.ATTR_META_KEY);
         }
@@ -89,16 +89,12 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
         throw VersionedUtils.versionLow();
     }
 
-
-
-
-
     @Override
     public @Nullable Component displayName() {
         Object nbt = ITEMSTACK.getTagElement(itemStack, "display");
-        if(nbt == null){
+        if (nbt == null) {
             return null;
-        }else {
+        } else {
             String nameString = COMPOUND_TAG.getString(nbt, "Name");
             return GsonComponentSerializer.gson().deserialize(nameString);
         }
@@ -106,8 +102,9 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
 
     @Override
     public void displayName(@Nullable Component component) {
-        String rawJson = component == null? null: GsonComponentSerializer.gson().serialize(component);
-        COMPOUND_TAG.putString(ITEMSTACK.getOrCreateTagElement(itemStack, "display" ), "Name", rawJson);
+        String rawJson =
+                component == null ? null : GsonComponentSerializer.gson().serialize(component);
+        COMPOUND_TAG.putString(ITEMSTACK.getOrCreateTagElement(itemStack, "display"), "Name", rawJson);
         this.nmsNameView.flush();
     }
 
@@ -138,38 +135,38 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
 
     @Override
     public boolean hasLocalizedName() {
-        Object display = ITEMSTACK.getTagElement(itemStack,"display");
+        Object display = ITEMSTACK.getTagElement(itemStack, "display");
         return display != null && COMPOUND_TAG.contains(display, "LocName");
     }
 
     @Override
     public @NotNull String getLocalizedName() {
-        Object display = ITEMSTACK.getTagElement(itemStack,"display");
+        Object display = ITEMSTACK.getTagElement(itemStack, "display");
         return display == null ? "" : COMPOUND_TAG.getString(display, "LocName");
     }
 
     @Override
     public void setLocalizedName(@Nullable String s) {
-        COMPOUND_TAG.putString(ITEMSTACK.getOrCreateTagElement(itemStack, "display" ), "LocName", s);
+        COMPOUND_TAG.putString(ITEMSTACK.getOrCreateTagElement(itemStack, "display"), "LocName", s);
     }
 
     @Override
     public @Nullable List<Component> lore() {
         List<String> lores = ITEMSTACK.getLoreRaw(itemStack);
-        return lores == null? null: ADVENTURE.asAdventureFromJson(lores);
+        return lores == null ? null : ADVENTURE.asAdventureFromJson(lores);
     }
 
     @Override
     public void lore(@Nullable List<? extends Component> list) {
-        Object nbt = ITEMSTACK.getTagElement(itemStack,"display");
-        if(list == null || list.isEmpty()){
-            if(nbt != null){
+        Object nbt = ITEMSTACK.getTagElement(itemStack, "display");
+        if (list == null || list.isEmpty()) {
+            if (nbt != null) {
                 COMPOUND_TAG.remove(nbt, "Lore");
             }
-        }else {
+        } else {
             AbstractList listTag = TAGS.listTag();
             List<String> asJson = ADVENTURE.asJson(list);
-            for (var str: asJson){
+            for (var str : asJson) {
                 listTag.add(TAGS.stringTag(str));
             }
             COMPOUND_TAG.put(nbt, "Lore", listTag);
@@ -190,13 +187,12 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
     @Override
     public void setCustomModelData(@Nullable Integer integer) {
 
-        if(integer != null){
+        if (integer != null) {
             Object nbt = ITEMSTACK.getOrCreateCustomTag(itemStack);
             COMPOUND_TAG.putInt(nbt, "CustomModelData", integer);
-        }else {
+        } else {
             Object nbt = ITEMSTACK.getCustomTag(itemStack);
-            if(nbt != null)
-                COMPOUND_TAG.remove(nbt, "CustomModelData");
+            if (nbt != null) COMPOUND_TAG.remove(nbt, "CustomModelData");
         }
     }
 
@@ -215,34 +211,33 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
         throw VersionedUtils.versionLow();
     }
 
-
-
     @Override
     public boolean addEnchant(@NotNull Enchantment ench, int level, boolean b) {
         if (b || level >= ench.getStartLevel() && level <= ench.getMaxLevel()) {
-            if(this.enchMap != null){
-                //update cache
+            if (this.enchMap != null) {
+                // update cache
                 this.enchMap.put(ench, level);
             }
             String enchId = ench.getKey().toString();
             Object nbt1 = ITEMSTACK.getOrCreateCustomTag(itemStack);
-            AbstractList<?> listTag = COMPOUND_TAG.getOrNewList(nbt1, "Enchantments",TagEnum.TAG_COMPOUND);
+            AbstractList<?> listTag = COMPOUND_TAG.getOrNewList(nbt1, "Enchantments", TagEnum.TAG_COMPOUND);
             boolean ret;
             Object newEnch = COMPOUND_TAG.newComp();
             COMPOUND_TAG.putString(newEnch, "id", enchId);
             COMPOUND_TAG.putShort(newEnch, "lvl", (short) level);
-            int index = Collections.binarySearch(listTag, newEnch, Comparator.comparing(o->COMPOUND_TAG.getString(o, "id")));
-            if(index < 0 ){
-                ((List)listTag).add(-index - 1, newEnch);
+            int index = Collections.binarySearch(
+                    listTag, newEnch, Comparator.comparing(o -> COMPOUND_TAG.getString(o, "id")));
+            if (index < 0) {
+                ((List) listTag).add(-index - 1, newEnch);
                 ret = true;
-            }else {
+            } else {
                 Object value = listTag.get(index);
                 int oldValue = 255 & COMPOUND_TAG.getShort(value, "lvl");
-                if(oldValue != level){
+                if (oldValue != level) {
                     ret = true;
-                    ((List)listTag).set(index, newEnch);
+                    ((List) listTag).set(index, newEnch);
 
-                }else {
+                } else {
                     ret = false;
                 }
             }
@@ -253,41 +248,41 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
 
     @Override
     public boolean removeEnchant(@NotNull Enchantment ench) {
-        if(this.enchMap != null){
+        if (this.enchMap != null) {
             this.enchMap.removeInt(ench);
         }
         String enchId = ench.getKey().toString();
         Object nbt1 = ITEMSTACK.getCustomTag(itemStack);
-        if(nbt1 != null && COMPOUND_TAG.contains(nbt1, "Enchantments", TagEnum.TAG_LIST)){
+        if (nbt1 != null && COMPOUND_TAG.contains(nbt1, "Enchantments", TagEnum.TAG_LIST)) {
             AbstractList<?> listTag = COMPOUND_TAG.getList(nbt1, "Enchantments", TagEnum.TAG_COMPOUND);
-            return listTag.removeIf(o->Objects.equals(enchId, COMPOUND_TAG.getString(o, "id")));
+            return listTag.removeIf(o -> Objects.equals(enchId, COMPOUND_TAG.getString(o, "id")));
 
-        }else return false;
+        } else return false;
     }
 
     @Override
     public void removeEnchantments() {
-        if(this.enchMap != null){
+        if (this.enchMap != null) {
             this.enchMap.clear();
         }
         Object nbt1 = ITEMSTACK.getCustomTag(itemStack);
-        if(nbt1 != null){
+        if (nbt1 != null) {
             COMPOUND_TAG.remove(nbt1, "Enchantments");
         }
     }
 
-    public int hideFlag(){
+    public int hideFlag() {
         Object nbt1 = ITEMSTACK.getCustomTag(itemStack);
-        return nbt1 != null? COMPOUND_TAG.getInt(nbt1, "HideFlags"): 0;
+        return nbt1 != null ? COMPOUND_TAG.getInt(nbt1, "HideFlags") : 0;
     }
 
-    public void hideFlag(int v){
-        if(v != 0){
+    public void hideFlag(int v) {
+        if (v != 0) {
             Object nbt1 = ITEMSTACK.getOrCreateCustomTag(itemStack);
             COMPOUND_TAG.putInt(nbt1, "HideFlags", v);
-        }else {
+        } else {
             Object nbt1 = ITEMSTACK.getCustomTag(itemStack);
-            if(nbt1 != null){
+            if (nbt1 != null) {
                 COMPOUND_TAG.remove(nbt1, "HideFlags");
             }
         }
@@ -296,8 +291,8 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
     @Override
     public void addItemFlags(@NotNull ItemFlag... itemFlags) {
         int hideFlag = hideFlag();
-        for (var flag : itemFlags){
-            hideFlag |= 1<<flag.ordinal();
+        for (var flag : itemFlags) {
+            hideFlag |= 1 << flag.ordinal();
         }
         hideFlag(hideFlag);
     }
@@ -305,8 +300,8 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
     @Override
     public void removeItemFlags(@NotNull ItemFlag... itemFlags) {
         int hideFlag = hideFlag();
-        for (var flag : itemFlags){
-            hideFlag &= ~(1<<flag.ordinal());
+        for (var flag : itemFlags) {
+            hideFlag &= ~(1 << flag.ordinal());
         }
         hideFlag(hideFlag);
     }
@@ -316,9 +311,9 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
         int hideFlag = hideFlag();
         Set<ItemFlag> flags = EnumSet.noneOf(ItemFlag.class);
         Debug.logger(hideFlag);
-        for (var i: ItemFlag.values()){
-            int bit = 1<<(i.ordinal());
-            if((bit & hideFlag) != 0){
+        for (var i : ItemFlag.values()) {
+            int bit = 1 << (i.ordinal());
+            if ((bit & hideFlag) != 0) {
                 flags.add(i);
             }
         }
@@ -328,7 +323,7 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
     @Override
     public boolean hasItemFlag(@NotNull ItemFlag itemFlag) {
         int hideFlag = hideFlag();
-        return ((1<<itemFlag.ordinal())& hideFlag) != 0;
+        return ((1 << itemFlag.ordinal()) & hideFlag) != 0;
     }
 
     @Override
@@ -379,12 +374,12 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
 
     @Override
     public void setUnbreakable(boolean b) {
-        if(b){
+        if (b) {
             Object nbt1 = ITEMSTACK.getOrCreateCustomTag(itemStack);
-            COMPOUND_TAG.putBoolean(nbt1, "Unbreakable",true);
-        }else {
+            COMPOUND_TAG.putBoolean(nbt1, "Unbreakable", true);
+        } else {
             Object nbt1 = ITEMSTACK.getCustomTag(itemStack);
-            if(nbt1 != null){
+            if (nbt1 != null) {
                 COMPOUND_TAG.remove(nbt1, "Unbreakable");
             }
         }
@@ -570,6 +565,4 @@ class ItemMetaViewImpl extends AbstractItemMetaView {
     public boolean hasDestroyableKeys() {
         return ITEMSTACK.hasCustomTagKey(itemStack, "CanDestroy");
     }
-
-
 }

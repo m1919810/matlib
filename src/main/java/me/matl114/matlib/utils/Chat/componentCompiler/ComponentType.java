@@ -10,24 +10,29 @@ public enum ComponentType {
     KEYBIND,
     NBT,
     CUSTOM,
-    FORMAT(false,true),
+    FORMAT(false, true),
     HOVER(true),
     CLICK(true),
     INSERT(true);
+
     @Getter
-    final boolean attach ;
+    final boolean attach;
+
     @Getter
-    final boolean prefix ;
-    ComponentType(){
-        this.attach = false ;
-        this.prefix = false ;
+    final boolean prefix;
+
+    ComponentType() {
+        this.attach = false;
+        this.prefix = false;
     }
-    ComponentType(boolean attach){
+
+    ComponentType(boolean attach) {
         this.attach = attach;
-        this.prefix = false ;
+        this.prefix = false;
     }
-    ComponentType(boolean attach, boolean prefix){
-        this.attach = attach ;
-        this.prefix = prefix ;
+
+    ComponentType(boolean attach, boolean prefix) {
+        this.attach = attach;
+        this.prefix = prefix;
     }
 }

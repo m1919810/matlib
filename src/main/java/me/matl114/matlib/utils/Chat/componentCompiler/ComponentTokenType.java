@@ -6,5 +6,5 @@ public enum ComponentTokenType {
     COMPONENT_END,
     FORMAT,
     RAW_TEXT,
-      ;
+    ;
 }

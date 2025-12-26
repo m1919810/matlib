@@ -15,6 +15,7 @@ public class TranslatableContentBuilder implements ContentBuilder, Cloneable {
     String fallback;
 
     static Object[] NO_ARGS = new Object[0];
+
     @Override
     public Object toNMS() {
         return NMSChat.COMP_CONTENT.newTranslatable(translateKey, fallback, NO_ARGS);
@@ -22,9 +23,9 @@ public class TranslatableContentBuilder implements ContentBuilder, Cloneable {
 
     @Override
     public TranslatableContentBuilder clone() {
-        try{
+        try {
             return (TranslatableContentBuilder) TranslatableContentBuilder.super.clone();
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new AssertionError(e);
         }
     }

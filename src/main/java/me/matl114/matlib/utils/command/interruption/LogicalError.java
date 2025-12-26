@@ -4,7 +4,8 @@ import org.bukkit.command.CommandSender;
 
 public class LogicalError extends ArgumentException {
     String message;
-    public LogicalError(String fullMessage){
+
+    public LogicalError(String fullMessage) {
         this.message = fullMessage;
     }
 

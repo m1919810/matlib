@@ -9,9 +9,11 @@ import org.bukkit.command.CommandSender;
 @AllArgsConstructor
 public class ValueAbsentError extends ArgumentException {
     String argument;
-    public ValueAbsentError(SimpleCommandArgs.Argument argument){
+
+    public ValueAbsentError(SimpleCommandArgs.Argument argument) {
         this(argument.getArgsName());
     }
+
     @Override
     public void handleAbort(CommandSender sender, InterruptionHandler command) {
         command.handleValueAbsent(sender, argument);

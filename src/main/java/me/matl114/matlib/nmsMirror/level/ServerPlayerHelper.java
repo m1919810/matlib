@@ -1,6 +1,10 @@
 package me.matl114.matlib.nmsMirror.level;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+
 import com.mojang.authlib.GameProfile;
+import java.util.Locale;
+import java.util.UUID;
 import me.matl114.matlib.common.lang.annotations.ConstVal;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.CastCheck;
@@ -8,12 +12,6 @@ import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.FieldTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
-import org.bukkit.entity.Player;
-
-import java.util.Locale;
-import java.util.UUID;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
 
 @Descriptive(target = "net.minecraft.server.level.ServerPlayer")
 public interface ServerPlayerHelper extends TargetDescriptor {
@@ -46,5 +44,4 @@ public interface ServerPlayerHelper extends TargetDescriptor {
     @FieldTarget
     @RedirectName("adventure$localeSetter")
     void locale(Object player, Locale locale);
-
 }

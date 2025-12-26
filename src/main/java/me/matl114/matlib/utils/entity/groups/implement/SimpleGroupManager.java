@@ -1,23 +1,24 @@
 package me.matl114.matlib.utils.entity.groups.implement;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import me.matl114.matlib.utils.entity.groups.EntityGroup;
 import me.matl114.matlib.utils.entity.groups.EntityGroupManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 public class SimpleGroupManager<W extends EntityGroup<? extends Entity>> implements EntityGroupManager<W> {
     public SimpleGroupManager(Map<String, W> groups) {
         this.groups = groups;
     }
+
     public SimpleGroupManager() {
         this.groups = new HashMap<String, W>();
     }
 
-    final Map<String,W> groups;
+    final Map<String, W> groups;
+
     @Override
     public void addGroup(String key, W group) {
         groups.put(key, group);

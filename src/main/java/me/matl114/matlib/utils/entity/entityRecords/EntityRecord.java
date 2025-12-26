@@ -1,26 +1,28 @@
 package me.matl114.matlib.utils.entity.entityRecords;
 
+import java.util.Optional;
+import java.util.UUID;
+import javax.annotation.Nonnull;
 import me.matl114.matlib.common.lang.annotations.ForceOnMainThread;
 import me.matl114.matlib.common.lang.annotations.Internal;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import javax.annotation.Nonnull;
-import java.util.Optional;
-import java.util.UUID;
-
 public interface EntityRecord<T extends Entity> {
     public UUID getUuid();
+
     @Internal
     public Entity getEntity();
 
     /**
      * get Recorded Entity View,may not load, should check valid before getEntity
      */
-    default T getEntityView(){
-        return (T)getEntity();
+    default T getEntityView() {
+        return (T) getEntity();
     }
+
     public Location getLocation();
+
     @ForceOnMainThread
     public void setLocation(Location location);
 
@@ -32,7 +34,7 @@ public interface EntityRecord<T extends Entity> {
     /**
      * check if entity is killed or unloaded
      */
-    default boolean stillValid(){
+    default boolean stillValid() {
         return isPresent() && getEntity().isValid();
     }
 
@@ -50,8 +52,8 @@ public interface EntityRecord<T extends Entity> {
      */
     @ForceOnMainThread
     @Nonnull
-    default Optional<T> getOrLoadEntity(){
-        if(loadEntity()){
+    default Optional<T> getOrLoadEntity() {
+        if (loadEntity()) {
             return Optional.of(getEntityView());
         }
         return Optional.empty();
@@ -63,11 +65,11 @@ public interface EntityRecord<T extends Entity> {
      */
     @ForceOnMainThread
     @Nonnull
-    default T forceGetOrLoadEntity(){
+    default T forceGetOrLoadEntity() {
         Optional<T> entity = getOrLoadEntity();
-        if(entity.isPresent()){
+        if (entity.isPresent()) {
             return entity.get();
-        }else throw new RuntimeException("Unable to find or load entity "+getUuid());
+        } else throw new RuntimeException("Unable to find or load entity " + getUuid());
     }
 
     /**
@@ -76,15 +78,15 @@ public interface EntityRecord<T extends Entity> {
      */
     @ForceOnMainThread
     default boolean killEntity() {
-        if(stillValid() || loadEntity()){
+        if (stillValid() || loadEntity()) {
             getEntity().remove();
             setNotPresent();
             return true;
-        }else {
+        } else {
             return false;
         }
     }
+
     @Internal
     public void setNotPresent();
-
 }

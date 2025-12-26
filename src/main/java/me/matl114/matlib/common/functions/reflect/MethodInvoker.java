@@ -6,18 +6,22 @@ import java.util.function.Function;
 
 public interface MethodInvoker<T> {
     public T invokeInternal(Object obj, Object... args) throws Throwable;
-    default T invoke(Object obj, Object... args)  {
-        try{
+
+    default T invoke(Object obj, Object... args) {
+        try {
             return invokeInternal(obj, args);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
+
     static final Object[] NO_ARGUMENT = new Object[0];
-    default T invokeNoArg(Object obj){
+
+    default T invokeNoArg(Object obj) {
         return invoke(obj, NO_ARGUMENT);
     }
-    public static <T> MethodInvoker<T> ofSafe(BiFunction<Object, Object[], T> con){
+
+    public static <T> MethodInvoker<T> ofSafe(BiFunction<Object, Object[], T> con) {
         return new MethodInvoker<T>() {
             @Override
             public T invokeInternal(Object obj, Object... args) throws Throwable {
@@ -31,8 +35,8 @@ public interface MethodInvoker<T> {
         };
     }
 
-    public static <T> MethodInvoker<T> ofNoArgs(Function<?,T> func){
-        Function<Object,T> fuck = (Function<Object, T>) func;
+    public static <T> MethodInvoker<T> ofNoArgs(Function<?, T> func) {
+        Function<Object, T> fuck = (Function<Object, T>) func;
         return new MethodInvoker<T>() {
             @Override
             public T invokeInternal(Object obj, Object... args) throws Throwable {
@@ -50,8 +54,9 @@ public interface MethodInvoker<T> {
             }
         };
     }
-    public static <T> MethodInvoker<T> staticMethodAsFunc(Function<?,T> func){
-        Function<Object,T> fuck = (Function<Object, T>) func;
+
+    public static <T> MethodInvoker<T> staticMethodAsFunc(Function<?, T> func) {
+        Function<Object, T> fuck = (Function<Object, T>) func;
         return new MethodInvoker<T>() {
             @Override
             public T invokeInternal(Object obj, Object... args) throws Throwable {
@@ -70,13 +75,14 @@ public interface MethodInvoker<T> {
         };
     }
 
-    public static MethodInvoker<Void> ofNoArgsNoReturn(Consumer<?> task){
+    public static MethodInvoker<Void> ofNoArgsNoReturn(Consumer<?> task) {
         Consumer<Object> task0 = (Consumer<Object>) task;
         return new MethodInvoker<Void>() {
             @Override
             public Void invokeInternal(Object obj, Object... args) throws Throwable {
                 throw new IllegalStateException("Method shouldn't be called");
             }
+
             @Override
             public Void invoke(Object obj, Object... args) {
                 task0.accept(obj);
@@ -91,8 +97,7 @@ public interface MethodInvoker<T> {
         };
     }
 
-    default  <W> MethodInvoker<W> cast(){
+    default <W> MethodInvoker<W> cast() {
         return (MethodInvoker<W>) this;
     }
-
 }

@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 public interface InvocationCreator {
-    default InvocationHandler bindTo(Object delegate){
+    default InvocationHandler bindTo(Object delegate) {
         return ((proxy, method, args) -> invoke(proxy, delegate, method, args));
     }
 

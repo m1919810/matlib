@@ -1,6 +1,8 @@
 package me.matl114.matlib.utils.chat.lan.i18n;
 
-import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
+import static me.matl114.matlib.utils.chat.lan.TranslateKeyUtils.*;
+
+import java.util.Objects;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
@@ -17,10 +19,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Objects;
-
-import static me.matl114.matlib.utils.chat.lan.TranslateKeyUtils.*;
-
 @MultiDescriptive(targetDefault = "?")
 public interface ZhCNLocalizationHelper extends RegistryLocalizationHelper, TargetDescriptor {
     @MethodTarget(isStatic = true)
@@ -36,37 +34,42 @@ public interface ZhCNLocalizationHelper extends RegistryLocalizationHelper, Targ
     default String getMaterialName(Material material) {
         return getMaterialTranslateDefault(material);
     }
+
     @MethodTarget(isStatic = true)
     @RedirectName("getName")
     @RedirectClass("net.guizhanss.guizhanlib.minecraft.helper.attribute.AttributeHelper")
     default String getAttributeName(Attribute attribute) {
         return getAttributeTranslationDefault(attribute);
     }
+
     @MethodTarget(isStatic = true)
     @RedirectName("getName")
     @RedirectClass("net.guizhanss.guizhanlib.minecraft.helper.block.BiomeHelper")
     default String getBiomeName(Biome biome) {
-        return getKeyedTranslationDefault("biome.minecraft",biome);
+        return getKeyedTranslationDefault("biome.minecraft", biome);
     }
+
     @MethodTarget(isStatic = true)
     @RedirectName("getName")
     @RedirectClass("net.guizhanss.guizhanlib.minecraft.helper.enchantments.EnchantmentHelper")
     default String getEnchantmentName(Enchantment ench) {
         return getEnchantmentTranslationDefault(ench);
     }
+
     @MethodTarget(isStatic = true)
     @RedirectName("getName")
     @RedirectClass("net.guizhanss.guizhanlib.minecraft.helper.entity.EntityTypeHelper")
-
     default String getEntityTypeName(EntityType entity) {
         return getEntityTranslationDefault(entity);
     }
+
     @MethodTarget(isStatic = true)
     @RedirectName("getName")
     @RedirectClass("net.guizhanss.guizhanlib.minecraft.helper.potion.PotionEffectTypeHelper")
     default String getPotionEffectTypeName(PotionEffectType type) {
         return getPotionTranslationDefault(type);
     }
+
     @MethodTarget(isStatic = true)
     @RedirectName("getName")
     @RedirectClass("net.guizhanss.guizhanlib.minecraft.helper.DyeColorHelper")
@@ -74,11 +77,11 @@ public interface ZhCNLocalizationHelper extends RegistryLocalizationHelper, Targ
         return getDyeColorTranslationDefault(color);
     }
 
-
     public static interface A {
         ZhCNLocalizationHelper I = DescriptorImplBuilder.createMultiHelper(ZhCNLocalizationHelper.class);
     }
-    public static interface P{
+
+    public static interface P {
         ZhCNLocalizationHelper I = DescriptorProxyBuilder.createMultiHelper(ZhCNLocalizationHelper.class);
     }
 }

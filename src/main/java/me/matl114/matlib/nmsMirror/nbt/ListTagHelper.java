@@ -1,15 +1,14 @@
 package me.matl114.matlib.nmsMirror.nbt;
 
-import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
-import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
-import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-import me.matl114.matlib.utils.version.Version;
+import static me.matl114.matlib.nmsMirror.Import.Tag;
 
 import java.util.AbstractList;
 import java.util.List;
-
-import static me.matl114.matlib.nmsMirror.Import.Tag;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
+import me.matl114.matlib.utils.version.Version;
 
 @Descriptive(target = "net.minecraft.nbt.ListTag")
 public interface ListTagHelper extends TagHelper {
@@ -18,7 +17,7 @@ public interface ListTagHelper extends TagHelper {
 
     @ConstructorTarget
     @IgnoreFailure(thresholdInclude = Version.v1_21_R4)
-    default AbstractList<?> newListTag(List<?> list, byte type){
+    default AbstractList<?> newListTag(List<?> list, byte type) {
         return newListTag0(list);
     }
 
@@ -39,7 +38,8 @@ public interface ListTagHelper extends TagHelper {
     AbstractList<?> getList(Object listTag, int index);
 
     @MethodTarget
-    short getShort(Object listTag, int index);;
+    short getShort(Object listTag, int index);
+    ;
 
     @MethodTarget
     int getInt(Object listTag, int index);
@@ -66,20 +66,20 @@ public interface ListTagHelper extends TagHelper {
     Object get(Object listTag, int index);
 
     @MethodTarget
-    boolean setTag(Object listTag, int index, @RedirectType(Tag)Object element);
+    boolean setTag(Object listTag, int index, @RedirectType(Tag) Object element);
 
     @MethodTarget
     @RedirectName("set")
-    Object getAndSet(Object listTag, int index, @RedirectType(Tag)Object nbtbase);
+    Object getAndSet(Object listTag, int index, @RedirectType(Tag) Object nbtbase);
 
     @MethodTarget
-    void addTag(Object listTag, int index,@RedirectType(Tag) Object nbtbase);
+    void addTag(Object listTag, int index, @RedirectType(Tag) Object nbtbase);
 
     @MethodTarget
     void clear(Object listTag);
 
-//    @FieldTarget
-//    @RedirectType("B")
-//    byte typeGetter(Object listTag);
+    //    @FieldTarget
+    //    @RedirectType("B")
+    //    byte typeGetter(Object listTag);
 
 }

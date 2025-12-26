@@ -1,22 +1,22 @@
 package me.matl114.matlib.utils.reflect.internel;
 
+import java.lang.reflect.Method;
+import java.util.Objects;
 import me.matl114.matlib.algorithms.dataStructures.struct.LazyInitValue;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 
-import java.lang.reflect.Method;
-import java.util.Objects;
-
 public interface SimpleObfManager {
-    static SimpleObfManager getManager(){
+    static SimpleObfManager getManager() {
         return manager.get();
     }
-    static LazyInitValue<SimpleObfManager> manager = LazyInitValue.ofLazy(()->{
-        try{
+
+    static LazyInitValue<SimpleObfManager> manager = LazyInitValue.ofLazy(() -> {
+        try {
             return new SimpleObfManagerImpl();
-        }catch (Throwable e){
+        } catch (Throwable e) {
             var e1 = e.getCause();
-            Debug.logger(e1 != null? e1: e, "Error while creating SimpleObfManagerImpl:");
+            Debug.logger(e1 != null ? e1 : e, "Error while creating SimpleObfManagerImpl:");
             Debug.logger("Using Default Simple Obf Impl");
             return new DefaultImpl();
         }
@@ -32,16 +32,16 @@ public interface SimpleObfManager {
      * @param clazz
      * @return
      */
-    default String deobfToJvm(Class<?> clazz){
+    default String deobfToJvm(Class<?> clazz) {
         var re = ByteCodeUtils.getComponentType(clazz);
         String deobfOrigin = deobfClassName(re.getB());
         String jvmType = ByteCodeUtils.toJvmType(deobfOrigin);
         return re.getA() + jvmType;
     }
 
-//    default String deobfNameToJvm(String clazz){
-//
-//    }
+    //    default String deobfNameToJvm(String clazz){
+    //
+    //    }
     /**
      * this method should return the reobf class name of a runtime class, you should check whether the class is in the mapping
      * @param mojangName
@@ -49,17 +49,17 @@ public interface SimpleObfManager {
      */
     public String reobfClassName(String mojangName);
 
-    default Class<?> reobfClass(String mojangName) throws Throwable{
+    default Class<?> reobfClass(String mojangName) throws Throwable {
         String obfName = reobfClassName(mojangName);
-        try{
-            //try check obf
+        try {
+            // try check obf
             return Class.forName(obfName);
-        }catch (NoClassDefFoundError error){
-            if(Objects.equals(mojangName, obfName)){
-                //nmd 没有obf,就是不对
+        } catch (NoClassDefFoundError error) {
+            if (Objects.equals(mojangName, obfName)) {
+                // nmd 没有obf,就是不对
                 throw error;
             }
-            //no obf present
+            // no obf present
             return Class.forName(mojangName);
         }
     }
@@ -76,15 +76,16 @@ public interface SimpleObfManager {
      */
     public String deobfMethodInClass(String mojangClassName, String obfMethodDescriptor);
 
-    default String deobfMethod(Method method0){
-        return deobfMethodInClass(deobfClassName(method0.getDeclaringClass().getName()), ByteCodeUtils.getMethodDescriptor(method0));
+    default String deobfMethod(Method method0) {
+        return deobfMethodInClass(
+                deobfClassName(method0.getDeclaringClass().getName()), ByteCodeUtils.getMethodDescriptor(method0));
     }
 
-    default boolean isMethodNameMatchAfterDeobf(String reobfClassName, String targetDescriptor, String methodName){
+    default boolean isMethodNameMatchAfterDeobf(String reobfClassName, String targetDescriptor, String methodName) {
         return Objects.equals(deobfMethodInClass(reobfClassName, targetDescriptor), methodName);
     }
 
-    static class DefaultImpl implements ObfManager{
+    static class DefaultImpl implements ObfManager {
 
         @Override
         public String deobfClassName(String currentName) {
@@ -106,5 +107,4 @@ public interface SimpleObfManager {
             return ByteCodeUtils.parseFieldNameFromDescriptor(obfMethodDescriptor);
         }
     }
-
 }

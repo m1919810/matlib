@@ -1,10 +1,9 @@
 package me.matl114.matlib.utils.reflect.mixImpl.annotations;
 
-import me.matl114.matlib.common.lang.annotations.Note;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import me.matl114.matlib.common.lang.annotations.Note;
 
 /**
  * 捕获字段
@@ -17,8 +16,9 @@ import java.lang.annotation.RetentionPolicy;
  * 可以用@RedirectClass重定向,但是当标记在FIELD时不能标记到其他类的非static字段
  */
 @Retention(RetentionPolicy.RUNTIME)
-@java.lang.annotation.Target({ElementType.FIELD,ElementType.METHOD})
+@java.lang.annotation.Target({ElementType.FIELD, ElementType.METHOD})
 public @interface ShadowField {
-    @Note("This parameter controls whether create access to the field, if NOT, the method will be used as PlaceHolder of target Method, and method body will be replaced by MixImplException.placeholder()")
+    @Note(
+            "This parameter controls whether create access to the field, if NOT, the method will be used as PlaceHolder of target Method, and method body will be replaced by MixImplException.placeholder()")
     boolean create() default false;
 }

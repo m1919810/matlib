@@ -2,14 +2,13 @@ package me.matl114.matlib.algorithms.dataStructures.frames.collection;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
-public class ListIndexIterator<T> implements Iterator<T>{
+public class ListIndexIterator<T> implements Iterator<T> {
     List<T> delegate;
     int index;
 
-    public ListIndexIterator(List<T> delegate){
-        this.delegate =delegate;
+    public ListIndexIterator(List<T> delegate) {
+        this.delegate = delegate;
         this.index = 0;
     }
 
@@ -25,10 +24,6 @@ public class ListIndexIterator<T> implements Iterator<T>{
 
     @Override
     public void remove() {
-        this.delegate.remove(--index );
-
+        this.delegate.remove(--index);
     }
-
-
-
 }

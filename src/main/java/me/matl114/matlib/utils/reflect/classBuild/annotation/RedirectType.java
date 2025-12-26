@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
  * write mojangNamed jvm descriptor here, we will use deobf name to match this flag
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD,ElementType.PARAMETER})
+@Target({ElementType.METHOD, ElementType.PARAMETER})
 public @interface RedirectType {
-    //must be jvm type name
+    // must be jvm type name
     String value();
 }

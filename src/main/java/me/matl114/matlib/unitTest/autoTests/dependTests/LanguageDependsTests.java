@@ -16,7 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class LanguageDependsTests implements TestCase {
     @OnlineTest(name = "zhCN guizhanLib bridge test")
-    public void test_guizhanlib() throws Throwable{
+    public void test_guizhanlib() throws Throwable {
         RegistryLocalizationHelper helper = DescriptorProxyBuilder.createMultiHelper(ZhCNLocalizationHelper.class);
         Debug.logger(helper.getClass());
         Debug.logger(helper.getAttributeName(VersionedRegistry.getInstance().getAttribute("armor")));
@@ -29,20 +29,19 @@ public class LanguageDependsTests implements TestCase {
 
         Debug.logger(helper.getBiomeName(Biome.BASALT_DELTAS));
         Debug.logger(helper.getEnchantmentName(VersionedRegistry.enchantment("sharpness")));
-//        Debug.logger(helper.getAttributeName(VersionedRegistry.getInstance().getAttribute("step_height")));
+        //        Debug.logger(helper.getAttributeName(VersionedRegistry.getInstance().getAttribute("step_height")));
     }
 
     @OnlineTest(name = "pinyin lib bridge test")
-    public void test_pinyin() throws  Throwable{
+    public void test_pinyin() throws Throwable {
         PinyinHelper helper = DescriptorProxyBuilder.createMultiHelper(PinyinHelper.class);
         Debug.logger(helper.toPinyin("卧槽"));
-        Debug.logger(helper.toPinyin("首字母缩写",helper.getPinyinStyleEnum("FIRST_LETTER")));
-        Debug.logger(helper.toPinyin("首字母缩写",helper.getPinyinStyleEnum("FIRST_LETTER"),""));
-        Debug.logger(helper.toPinyin("首字母缩写",helper.getPinyinStyleEnum("INPUT"),""));
-        Debug.logger(helper.toPinyin("首字母缩写",helper.getPinyinStyleEnum("NORMAL"),""));
-        Debug.logger(helper.toPinyin("首字母缩写",helper.getPinyinStyleEnum("DEFAULT"),""));
-        Debug.logger(helper.toPinyin("首字母缩写",helper.getPinyinStyleEnum("NUM_LAST"),""));
-
+        Debug.logger(helper.toPinyin("首字母缩写", helper.getPinyinStyleEnum("FIRST_LETTER")));
+        Debug.logger(helper.toPinyin("首字母缩写", helper.getPinyinStyleEnum("FIRST_LETTER"), ""));
+        Debug.logger(helper.toPinyin("首字母缩写", helper.getPinyinStyleEnum("INPUT"), ""));
+        Debug.logger(helper.toPinyin("首字母缩写", helper.getPinyinStyleEnum("NORMAL"), ""));
+        Debug.logger(helper.toPinyin("首字母缩写", helper.getPinyinStyleEnum("DEFAULT"), ""));
+        Debug.logger(helper.toPinyin("首字母缩写", helper.getPinyinStyleEnum("NUM_LAST"), ""));
 
         Debug.logger(helper.toPinyinList('行'));
         Debug.logger(helper.samePinyinMap('行'));

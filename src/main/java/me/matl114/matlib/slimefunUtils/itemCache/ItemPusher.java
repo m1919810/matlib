@@ -1,50 +1,52 @@
 package me.matl114.matlib.slimefunUtils.itemCache;
 
-
+import javax.annotation.Nonnull;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import javax.annotation.Nonnull;
 
 /**
  * used to cal num when push item, consume-only, it will not push item when unionSum
  */
 public class ItemPusher extends ItemCounter {
 
+    private static ItemPusher INSTANCE = new ItemPusher(new ItemStack(Material.STONE));
 
-    private static ItemPusher INSTANCE=new ItemPusher(new ItemStack(Material.STONE));
-    public ItemPusher(){
+    public ItemPusher() {
         super();
     }
-    public ItemPusher(ItemStack item) {
-        //can use as storage unit
-        super(item);
 
+    public ItemPusher(ItemStack item) {
+        // can use as storage unit
+        super(item);
     }
+
     public static ItemPusher get(ItemStack item) {
-        if(item==null) return null;
-        ItemPusher itp=INSTANCE.clone();
+        if (item == null) return null;
+        ItemPusher itp = INSTANCE.clone();
         itp.init(item);
         return itp;
     }
-    protected void init(ItemStack item){
-        super.init( item);
+
+    protected void init(ItemStack item) {
+        super.init(item);
     }
-    protected void init( ){
+
+    protected void init() {
         super.init();
     }
 
-    public ItemPusher(ItemStack item,int maxcnt) {
-        //can use as storage unit
+    public ItemPusher(ItemStack item, int maxcnt) {
+        // can use as storage unit
         super(item);
         this.maxStackCnt = maxcnt;
     }
-    public boolean safeAddAmount(int amount){
-        int result=amount+cnt;
-        if(result>maxStackCnt){
+
+    public boolean safeAddAmount(int amount) {
+        int result = amount + cnt;
+        if (result > maxStackCnt) {
             return false;
-        }else {
+        } else {
             setAmount(result);
             return true;
         }
@@ -53,35 +55,34 @@ public class ItemPusher extends ItemCounter {
      * this arguments has no meaning ,just a formated argument
      * @param menu
      */
-    public void updateMenu(@Nonnull BlockMenu menu){
-        if(dirty){
+    public void updateMenu(@Nonnull BlockMenu menu) {
+        if (dirty) {
             updateItemStack();
-
         }
     }
 
     public void grab(ItemCounter counter) {
-        int left=maxStackCnt-cnt;
-        if(left>counter.getAmount()){
+        int left = maxStackCnt - cnt;
+        if (left > counter.getAmount()) {
             addAmount(counter.getAmount());
             counter.setAmount(0);
-        }else {
+        } else {
             setAmount(maxStackCnt);
             counter.addAmount(-left);
         }
     }
+
     public void push(ItemCounter counter) {
         counter.grab(this);
     }
-
 
     /**
      * should sync before
      * @param source
      */
-    public void setFrom(ItemCounter source){
-        if(item==null&&(source!=null&&source.getItem()!=null)){
-            fromSource(source,true);
+    public void setFrom(ItemCounter source) {
+        if (item == null && (source != null && source.getItem() != null)) {
+            fromSource(source, true);
         }
     }
 
@@ -90,28 +91,29 @@ public class ItemPusher extends ItemCounter {
      * @param limit
      * @return
      */
-    public int transportFrom(ItemCounter counter,int limit){
-        //该物品槽能转运的最大数量
-        int left=Math.min( maxStackCnt-cnt,limit);
-        //如果这个数量比提供的少
-        if(left>counter.getAmount()){
-            //设置真正被传输的数量是... 提供的数量 小于预期left
-            left=counter.getAmount();
-            //counter清空
+    public int transportFrom(ItemCounter counter, int limit) {
+        // 该物品槽能转运的最大数量
+        int left = Math.min(maxStackCnt - cnt, limit);
+        // 如果这个数量比提供的少
+        if (left > counter.getAmount()) {
+            // 设置真正被传输的数量是... 提供的数量 小于预期left
+            left = counter.getAmount();
+            // counter清空
             counter.setAmount(0);
-            //加上
+            // 加上
             addAmount(left);
 
-        }else{
-            //否则这个数量提供的比那个多
-            //设置数量+=left
-            setAmount(cnt+left);
-            //left <= counter.getAmount()
+        } else {
+            // 否则这个数量提供的比那个多
+            // 设置数量+=left
+            setAmount(cnt + left);
+            // left <= counter.getAmount()
             counter.addAmount(-left);
         }
-        return limit-left;
+        return limit - left;
     }
-    protected ItemPusher clone(){
-        return (ItemPusher)super.clone();
+
+    protected ItemPusher clone() {
+        return (ItemPusher) super.clone();
     }
 }

@@ -6,29 +6,31 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class ItemStackCache implements Cloneable{
+public class ItemStackCache implements Cloneable {
     /**
      * get item,should be read-only! and will not represent real amount
      * @return
      */
     @Getter
     protected ItemStack item;
-    protected LazyInitReference<ItemMeta> metaRef;
-    private static ItemStackCache INSTANCE=new ItemStackCache() ;
-    public ItemStackCache() {
-    }
 
-    public static ItemStackCache get(ItemStack item){
-        ItemStackCache cache=INSTANCE.clone();
+    protected LazyInitReference<ItemMeta> metaRef;
+    private static ItemStackCache INSTANCE = new ItemStackCache();
+
+    public ItemStackCache() {}
+
+    public static ItemStackCache get(ItemStack item) {
+        ItemStackCache cache = INSTANCE.clone();
         cache.init(item);
         return cache;
     }
-    protected void init(ItemStack item){
+
+    protected void init(ItemStack item) {
         this.item = item;
         this.metaRef = LazyInitReference.ofEmpty();
     }
 
-    public Material getType(){
+    public Material getType() {
         return item.getType();
     }
     /**
@@ -37,7 +39,7 @@ public class ItemStackCache implements Cloneable{
      * @return
      */
     public ItemMeta getMeta() {
-        if(!metaRef.init) {
+        if (!metaRef.init) {
             metaRef.value = item.hasItemMeta() ? item.getItemMeta() : null;
             metaRef.init = true;
         }
@@ -49,12 +51,12 @@ public class ItemStackCache implements Cloneable{
      * @return
      */
     public void setMeta(ItemMeta meta) {
-        this.metaRef.value=meta;
-        this.metaRef.init=true;
+        this.metaRef.value = meta;
+        this.metaRef.init = true;
     }
 
-    public void fromSource(ItemStackCache cache){
-        item=cache.item;
+    public void fromSource(ItemStackCache cache) {
+        item = cache.item;
         metaRef = cache.metaRef;
     }
 

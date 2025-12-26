@@ -1,18 +1,18 @@
 package me.matl114.matlib.nmsMirror.chat;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+
 import com.google.gson.JsonElement;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import net.kyori.adventure.text.Component;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-import static me.matl114.matlib.nmsMirror.Import.*;
 
 @MultiDescriptive(targetDefault = "net.minecraft.network.chat.Component")
 public interface ComponentHelper extends TargetDescriptor {
@@ -59,11 +59,11 @@ public interface ComponentHelper extends TargetDescriptor {
     Iterable<?> score(String name, String objective);
 
     @MethodTarget(isStatic = true)
-    Iterable<?> nbt(String rawPath, boolean interpret, Optional<?> separator,@RedirectType( DataSource) Object dataSource);
+    Iterable<?> nbt(
+            String rawPath, boolean interpret, Optional<?> separator, @RedirectType(DataSource) Object dataSource);
 
-//    @MethodTarget(isStatic = true)
-//    Iterable<?> selector(String pattern, Optional<?> separator);
-
+    //    @MethodTarget(isStatic = true)
+    //    Iterable<?> selector(String pattern, Optional<?> separator);
 
     @CastCheck(AdventureComponent)
     boolean isAdventure(Iterable<?> comp);
@@ -73,30 +73,29 @@ public interface ComponentHelper extends TargetDescriptor {
 
     @MethodTarget(isStatic = true)
     @RedirectClass(MutableComponent)
-    Iterable<?> create(@RedirectType(ComponentContents)Object content);
-
-
-    @RedirectClass(MutableComponent)
-    @MethodTarget
-    Iterable<?> append(Iterable<?> thi,@RedirectType(ChatComponent) Iterable<?> text);
+    Iterable<?> create(@RedirectType(ComponentContents) Object content);
 
     @RedirectClass(MutableComponent)
     @MethodTarget
-    Iterable<?> withStyle(Iterable<?> thi, @RedirectType(Style)Object style);
+    Iterable<?> append(Iterable<?> thi, @RedirectType(ChatComponent) Iterable<?> text);
 
     @RedirectClass(MutableComponent)
     @MethodTarget
-    Iterable<?> setStyle(Iterable<?> thi, @RedirectType(Style)Object style);
+    Iterable<?> withStyle(Iterable<?> thi, @RedirectType(Style) Object style);
+
+    @RedirectClass(MutableComponent)
+    @MethodTarget
+    Iterable<?> setStyle(Iterable<?> thi, @RedirectType(Style) Object style);
 
     @RedirectClass(MutableComponent)
     @FieldTarget
     @RedirectName("siblingsSetter")
     void forceReplaceSiblings(Iterable<?> thi, List<Iterable<?>> newList);
 
-    //remove because of version
-//    @RedirectClass(MutableComponent)
-//    @MethodTarget
-//    Iterable<?> withColor(Iterable<?> thi, int color);
+    // remove because of version
+    //    @RedirectClass(MutableComponent)
+    //    @MethodTarget
+    //    Iterable<?> withColor(Iterable<?> thi, int color);
 
     @MethodTarget
     @RedirectClass(AdventureComponent)
@@ -112,11 +111,11 @@ public interface ComponentHelper extends TargetDescriptor {
 
     @MethodTarget(isStatic = true)
     @RedirectClass(ChatComponentSerializer)
-    String toJson(@RedirectType(ChatComponent)Iterable<?> comp);
+    String toJson(@RedirectType(ChatComponent) Iterable<?> comp);
 
     @MethodTarget(isStatic = true)
     @RedirectClass(ChatComponentSerializer)
-    JsonElement toJsonTree(@RedirectType(ChatComponent)Iterable<?> comp);
+    JsonElement toJsonTree(@RedirectType(ChatComponent) Iterable<?> comp);
 
     @MethodTarget(isStatic = true)
     @RedirectClass(ChatComponentSerializer)
@@ -128,6 +127,4 @@ public interface ComponentHelper extends TargetDescriptor {
 
     @GetType(FormattedText$ContentConsumer)
     Class<?> getContentConsumerType();
-
-
 }

@@ -1,17 +1,16 @@
 package me.matl114.matlib.nmsMirror.inventory;
 
-import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
-import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
-import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
-import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-import org.bukkit.Location;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.InventoryHolder;
+import static me.matl114.matlib.nmsMirror.Import.*;
 
 import java.util.List;
 import java.util.function.Predicate;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
+import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
+import org.bukkit.Location;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.InventoryHolder;
 
 @MultiDescriptive(targetDefault = ContainerClass)
 public interface ContainerHelper extends TargetDescriptor {
@@ -31,7 +30,7 @@ public interface ContainerHelper extends TargetDescriptor {
     Object removeItemNoUpdate(Object container, int index);
 
     @MethodTarget
-    void setItem(Object container, int slot,@RedirectType(ItemStack) Object item);
+    void setItem(Object container, int slot, @RedirectType(ItemStack) Object item);
 
     @MethodTarget
     int getMaxStackSize(Object container);
@@ -40,19 +39,20 @@ public interface ContainerHelper extends TargetDescriptor {
     void setChanged(Object container);
 
     @MethodTarget
-    boolean stillValid(Object container, @RedirectType(Player)Object player);
+    boolean stillValid(Object container, @RedirectType(Player) Object player);
 
     @MethodTarget
-    boolean canPlaceItem(Object container, int slot, @RedirectType(ItemStack)Object item );
+    boolean canPlaceItem(Object container, int slot, @RedirectType(ItemStack) Object item);
 
     @MethodTarget
-    boolean canTakeItem(Object container, @RedirectType(Container)Object hopper, int slot, @RedirectType(ItemStack)Object item);
+    boolean canTakeItem(
+            Object container, @RedirectType(Container) Object hopper, int slot, @RedirectType(ItemStack) Object item);
 
     @MethodTarget
     boolean hasAnyMatching(Object container, Predicate<?> predicate);
 
     @MethodTarget(isStatic = true)
-    boolean stillValidBlockEntity(@RedirectType(BlockEntity)Object blockEntity, @RedirectType(Player)Object player);
+    boolean stillValidBlockEntity(@RedirectType(BlockEntity) Object blockEntity, @RedirectType(Player) Object player);
 
     @MethodTarget
     List<?> getContents(Object container);

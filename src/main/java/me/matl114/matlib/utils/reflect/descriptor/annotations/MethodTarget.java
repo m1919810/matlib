@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@java.lang.annotation.Target({ElementType.FIELD,ElementType.METHOD})
+@java.lang.annotation.Target({ElementType.FIELD, ElementType.METHOD})
 public @interface MethodTarget {
     boolean isStatic() default false;
 }

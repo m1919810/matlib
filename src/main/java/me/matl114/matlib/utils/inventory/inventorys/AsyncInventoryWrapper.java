@@ -1,13 +1,17 @@
 package me.matl114.matlib.utils.inventory.inventorys;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import javax.annotation.Nullable;
 import me.matl114.matlib.common.lang.annotations.NotRecommended;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.common.lang.annotations.UnsafeOperation;
+import me.matl114.matlib.utils.NMSInventoryUtils;
 import me.matl114.matlib.utils.ThreadUtils;
+import me.matl114.matlib.utils.WorldUtils;
 import me.matl114.matlib.utils.inventory.inventoryRecords.InventoryRecord;
 import me.matl114.matlib.utils.inventory.inventoryRecords.SimpleInventoryRecord;
-import me.matl114.matlib.utils.NMSInventoryUtils;
-import me.matl114.matlib.utils.WorldUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,33 +23,30 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-
 @Note(value = "note that this class just provides a view to manipulate block inventory in an async-safe way")
 public abstract class AsyncInventoryWrapper implements Inventory {
-    boolean triggerDelayUpdate =false;
+    boolean triggerDelayUpdate = false;
     Inventory handle;
     InventoryRecord record = null;
+
     @Deprecated(forRemoval = true)
-    public static Inventory wrapOfCurrentThread(Plugin pl,@Nullable Inventory blockInventory){
+    public static Inventory wrapOfCurrentThread(Plugin pl, @Nullable Inventory blockInventory) {
         return wrapOfCurrentThread(blockInventory);
     }
+
     @NotRecommended("use Inventory Record instead")
     public static Inventory wrapOfCurrentThread(@Nullable Inventory blockInventory) {
-        if(blockInventory == null) {
+        if (blockInventory == null) {
             return null;
         }
-        if(Bukkit.isPrimaryThread()){
+        if (Bukkit.isPrimaryThread()) {
             return blockInventory;
-        }else {
+        } else {
             return new AsyncInventoryWrapper(blockInventory) {
                 @Override
                 public void delayChangeUpdateInternal() {
-                    ThreadUtils.executeSync(()->{
-                        if(blockInventory.getHolder(false) instanceof TileState tile) {
+                    ThreadUtils.executeSync(() -> {
+                        if (blockInventory.getHolder(false) instanceof TileState tile) {
                             WorldUtils.tileEntitySetChange(tile);
                         }
                     });
@@ -53,48 +54,56 @@ public abstract class AsyncInventoryWrapper implements Inventory {
             };
         }
     }
+
     @Deprecated(forRemoval = true)
-    public static Inventory wrapOfCurrentThread(Plugin pl, InventoryRecord record){
+    public static Inventory wrapOfCurrentThread(Plugin pl, InventoryRecord record) {
         return wrapOfCurrentThread(record);
     }
-    public static Inventory wrapOfCurrentThread( InventoryRecord record) {
-        if(!record.isVanillaInv()||Bukkit.isPrimaryThread()){
+
+    public static Inventory wrapOfCurrentThread(InventoryRecord record) {
+        if (!record.isVanillaInv() || Bukkit.isPrimaryThread()) {
             return record.inventory();
-        }else {
-            return record.hasInv()?new AsyncInventoryWrapper(record) {
-                @Override
-                public void delayChangeUpdateInternal() {
-                    ThreadUtils.executeSync(record::setChange);
-                }
-            }:null;
-        }
-    }
-    public static Inventory wrapOfThread(InventoryRecord record, boolean isMainThread) {
-        if(!record.isVanillaInv()||isMainThread){
-            return record.inventory();
-        }else {
-            return record.hasInv()?new AsyncInventoryWrapper(record) {
-                @Override
-                public void delayChangeUpdateInternal() {
-                    ThreadUtils.executeSync(record::setChange);
-                }
-            }:null;
+        } else {
+            return record.hasInv()
+                    ? new AsyncInventoryWrapper(record) {
+                        @Override
+                        public void delayChangeUpdateInternal() {
+                            ThreadUtils.executeSync(record::setChange);
+                        }
+                    }
+                    : null;
         }
     }
 
-    public InventoryHolder getHolder(boolean var1){
+    public static Inventory wrapOfThread(InventoryRecord record, boolean isMainThread) {
+        if (!record.isVanillaInv() || isMainThread) {
+            return record.inventory();
+        } else {
+            return record.hasInv()
+                    ? new AsyncInventoryWrapper(record) {
+                        @Override
+                        public void delayChangeUpdateInternal() {
+                            ThreadUtils.executeSync(record::setChange);
+                        }
+                    }
+                    : null;
+        }
+    }
+
+    public InventoryHolder getHolder(boolean var1) {
         return handle.getHolder(var1);
     }
 
-
     public AsyncInventoryWrapper(Inventory inventory) {
         this.handle = inventory;
-        this.record = SimpleInventoryRecord.fromInventory(inventory,false);
+        this.record = SimpleInventoryRecord.fromInventory(inventory, false);
     }
-    public AsyncInventoryWrapper(InventoryRecord record){
+
+    public AsyncInventoryWrapper(InventoryRecord record) {
         this.handle = record.inventory();
         this.record = record;
     }
+
     @Override
     public int getSize() {
         return this.handle.getSize();
@@ -112,7 +121,7 @@ public abstract class AsyncInventoryWrapper implements Inventory {
 
     @Override
     public ItemStack getItem(int i) {
-        //trigger update when getItem to avoid direct count modification
+        // trigger update when getItem to avoid direct count modification
         delayChangeUpdate();
         return this.handle.getItem(i);
     }
@@ -128,22 +137,21 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     @NotRecommended
     @Note(value = "Not recommended in async")
     public HashMap<Integer, ItemStack> addItem(ItemStack... itemStacks) throws IllegalArgumentException {
-        try{
+        try {
             return this.handle.addItem(itemStacks);
-        }catch(Throwable e){
+        } catch (Throwable e) {
             delayChangeUpdate();
         }
         return new HashMap<>();
-
     }
 
     @Override
     @NotRecommended
     @Note(value = "Not recommended in async")
     public HashMap<Integer, ItemStack> removeItem(ItemStack... itemStacks) throws IllegalArgumentException {
-        try{
+        try {
             return this.handle.removeItem(itemStacks);
-        }catch(Throwable e){
+        } catch (Throwable e) {
             delayChangeUpdate();
         }
         return new HashMap<>();
@@ -157,7 +165,7 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     @Override
     @UnsafeOperation
     public void setContents(ItemStack[] itemStacks) throws IllegalArgumentException {
-        NMSInventoryUtils.setTileInvContentsNoUpdate(this.record,itemStacks);
+        NMSInventoryUtils.setTileInvContentsNoUpdate(this.record, itemStacks);
     }
 
     @Override
@@ -168,7 +176,7 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     @Override
     @UnsafeOperation
     public void setStorageContents(ItemStack[] itemStacks) throws IllegalArgumentException {
-        NMSInventoryUtils.setTileInvContentsNoUpdate(this.record,itemStacks);
+        NMSInventoryUtils.setTileInvContentsNoUpdate(this.record, itemStacks);
     }
 
     @Override
@@ -230,10 +238,9 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     @NotRecommended
     @Note(value = "Not recommended in async")
     public void remove(Material material) throws IllegalArgumentException {
-        try{
+        try {
             this.handle.remove(material);
-        }
-        catch (Throwable e){
+        } catch (Throwable e) {
             delayChangeUpdate();
         }
     }
@@ -242,9 +249,9 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     @NotRecommended
     @Note(value = "Not recommended in async")
     public void remove(ItemStack itemStack) {
-        try{
+        try {
             this.handle.remove(itemStack);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             delayChangeUpdate();
         }
     }
@@ -253,9 +260,9 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     @NotRecommended
     @Note(value = "Not recommended in async")
     public void clear(int i) {
-        try{
+        try {
             this.handle.clear(i);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             delayChangeUpdate();
         }
     }
@@ -264,9 +271,9 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     @NotRecommended
     @Note(value = "Not recommended in async")
     public void clear() {
-        try{
+        try {
             this.handle.clear();
-        }catch (Throwable e){
+        } catch (Throwable e) {
             delayChangeUpdate();
         }
     }
@@ -300,18 +307,22 @@ public abstract class AsyncInventoryWrapper implements Inventory {
     public Location getLocation() {
         return this.handle.getLocation();
     }
+
     @Note(value = "override of this method is available if multiple change update is required")
-    public void delayChangeUpdate(){
-        if(!triggerDelayUpdate){
+    public void delayChangeUpdate() {
+        if (!triggerDelayUpdate) {
             triggerDelayUpdate = true;
             delayChangeUpdateInternal();
         }
     }
+
     public abstract void delayChangeUpdateInternal();
-    public HashMap<Integer, ItemStack> removeItemAnySlot(ItemStack... var1) throws IllegalArgumentException{
+
+    public HashMap<Integer, ItemStack> removeItemAnySlot(ItemStack... var1) throws IllegalArgumentException {
         return handle.removeItemAnySlot(var1);
     }
-    public int close(){
+
+    public int close() {
         return handle.close();
     }
 }

@@ -7,10 +7,12 @@ public class BidirListIndexIterator<T> extends ListIndexIterator<T> implements L
     public BidirListIndexIterator(List<T> delegate) {
         super(delegate);
     }
+
     public BidirListIndexIterator(List<T> delegate, int index) {
         super(delegate);
         this.index = index;
     }
+
     int lastVisit = -1;
 
     @Override
@@ -24,13 +26,12 @@ public class BidirListIndexIterator<T> extends ListIndexIterator<T> implements L
         return this.delegate.get(this.lastVisit);
     }
 
-
     @Override
     public int nextIndex() {
         return index;
     }
 
-    public T next(){
+    public T next() {
         this.lastVisit = index;
         return super.next();
     }
@@ -39,7 +40,6 @@ public class BidirListIndexIterator<T> extends ListIndexIterator<T> implements L
     public int previousIndex() {
         return index - 1;
     }
-
 
     @Override
     public void add(T t) {
@@ -55,11 +55,12 @@ public class BidirListIndexIterator<T> extends ListIndexIterator<T> implements L
         }
         delegate.remove(lastVisit);
         // 调整索引（如果删除的是通过 next() 访问的元素）
-        if(lastVisit < index){
+        if (lastVisit < index) {
             --index;
         }
         lastVisit = -1;
     }
+
     @Override
     public void set(T t) {
         if (lastVisit == -1) {

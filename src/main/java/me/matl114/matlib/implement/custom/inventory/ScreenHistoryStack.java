@@ -1,12 +1,11 @@
 package me.matl114.matlib.implement.custom.inventory;
 
+import java.util.function.Supplier;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-
-import java.util.function.Supplier;
 
 public interface ScreenHistoryStack extends Listener {
     /**
@@ -27,7 +26,7 @@ public interface ScreenHistoryStack extends Listener {
      * @param player
      * @return
      */
-    default boolean goBackToLast(InventoryBuilder.InventoryFactory factory, Player player){
+    default boolean goBackToLast(InventoryBuilder.InventoryFactory factory, Player player) {
         popLast(player);
         return openLast(factory, player);
     }
@@ -54,7 +53,8 @@ public interface ScreenHistoryStack extends Listener {
      * @param page
      * @param screen
      */
-    default void openWithHistoryClear(InventoryBuilder.InventoryFactory screenType, Player player, int page, Screen screen){
+    default void openWithHistoryClear(
+            InventoryBuilder.InventoryFactory screenType, Player player, int page, Screen screen) {
         cleanPlayerHistory(player);
         openAndPush(screenType, player, page, screen);
     }
@@ -73,8 +73,9 @@ public interface ScreenHistoryStack extends Listener {
      * @param player
      * @param screenSupplier
      */
-    default void openLastOrCreate(InventoryBuilder.InventoryFactory screenType, Player player, Supplier<Screen> screenSupplier){
-        if(!openLast(screenType, player)) {
+    default void openLastOrCreate(
+            InventoryBuilder.InventoryFactory screenType, Player player, Supplier<Screen> screenSupplier) {
+        if (!openLast(screenType, player)) {
             Screen screen = screenSupplier.get().relateToHistory(this);
             screen.openPageWithHistory(screenType, player, 1);
         }
@@ -87,7 +88,7 @@ public interface ScreenHistoryStack extends Listener {
      * @param page
      * @param screen
      */
-    default void openAndPush(InventoryBuilder.InventoryFactory screenType, Player player, int page, Screen screen){
+    default void openAndPush(InventoryBuilder.InventoryFactory screenType, Player player, int page, Screen screen) {
         screen.relateToHistory(this);
         screen.openPageWithHistory(screenType, player, page);
     }
@@ -99,15 +100,16 @@ public interface ScreenHistoryStack extends Listener {
      * @param page
      * @param screen
      */
-    default void openNoHistory(InventoryBuilder.InventoryFactory screenType, Player player, int page, Screen screen){
+    default void openNoHistory(InventoryBuilder.InventoryFactory screenType, Player player, int page, Screen screen) {
         screen.openPage(screenType, player, page);
     }
+
     @EventHandler(priority = EventPriority.MONITOR)
-    default void cleanHistoryWhenLeave(PlayerQuitEvent event){
+    default void cleanHistoryWhenLeave(PlayerQuitEvent event) {
         cleanPlayerHistory(event.getPlayer());
     }
 
-    static ScreenHistoryStack of(){
+    static ScreenHistoryStack of() {
         return new ScreenHistoryStackImpl();
     }
 }

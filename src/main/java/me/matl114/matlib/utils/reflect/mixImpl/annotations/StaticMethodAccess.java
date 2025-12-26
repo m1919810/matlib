@@ -1,10 +1,9 @@
 package me.matl114.matlib.utils.reflect.mixImpl.annotations;
 
-import me.matl114.matlib.common.lang.annotations.NotRecommended;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import me.matl114.matlib.common.lang.annotations.NotRecommended;
 
 /**
  * 这个方法提供了从接口处访问子类static方法的方法
@@ -17,5 +16,4 @@ import java.lang.annotation.RetentionPolicy;
 @NotRecommended
 @Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Target({ElementType.METHOD})
-public @interface StaticMethodAccess {
-}
+public @interface StaticMethodAccess {}

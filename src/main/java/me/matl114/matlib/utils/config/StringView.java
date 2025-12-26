@@ -1,6 +1,6 @@
 package me.matl114.matlib.utils.config;
 
-public class StringView implements DataView<String>{
+public class StringView implements DataView<String> {
     private final NodeReference<String> parent;
 
     public StringView(NodeReference<String> parent) {

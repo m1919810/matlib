@@ -1,10 +1,9 @@
 package me.matl114.matlib.algorithms.designs.concurrency;
 
-import me.matl114.matlibAdaptor.algorithms.dataStructures.LockFactory;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 import java.util.function.Supplier;
+import me.matl114.matlibAdaptor.algorithms.dataStructures.LockFactory;
 
 /**
  * no lock at all

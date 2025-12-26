@@ -9,6 +9,4 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Final {
-
-}
+public @interface Final {}

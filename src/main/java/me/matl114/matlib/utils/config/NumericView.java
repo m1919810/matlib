@@ -19,7 +19,6 @@ public abstract class NumericView implements DataView<Number> {
         return parent.get();
     }
 
-
     public boolean set(Number value) {
         return parent.set(value);
     }
@@ -29,31 +28,34 @@ public abstract class NumericView implements DataView<Number> {
         return rangeType;
     }
 
-    static class IntView extends NumericView{
+    static class IntView extends NumericView {
         {
             rangeType = Type.INT_RANGE;
         }
+
         int cache;
 
         protected IntView(NodeReference<Number> parent) {
             super(parent);
         }
 
-        public int getAsInt(){
-            if(!initialized){
+        public int getAsInt() {
+            if (!initialized) {
                 cache = get().intValue();
                 initialized = true;
             }
             return cache;
         }
-        public long getAsLong(){
-            if(!initialized){
+
+        public long getAsLong() {
+            if (!initialized) {
                 cache = get().intValue();
                 initialized = true;
             }
             return cache;
         }
-        public boolean setInt(int val){
+
+        public boolean setInt(int val) {
             cache = val;
             initialized = true;
             return set(val);
@@ -65,39 +67,42 @@ public abstract class NumericView implements DataView<Number> {
             initialized = true;
             return set(cache);
         }
-
-
     }
-    static class LongView extends NumericView{
+
+    static class LongView extends NumericView {
         {
             rangeType = Type.LONG_RANGE;
         }
+
         long cache;
 
         protected LongView(NodeReference<Number> parent) {
             super(parent);
         }
-        public int getAsInt(){
-            if(!initialized){
+
+        public int getAsInt() {
+            if (!initialized) {
                 cache = get().longValue();
                 initialized = true;
             }
             return (int) cache;
         }
-        public long getAsLong(){
-            if(!initialized){
+
+        public long getAsLong() {
+            if (!initialized) {
                 cache = get().longValue();
                 initialized = true;
             }
             return cache;
         }
-        public boolean setLong(long val){
+
+        public boolean setLong(long val) {
             cache = val;
             initialized = true;
             return set(val);
         }
 
-        public boolean setInt(int val){
+        public boolean setInt(int val) {
             cache = val;
             initialized = true;
             return set(cache);
@@ -110,7 +115,8 @@ public abstract class NumericView implements DataView<Number> {
             return set(cache);
         }
     }
-    static class DoubleView extends NumericView{
+
+    static class DoubleView extends NumericView {
         {
             rangeType = Type.FLOAT_RANGE;
         }
@@ -118,44 +124,47 @@ public abstract class NumericView implements DataView<Number> {
         protected DoubleView(NodeReference<Number> parent) {
             super(parent);
         }
+
         double cache;
+
         @Override
         public double getAsDouble() {
-            if(!initialized){
+            if (!initialized) {
                 cache = get().doubleValue();
                 initialized = true;
             }
             return cache;
         }
 
-        public int getAsInt(){
-            if(!initialized){
+        public int getAsInt() {
+            if (!initialized) {
                 cache = get().doubleValue();
                 initialized = true;
             }
-            return (int)cache;
+            return (int) cache;
         }
 
-        public long getAsLong(){
-            if(!initialized){
+        public long getAsLong() {
+            if (!initialized) {
                 cache = get().doubleValue();
                 initialized = true;
             }
             return (long) cache;
         }
 
-        public boolean setInt(int val){
+        public boolean setInt(int val) {
             cache = (double) val;
             initialized = true;
             return set(cache);
         }
 
-        public boolean setLong(long val){
+        public boolean setLong(long val) {
             cache = (double) val;
             initialized = true;
             return set(cache);
         }
-        public boolean setDouble(double val){
+
+        public boolean setDouble(double val) {
             cache = val;
             initialized = true;
             return set(val);
@@ -168,7 +177,4 @@ public abstract class NumericView implements DataView<Number> {
             return set(cache);
         }
     }
-
-
-
 }

@@ -3,12 +3,12 @@ package me.matl114.matlib.nmsUtils.serialize;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import me.matl114.matlib.nmsMirror.fix.DataHelper;
-
 import java.util.stream.Stream;
+import me.matl114.matlib.nmsMirror.fix.DataHelper;
 
 public class NumberOps implements DynamicOps<Number> {
     public static final NumberOps I = new NumberOps();
+
     @Override
     public Number empty() {
         return 0;
@@ -31,7 +31,7 @@ public class NumberOps implements DynamicOps<Number> {
 
     @Override
     public DataResult<String> getStringValue(Number number) {
-        return number != null?  DataHelper.A.I.success(number.toString()): DataHelper.A.I.error(()->"Not a number");
+        return number != null ? DataHelper.A.I.success(number.toString()) : DataHelper.A.I.error(() -> "Not a number");
     }
 
     @Override
@@ -41,17 +41,17 @@ public class NumberOps implements DynamicOps<Number> {
 
     @Override
     public DataResult<Number> mergeToList(Number number, Number t1) {
-        return DataHelper.A.I.error(()->"Collection not support");
+        return DataHelper.A.I.error(() -> "Collection not support");
     }
 
     @Override
     public DataResult<Number> mergeToMap(Number number, Number t1, Number t2) {
-        return DataHelper.A.I.error(()->"Collection not support");
+        return DataHelper.A.I.error(() -> "Collection not support");
     }
 
     @Override
     public DataResult<Stream<Pair<Number, Number>>> getMapValues(Number number) {
-        return DataHelper.A.I.error(()->"Collection not support");
+        return DataHelper.A.I.error(() -> "Collection not support");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class NumberOps implements DynamicOps<Number> {
 
     @Override
     public DataResult<Stream<Number>> getStream(Number number) {
-        return DataHelper.A.I.error(()->"Collection not support");
+        return DataHelper.A.I.error(() -> "Collection not support");
     }
 
     @Override

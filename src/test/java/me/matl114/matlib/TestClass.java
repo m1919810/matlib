@@ -6,50 +6,61 @@ public class TestClass {
     public Object a;
     public Object b;
     public static Object c;
-    public int ttt=1;
+    public int ttt = 1;
 
     @Getter
     public Object d = null;
+
     @Getter
     private static Object e;
-    public final static Object f = new Object();
+
+    public static final Object f = new Object();
+
     @Getter
-    public final static Object s=1;
-    public String m1(){
+    public static final Object s = 1;
+
+    public String m1() {
         System.out.println("method 1 called");
         return "6b";
     }
-    public String m2(String m2){
+
+    public String m2(String m2) {
         System.out.println("method 2 called");
-        System.out.println("message "+m2);
+        System.out.println("message " + m2);
         return "6b";
     }
-    private void m3(){
+
+    private void m3() {
         System.out.println("method 3 called");
     }
-    public static void m4(){
+
+    public static void m4() {
         System.out.println("method 4 called");
     }
-    private static void m5(){
+
+    private static void m5() {
         System.out.println("method 5 called");
     }
-    public static void m6(String m6){
+
+    public static void m6(String m6) {
         System.out.println("method 6 called");
-        System.out.println("message "+m6);
-    }
-    public static void m6(Object m6){
-        System.out.println("method 6 called");
-        System.out.println("message "+m6);
-    }
-    public static String m7(Object m6){
-        System.out.println("method 7 called");
-        System.out.println("message "+m6);
-        return m6.toString();
-    }
-    public static void m8(Object m6){
-        System.out.println("method 8 called");
-        System.out.println("message "+m6);
-        return;
+        System.out.println("message " + m6);
     }
 
+    public static void m6(Object m6) {
+        System.out.println("method 6 called");
+        System.out.println("message " + m6);
+    }
+
+    public static String m7(Object m6) {
+        System.out.println("method 7 called");
+        System.out.println("message " + m6);
+        return m6.toString();
+    }
+
+    public static void m8(Object m6) {
+        System.out.println("method 8 called");
+        System.out.println("message " + m6);
+        return;
+    }
 }

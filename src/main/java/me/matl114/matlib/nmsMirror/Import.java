@@ -1,7 +1,5 @@
 package me.matl114.matlib.nmsMirror;
 
-import com.mojang.serialization.DataResult;
-import io.papermc.paper.datacomponent.item.CustomModelData;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 
 public interface Import {
@@ -16,7 +14,7 @@ public interface Import {
     String ResourceLocation = "Lnet/minecraft/resources/ResourceLocation;";
     String DataComponentType = "Lnet/minecraft/core/component/DataComponentType;";
     String DataComponentMap = "Lnet/minecraft/core/component/DataComponentMap;";
-//    String CraftPersistentDataContainer = "Lorg/bukkit/craftbukkit/persistence/CraftPersistentDataContainer;";
+    //    String CraftPersistentDataContainer = "Lorg/bukkit/craftbukkit/persistence/CraftPersistentDataContainer;";
     String BlockPos = "Lnet/minecraft/core/BlockPos;";
     String Vec3i = "Lnet/minecraft/core/Vec3i;";
     String BlockState = "Lnet/minecraft/world/level/block/state/BlockState;";
@@ -59,7 +57,7 @@ public interface Import {
     String NbtContents = "Lnet/minecraft/network/chat/contents/NbtContents;";
     String TranslatableContents = "Lnet/minecraft/network/chat/contents/TranslatableContents;";
     String SelectorContents = "Lnet/minecraft/network/chat/contents/SelectorContents;";
-    //String PlainTextContents = "Lnet/minecraft/network/chat/contents/PlainTextContents;";
+    // String PlainTextContents = "Lnet/minecraft/network/chat/contents/PlainTextContents;";
     String LiteralContents = "Lnet/minecraft/network/chat/contents/PlainTextContents$LiteralContents;";
     String KeybindContents = "Lnet/minecraft/network/chat/contents/KeybindContents;";
     String FormattedText$ContentConsumer = "Lnet/minecraft/network/chat/FormattedText$ContentConsumer;";
@@ -80,7 +78,7 @@ public interface Import {
     String CraftEnchantment = "Lorg/bukkit/craftbukkit/enchantments/CraftEnchantment;";
     String MerchantOffer = "Lnet/minecraft/world/item/trading/MerchantOffer;";
     String MerchantOffers = "Lnet/minecraft/world/item/trading/MerchantOffers;";
-    String ClientInformation ="Lnet/minecraft/server/level/ClientInformation;";
+    String ClientInformation = "Lnet/minecraft/server/level/ClientInformation;";
     String ChunkMapTrackedEntity = "Lnet/minecraft/server/level/ChunkMap$TrackedEntity;";
     String ServerPlayer = "Lnet/minecraft/server/level/ServerPlayer;";
     String SynchedEntityData = "Lnet/minecraft/network/syncher/SynchedEntityData;";
@@ -89,9 +87,10 @@ public interface Import {
     String Holder = "Lnet/minecraft/core/Holder;";
     String HolderLookupProvider = "Lnet/minecraft/core/HolderLookup$Provider;";
     String HolderReference = "Lnet/minecraft/core/Holder$Reference;";
-    String CustomModelData ="Lnet/minecraft/world/item/component/CustomModelData;";
-    String CraftCustomModelDataComponent ="Lorg/bukkit/craftbukkit/inventory/components/CraftCustomModelDataComponent;";
-    String Enchantable ="Lnet/minecraft/world/item/component/Enchantable;";
+    String CustomModelData = "Lnet/minecraft/world/item/component/CustomModelData;";
+    String CraftCustomModelDataComponent =
+            "Lorg/bukkit/craftbukkit/inventory/components/CraftCustomModelDataComponent;";
+    String Enchantable = "Lnet/minecraft/world/item/component/Enchantable;";
     String ToggleTooltipsHelper = "Lnet/minecraft/world/level/storage/loot/functions/ToggleTooltips$ComponentToggle;";
     String TagKey = "Lnet/minecraft/tags/TagKey;";
     String CraftTag = "Lorg/bukkit/craftbukkit/tag/CraftTag;";
@@ -107,8 +106,8 @@ public interface Import {
     String CraftEquippableComponent = "Lorg/bukkit/craftbukkit/inventory/components/CraftEquippableComponent;";
     String JukeboxPlayable = "Lnet/minecraft/world/item/JukeboxPlayable;";
     String CraftJukeboxComponent = "Lorg/bukkit/craftbukkit/inventory/components/CraftJukeboxComponent;";
-//    String Encoder = "Lcom/mojang/serialization/Encoder;";
-//    String Encoder = "Lcom/mojang/serialization/Encoder;";
+    //    String Encoder = "Lcom/mojang/serialization/Encoder;";
+    //    String Encoder = "Lcom/mojang/serialization/Encoder;";
     String CraftMetaItem = "Lorg/bukkit/craftbukkit/inventory/CraftMetaItem;";
     String CraftAttributeInstance = "Lorg/bukkit/craftbukkit/attribute/CraftAttributeInstance;";
     String SnbtPrinterTagVisitor = "Lnet/minecraft/nbt/SnbtPrinterTagVisitor;";
@@ -118,7 +117,7 @@ public interface Import {
     String ItemContainerContents = "Lnet/minecraft/world/item/component/ItemContainerContents;";
     String TooltipDisplay = "Lnet/minecraft/world/item/component/TooltipDisplay;";
     String FontDescription = "Lnet/minecraft/network/chat/FontDescription;";
-    String FontAtlasSprite= "Lnet/minecraft/network/chat/FontDescription$AtlasSprite;";
+    String FontAtlasSprite = "Lnet/minecraft/network/chat/FontDescription$AtlasSprite;";
     String FontPlayerSprite = "Lnet/minecraft/network/chat/FontDescription$PlayerSprite;";
     String FontResource = "Lnet/minecraft/network/chat/FontDescription$Resource;";
 
@@ -131,7 +130,6 @@ public interface Import {
     String ChatComponentClass = "net.minecraft.network.chat.Component";
     String ItemLoreClass = "net.minecraft.world.item.component.ItemLore";
 
-
     String ChannelInitializeListenerClass = "io.papermc.paper.network.ChannelInitializeListener";
     String ChannelInitializeListenerHolderClass = "io.papermc.paper.network.ChannelInitializeListenerHolder";
     String PacketClass = "net.minecraft.network.protocol.Packet";
@@ -139,11 +137,11 @@ public interface Import {
     String FriendlyByteBufClass = "net.minecraft.network.FriendlyByteBuf";
     String PacketSendListenerClass = "net.minecraft.network.PacketSendListener";
 
-    public static Class<?> forName(String desName){
-        try{
+    public static Class<?> forName(String desName) {
+        try {
             return Class.forName(ByteCodeUtils.fromJvmType(desName));
 
-        }catch (Throwable e){
+        } catch (Throwable e) {
             return null;
         }
     }

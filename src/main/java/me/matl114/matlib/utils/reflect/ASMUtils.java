@@ -1,112 +1,100 @@
 package me.matl114.matlib.utils.reflect;
 
+import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Type.getInternalName;
+
 import com.google.common.base.Preconditions;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import me.matl114.matlib.utils.Debug;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-import javax.annotation.Nullable;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
-
-import static org.objectweb.asm.Opcodes.*;
-import static org.objectweb.asm.Type.getInternalName;
-
 public class ASMUtils {
-    public static void insertDebug(MethodVisitor mv, String log){
+    public static void insertDebug(MethodVisitor mv, String log) {
         mv.visitLdcInsn(log);
-        mv.visitMethodInsn(
-            INVOKESTATIC,
-            getInternalName(Debug.class),
-            "logger",
-            "(Ljava/lang/String;)V",
-            false
-        );
+        mv.visitMethodInsn(INVOKESTATIC, getInternalName(Debug.class), "logger", "(Ljava/lang/String;)V", false);
     }
-    public static void generateEmptyInit(ClassWriter cw,@Nullable String parentCls){
+
+    public static void generateEmptyInit(ClassWriter cw, @Nullable String parentCls) {
         var methodVisitor = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         {
             methodVisitor.visitCode();
             methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
             methodVisitor.visitMethodInsn(
-                Opcodes.INVOKESPECIAL,
-                parentCls == null?"java/lang/Object":parentCls.replace(".","/"),
-                "<init>",
-                "()V",
-                false);
+                    Opcodes.INVOKESPECIAL,
+                    parentCls == null ? "java/lang/Object" : parentCls.replace(".", "/"),
+                    "<init>",
+                    "()V",
+                    false);
             methodVisitor.visitInsn(Opcodes.RETURN);
-            methodVisitor.visitMaxs(0,0);
+            methodVisitor.visitMaxs(0, 0);
             methodVisitor.visitEnd();
         }
     }
-    public static MethodVisitor createOverrideMethodImpl(ClassWriter cw, Method method){
+
+    public static MethodVisitor createOverrideMethodImpl(ClassWriter cw, Method method) {
         Class<?>[] exceptions = method.getExceptionTypes();
-        String[] names = (exceptions == null || exceptions.length == 0) ? null : Arrays.stream(exceptions) .map(Type::getInternalName).toArray(String[]::new);
+        String[] names = (exceptions == null || exceptions.length == 0)
+                ? null
+                : Arrays.stream(exceptions).map(Type::getInternalName).toArray(String[]::new);
         int mod = method.getModifiers();
-        //remove abstract flag
-        mod = mod & (~ Opcodes.ACC_ABSTRACT);
+        // remove abstract flag
+        mod = mod & (~Opcodes.ACC_ABSTRACT);
         return cw.visitMethod(mod, method.getName(), Type.getMethodDescriptor(method), null, names);
     }
-    public static void createSuitableLoad(MethodVisitor mv, String loadType, int loadIndex){
-        switch (loadType){
+
+    public static int createSuitableLoad(MethodVisitor mv, String loadType, int loadIndex) {
+        switch (loadType) {
             case "int":
             case "boolean":
             case "short":
             case "byte":
             case "char":
                 mv.visitVarInsn(Opcodes.ILOAD, loadIndex);
-                break;
+                return 1;
+
             case "long":
                 mv.visitVarInsn(Opcodes.LLOAD, loadIndex);
-                break;
+                return 2;
             case "double":
                 mv.visitVarInsn(Opcodes.DLOAD, loadIndex);
-                break;
+                return 2;
             case "float":
                 mv.visitVarInsn(Opcodes.FLOAD, loadIndex);
-                break;
+                return 1;
             case "void":
                 throw new IllegalArgumentException("Can not load a void variable");
             default:
                 mv.visitVarInsn(Opcodes.ALOAD, loadIndex);
-                break;
+                return 1;
         }
     }
 
-    public static void createMethodLookupField(ClassWriter cw){
+    public static void createMethodLookupField(ClassWriter cw) {
         var fv = cw.visitField(
-            ACC_PUBLIC|ACC_FINAL|ACC_STATIC,
-            "lookup",
-            "Ljava/lang/invoke/MethodHandles$Lookup;",
-            null,
-            null
-        );
+                ACC_PUBLIC | ACC_FINAL | ACC_STATIC, "lookup", "Ljava/lang/invoke/MethodHandles$Lookup;", null, null);
         fv.visitEnd();
     }
 
-    public static void createMethodLookupInit(MethodVisitor mv, String implPath){
+    public static void createMethodLookupInit(MethodVisitor mv, String implPath) {
         mv.visitLdcInsn(Type.getType(ByteCodeUtils.toJvmType(implPath)));
         mv.visitMethodInsn(
-            INVOKESTATIC,
-            getInternalName(MethodHandles.class),
-            "lookup",
-            "()Ljava/lang/invoke/MethodHandles$Lookup;",
-            false
-        );
-        mv.visitFieldInsn(
-            PUTSTATIC,
-            implPath,
-            "lookup",
-            "Ljava/lang/invoke/MethodHandles$Lookup;"
-        );
+                INVOKESTATIC,
+                getInternalName(MethodHandles.class),
+                "lookup",
+                "()Ljava/lang/invoke/MethodHandles$Lookup;",
+                false);
+        mv.visitFieldInsn(PUTSTATIC, implPath, "lookup", "Ljava/lang/invoke/MethodHandles$Lookup;");
     }
 
-    public static void createSuitableReturn(MethodVisitor mv, String returnType){
-        switch (returnType){
+    public static void createSuitableReturn(MethodVisitor mv, String returnType) {
+        switch (returnType) {
             case "int":
             case "boolean":
             case "short":
@@ -131,8 +119,9 @@ public class ASMUtils {
                 break;
         }
     }
-    public static void createSuitableDefaultValueReturn(MethodVisitor mv, String returnType){
-        switch (returnType){
+
+    public static void createSuitableDefaultValueReturn(MethodVisitor mv, String returnType) {
+        switch (returnType) {
             case "int":
             case "boolean":
             case "short":
@@ -162,54 +151,56 @@ public class ASMUtils {
                 break;
         }
     }
-    public static void castType(MethodVisitor mv, String originType, String targetType){
-        if(!ReflectUtils.isPrimitiveType(originType) && ReflectUtils.isPrimitiveType(targetType)){
-            //向基类转
-            if(!ReflectUtils.isBoxedPrimitive(originType)){
-                //原 不是基类包装类
+
+    public static void castType(MethodVisitor mv, String originType, String targetType) {
+        if (!ReflectUtils.isPrimitiveType(originType) && ReflectUtils.isPrimitiveType(targetType)) {
+            // 向基类转
+            if (!ReflectUtils.isBoxedPrimitive(originType)) {
+                // 原 不是基类包装类
                 String boxedType = ReflectUtils.getBoxedClass(targetType);
                 castType(mv, originType, boxedType);
                 castToPrimitiveType(mv, targetType);
-            }else {
-                //考虑 基类是否可以转
+            } else {
+                // 考虑 基类是否可以转
                 String unboxed = ReflectUtils.getUnboxedClass(originType);
                 castToPrimitiveType(mv, unboxed);
                 castInPrimitive(mv, unboxed, targetType);
             }
-        } else if(ReflectUtils.isPrimitiveType(originType) && !ReflectUtils.isPrimitiveType(targetType)){
+        } else if (ReflectUtils.isPrimitiveType(originType) && !ReflectUtils.isPrimitiveType(targetType)) {
 
-            if(ReflectUtils.isBoxedPrimitive(targetType)){
+            if (ReflectUtils.isBoxedPrimitive(targetType)) {
 
                 String unbox = ReflectUtils.getUnboxedClass(targetType);
                 castInPrimitive(mv, originType, unbox);
                 castFromPrimitiveType(mv, unbox);
-            }else {
+            } else {
 
                 String boxedClass = ReflectUtils.getBoxedClass(originType);
                 castFromPrimitiveType(mv, originType);
-                if(!Objects.equals(targetType, boxedClass)){
-                    //not boxClass belike cast to Object or sth
+                if (!Objects.equals(targetType, boxedClass)) {
+                    // not boxClass belike cast to Object or sth
                     castRefInternel(mv, targetType);
                 }
             }
-//            Preconditions.checkArgument(Objects.equals(boxedClass, targetType), "Primitive type "+ originType+" can only cast to "+ boxedClass);
+            //            Preconditions.checkArgument(Objects.equals(boxedClass, targetType), "Primitive type "+
+            // originType+" can only cast to "+ boxedClass);
 
-        } else if(ReflectUtils.isPrimitiveType(originType )&& ReflectUtils.isPrimitiveType(targetType)){
+        } else if (ReflectUtils.isPrimitiveType(originType) && ReflectUtils.isPrimitiveType(targetType)) {
 
             castInPrimitive(mv, originType, targetType);
-        }
-        else {
+        } else {
 
             castRefInternel(mv, targetType);
         }
     }
 
-    private static void castRefInternel(MethodVisitor mv, String to){
-        if(!"java/lang/Object".equals(to)){
+    private static void castRefInternel(MethodVisitor mv, String to) {
+        if (!"java/lang/Object".equals(to)) {
             mv.visitTypeInsn(Opcodes.CHECKCAST, to);
         }
     }
-    public static void castToPrimitiveType(MethodVisitor mv, String primitive){
+
+    public static void castToPrimitiveType(MethodVisitor mv, String primitive) {
         switch (primitive) {
             case "int":
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
@@ -236,22 +227,29 @@ public class ASMUtils {
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false);
                 break;
             case "void":
-                //wtf?
+                // wtf?
             default:
                 throw new IllegalArgumentException("Unsupported primitive type: " + primitive);
         }
     }
-    public static void castFromPrimitiveType(MethodVisitor mv, String primitive){
-        String boxed  = ReflectUtils.getBoxedClass(primitive);
-        Preconditions.checkArgument(!Objects.equals(primitive, "void"),"can not cast "+primitive +" to "+boxed);
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, boxed, "valueOf", "("+  ByteCodeUtils.toJvmType(primitive) +")"+ ByteCodeUtils.toJvmType(boxed), false );
+
+    public static void castFromPrimitiveType(MethodVisitor mv, String primitive) {
+        String boxed = ReflectUtils.getBoxedClass(primitive);
+        Preconditions.checkArgument(!Objects.equals(primitive, "void"), "can not cast " + primitive + " to " + boxed);
+        mv.visitMethodInsn(
+                Opcodes.INVOKESTATIC,
+                boxed,
+                "valueOf",
+                "(" + ByteCodeUtils.toJvmType(primitive) + ")" + ByteCodeUtils.toJvmType(boxed),
+                false);
     }
-    public static void castInPrimitive(MethodVisitor mv, String primFrom, String primTo){
-        if(Objects.equals(primFrom, primTo)){
+
+    public static void castInPrimitive(MethodVisitor mv, String primFrom, String primTo) {
+        if (Objects.equals(primFrom, primTo)) {
             return;
         }
         switch (primFrom + "->" + primTo) {
-            // int -> 其他类型
+                // int -> 其他类型
             case "int->long":
                 mv.visitInsn(Opcodes.I2L); // int 转 long
                 break;
@@ -271,7 +269,7 @@ public class ASMUtils {
                 mv.visitInsn(Opcodes.I2C); // int 转 char（无符号截断）
                 break;
 
-            // long -> 其他类型
+                // long -> 其他类型
             case "long->int":
                 mv.visitInsn(Opcodes.L2I); // long 转 int（截断）
                 break;
@@ -282,7 +280,7 @@ public class ASMUtils {
                 mv.visitInsn(Opcodes.L2D); // long 转 double
                 break;
 
-            // float -> 其他类型
+                // float -> 其他类型
             case "float->int":
                 mv.visitInsn(Opcodes.F2I); // float 转 int（截断）
                 break;
@@ -293,7 +291,7 @@ public class ASMUtils {
                 mv.visitInsn(Opcodes.F2D); // float 转 double
                 break;
 
-            // double -> 其他类型
+                // double -> 其他类型
             case "double->int":
                 mv.visitInsn(Opcodes.D2I); // double 转 int（截断）
                 break;
@@ -304,7 +302,7 @@ public class ASMUtils {
                 mv.visitInsn(Opcodes.D2F); // double 转 float
                 break;
 
-            // 其他类型（short/byte/char 通常先转 int）
+                // 其他类型（short/byte/char 通常先转 int）
             case "short->int":
             case "byte->int":
             case "char->int":

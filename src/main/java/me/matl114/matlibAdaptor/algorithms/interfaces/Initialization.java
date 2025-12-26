@@ -1,10 +1,9 @@
 package me.matl114.matlibAdaptor.algorithms.interfaces;
 
+import java.util.logging.Logger;
 import me.matl114.matlibAdaptor.proxy.annotations.AdaptorInterface;
 import me.matl114.matlibAdaptor.proxy.annotations.DefaultMethod;
 import me.matl114.matlibAdaptor.proxy.annotations.InternalMethod;
-
-import java.util.logging.Logger;
 
 /**
  * Initialization contains the startup/shutdown information of a progress,
@@ -17,6 +16,7 @@ public interface Initialization {
      * @return
      */
     public boolean isTestMode();
+
     public Initialization testMode(boolean testMode);
 
     /**
@@ -24,24 +24,27 @@ public interface Initialization {
      * @return
      */
     public String getDisplayName();
+
     @InternalMethod
-    public Initialization displayName(final String displayName) ;
+    public Initialization displayName(final String displayName);
 
     /**
      * control the progress's start/stop
      * @return
      */
     @DefaultMethod
-    default void onStart(){
+    default void onStart() {
         onEnable();
     }
+
     @InternalMethod
     public Initialization onEnable();
 
     @DefaultMethod
-    default void onStop(){
+    default void onStop() {
         onDisable();
     }
+
     @InternalMethod
     public Initialization onDisable();
 
@@ -56,7 +59,7 @@ public interface Initialization {
      * @param <T>
      */
     @InternalMethod
-    default  <T extends Initialization> T cast() {
-        return (T)this;
+    default <T extends Initialization> T cast() {
+        return (T) this;
     }
 }

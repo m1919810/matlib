@@ -6,11 +6,8 @@ import me.matl114.matlib.unitTest.samples.DemoTargetClass;
 
 public class CommonTest implements TestCase {
     @OnlineTest(name = "common test")
-    public void test_common()throws Throwable{
+    public void test_common() throws Throwable {
         DemoTargetClass targetClass = new DemoTargetClass();
         targetClass.testMethod();
     }
-
-
 }
-

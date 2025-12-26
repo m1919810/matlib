@@ -1,11 +1,10 @@
 package me.matl114.matlib.utils.reflect.internel;
 
+import java.lang.invoke.MethodHandle;
+import java.util.Map;
 import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
-
-import java.lang.invoke.MethodHandle;
-import java.util.Map;
 
 @Note("this is a HAND-MADE impl for ObfHelper because we need to get the ObfSource before anything")
 @Internal
@@ -16,34 +15,32 @@ class ClassMapperHelperImpl implements ClassMapperHelper {
     private static final MethodHandle handle2 = ReflectUtils.getMethodHandle(clazz0, "mojangName");
     private static final MethodHandle handle3 = ReflectUtils.getMethodHandle(clazz0, "methodsByObf");
 
-    //private final Constructor<?> init0;
-    public ClassMapperHelperImpl() {
-    }
-
+    // private final Constructor<?> init0;
+    public ClassMapperHelperImpl() {}
 
     @Override
     public String obfNameGetter(Object obj) {
-        try{
+        try {
             return (String) handle1.invoke(obj);
-        }catch (Throwable e ){
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public String mojangNameGetter(Object obj) {
-        try{
-            return (String) handle2 .invoke(obj);
-        }catch (Throwable e){
+        try {
+            return (String) handle2.invoke(obj);
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public Map methodsByObf(Object self) {
-        try{
-            return (Map)handle3.invoke(self);
-        }catch (Throwable e){
+        try {
+            return (Map) handle3.invoke(self);
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }

@@ -1,19 +1,18 @@
 package me.matl114.matlib.nmsMirror.chat;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+
+import java.util.Optional;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 
-import java.util.Optional;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
-
 @MultiDescriptive(targetDefault = "net.minecraft.network.chat.ComponentContents")
 public interface ComponentContentAPI extends TargetDescriptor {
     @MethodTarget
-    Optional visit(Object val, @RedirectType(FormattedText$ContentConsumer)Object val2);
+    Optional visit(Object val, @RedirectType(FormattedText$ContentConsumer) Object val2);
 
     @CastCheck(TranslatableContents)
     boolean isTranslatable(Object val);

@@ -1,14 +1,13 @@
 package me.matl114.matlib.utils.experimential;
 
 import com.google.common.base.Preconditions;
+import java.lang.reflect.Constructor;
+import java.util.concurrent.atomic.AtomicInteger;
 import me.matl114.matlib.common.lang.annotations.*;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.version.Version;
 import me.matl114.matlib.utils.version.VersionAtLeast;
 import org.bukkit.Bukkit;
-
-import java.lang.reflect.Constructor;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Experimental
 @Note("This util class provides method to create Fake primary thread that you can run sync task on")
@@ -19,17 +18,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FakeSchedular {
     private static boolean enabled = false;
     private static Constructor<? extends Thread> threadConstructor;
+
     @ForceOnMainThread
-    public static void init(){
+    public static void init() {
         Version v = FakeSchedular.class.getAnnotation(VersionAtLeast.class).value();
-        if(!Version.getVersionInstance().isAtLeast(v)){
+        if (!Version.getVersionInstance().isAtLeast(v)) {
             enabled = false;
             Debug.logger("Fake Schedular thread not enabled");
-//            throw new UnsupportedOperationException("Version should be at least " + FakeSchedular.class.getAnnotation(VersionAtLeast.class).value());
-        }else {
+            //            throw new UnsupportedOperationException("Version should be at least " +
+            // FakeSchedular.class.getAnnotation(VersionAtLeast.class).value());
+        } else {
             try {
                 Preconditions.checkState(Bukkit.isPrimaryThread());
-                threadConstructor = Thread.currentThread().getClass().getConstructor(Runnable.class,String.class);
+                threadConstructor = Thread.currentThread().getClass().getConstructor(Runnable.class, String.class);
                 threadConstructor.setAccessible(true);
                 enabled = true;
                 Debug.logger("Fake Schedular thread enabled");
@@ -38,8 +39,8 @@ public class FakeSchedular {
                 Debug.logger("Fake Schedular thread not enabled");
             }
         }
-
     }
+
     private static final AtomicInteger taskCounter = new AtomicInteger(0);
 
     /**
@@ -48,19 +49,19 @@ public class FakeSchedular {
      * @param runnable
      * @return
      */
-    public static Thread runSync(Runnable runnable){
-        if(enabled){
-            try{
-                Thread thread =  threadConstructor.newInstance(runnable,"Fake Server Thread - "+taskCounter.incrementAndGet());
+    public static Thread runSync(Runnable runnable) {
+        if (enabled) {
+            try {
+                Thread thread = threadConstructor.newInstance(
+                        runnable, "Fake Server Thread - " + taskCounter.incrementAndGet());
                 thread.start();
                 return thread;
-            }catch (Throwable e){
+            } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
-        }else {
+        } else {
             Debug.logger("Fake Schedular thread not enabled");
             return null;
         }
-
     }
 }

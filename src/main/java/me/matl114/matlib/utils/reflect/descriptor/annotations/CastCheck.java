@@ -8,6 +8,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface CastCheck {
-    //使用jvm type name 和 class name 都行
-    String value() ;
+    // 使用jvm type name 和 class name 都行
+    String value();
 }

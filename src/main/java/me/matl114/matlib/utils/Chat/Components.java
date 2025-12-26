@@ -7,17 +7,17 @@ import me.matl114.matlib.utils.chat.placeholder.ArgumentedValue;
 import net.kyori.adventure.text.Component;
 
 public class Components {
-    public static ArgumentedValue<Component> compile(String input){
+    public static ArgumentedValue<Component> compile(String input) {
         var ast = ComponentFormatParser.compile(input);
         var builder = new DynamicComponentBuilder();
         ast.accept(builder);
         return builder.getFinalFunction()::apply;
     }
 
-    public static net.kyori.adventure.text.ComponentBuilder compileStatic(String input){
+    public static net.kyori.adventure.text.ComponentBuilder compileStatic(String input) {
         var ast = ComponentFormatParser.compile(input);
         var builder = new ComponentBuilder();
         ast.accept(builder);
-        return  builder.getResult();
+        return builder.getResult();
     }
 }

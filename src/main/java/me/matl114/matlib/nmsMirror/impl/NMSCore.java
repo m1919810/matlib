@@ -13,21 +13,20 @@ import me.matl114.matlib.utils.version.Version;
 
 public class NMSCore {
     public static final CompoundTagHelper COMPOUND_TAG;
-    public static final ListTagHelper LIST_TAG ;
+    public static final ListTagHelper LIST_TAG;
     public static final TagAPI TAGS;
 
     public static final ResourceLocationHelper NAMESPACE_KEY;
     public static final RegistriesHelper REGISTRIES;
-    public static final BlockPosHelper BLOCKPOS ;
-
+    public static final BlockPosHelper BLOCKPOS;
 
     static {
-        //Version version = Version.getVersionInstance();
-        if (Version.getVersionInstance().isAtLeast(Version.v1_21_R4)){
+        // Version version = Version.getVersionInstance();
+        if (Version.getVersionInstance().isAtLeast(Version.v1_21_R4)) {
             COMPOUND_TAG = DescriptorImplBuilder.createHelperImpl(CompoundTagHelper_v1_21_R4.class);
             TAGS = DescriptorImplBuilder.createMultiHelper(TagAPI_v1_21_R4.class);
 
-        }else {
+        } else {
             COMPOUND_TAG = DescriptorImplBuilder.createHelperImpl(CompoundTagHelper.class);
             TAGS = DescriptorImplBuilder.createMultiHelper(TagAPI.class);
         }

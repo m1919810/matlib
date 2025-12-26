@@ -9,23 +9,26 @@ public class ItemStackKey extends ItemStackHolder implements ItemHashCache {
     Integer hashCode;
     Integer hashCodeNoLore;
 
-    protected ItemStackKey(ItemStack cis){
+    protected ItemStackKey(ItemStack cis) {
         super(cis);
     }
+
     @Note("this method should be only used for creating key for map")
-    public static ItemStackKey of(ItemStack item){
-        if(item == null)return null;
+    public static ItemStackKey of(ItemStack item) {
+        if (item == null) return null;
         ItemStack cis = ItemUtils.cleanStack(item);
         return new ItemStackKey(cis);
     }
-    public int getHashCode(){
-        if(hashCode == null){
-            hashCode =  ItemUtils.itemStackHashCode(this.handle);
+
+    public int getHashCode() {
+        if (hashCode == null) {
+            hashCode = ItemUtils.itemStackHashCode(this.handle);
         }
         return hashCode;
     }
-    public int getHashCodeNoLore(){
-        if(hashCodeNoLore == null){
+
+    public int getHashCodeNoLore() {
+        if (hashCodeNoLore == null) {
             hashCodeNoLore = ItemUtils.itemStackHashCodeWithoutLore(this.handle);
         }
         return hashCodeNoLore;

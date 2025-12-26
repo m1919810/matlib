@@ -4,14 +4,18 @@ import me.matl114.matlib.utils.Debug;
 
 public interface DemoTargetInterface {
     static int i = -114;
+
     public void r();
-    default void f(){
+
+    default void f() {
         Debug.logger("Interface.f called");
     }
-    default void abs(){
+
+    default void abs() {
         Debug.logger("Interface.abs called");
     }
-    default void privateMethod(){
+
+    default void privateMethod() {
         Debug.logger("Interface.privateMethod called");
     }
 }

@@ -1,7 +1,12 @@
 package me.matl114.matlib.nmsMirror.network;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+import static me.matl114.matlib.nmsMirror.network.PacketType.*;
+
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import java.util.ArrayList;
+import java.util.List;
 import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
@@ -11,24 +16,17 @@ import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import me.matl114.matlib.utils.version.Version;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
-import static me.matl114.matlib.nmsMirror.network.PacketType.*;
-
 @MultiDescriptive(targetDefault = "net.minecraft.network.protocol.Packet")
 public interface PacketAPI extends TargetDescriptor {
     @CastCheck(Packet)
     boolean isPacket(Object val);
 
     @MethodTarget
-    void handle(Object packet, @RedirectType(PacketListener)Object listener);
+    void handle(Object packet, @RedirectType(PacketListener) Object listener);
 
-    //out of date
-//    @MethodTarget
-//    void write(Object packet, @RedirectType(FriendlyByteBuf)ByteBuf buf);
+    // out of date
+    //    @MethodTarget
+    //    void write(Object packet, @RedirectType(FriendlyByteBuf)ByteBuf buf);
 
     @CastCheck(ServerboundHelloPacket)
     boolean isServerboundHelloPacket(Object packet);
@@ -53,32 +51,31 @@ public interface PacketAPI extends TargetDescriptor {
     Iterable<?> bundlePacket$SubPackets(Object packet);
 
     @ConstructorTarget
-    //@IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = true)
+    // @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = true)
     @RedirectClass("net.minecraft.network.protocol.game.ClientboundBundlePacket")
     Object newBundle(Iterable<?> packets);
-    //nothing is wrong!
-//    {
-//        return newBundle0(packets);
-//    }
+    // nothing is wrong!
+    //    {
+    //        return newBundle0(packets);
+    //    }
 
-//    @ConstructorTarget
-//    @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = false)
-//    @RedirectClass("net.minecraft.network.protocol.BundlePacket")
-//    @Internal
-//    public Object newBundle0(Iterable<?> packets);
+    //    @ConstructorTarget
+    //    @IgnoreFailure(thresholdInclude = Version.v1_20_R4, below = false)
+    //    @RedirectClass("net.minecraft.network.protocol.BundlePacket")
+    //    @Internal
+    //    public Object newBundle0(Iterable<?> packets);
 
-
-    //itemStack fields
+    // itemStack fields
 
     @FieldTarget
     @RedirectName("itemStackGetter")
     @RedirectClass(ServerboundSetCreativeModeSlotPacket)
     Object serverboundSetCreativeModeSlotPacket$itemStack(Object packet);
 
-    //already a copy
+    // already a copy
     @MethodTarget
     @RedirectClass(ClientboundSetCursorItemPacket)
-    @IgnoreFailure(thresholdInclude = Version.v1_21_R2,below = true)
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R2, below = true)
     @RedirectName("contents")
     Object clientboundSetCursorItemPacket$cursor(Object packet);
 
@@ -94,7 +91,7 @@ public interface PacketAPI extends TargetDescriptor {
 
     @MethodTarget
     @RedirectClass(ClientboundSetPlayerInventoryPacket)
-    @IgnoreFailure(thresholdInclude = Version.v1_21_R2,below = true)
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R2, below = true)
     @RedirectName("contents")
     Object clientboundSetPlayerInventoryPacket$SlotContent(Object packet);
 
@@ -132,11 +129,10 @@ public interface PacketAPI extends TargetDescriptor {
     @RedirectClass(ServerboundClientInformationPacket)
     @RedirectName("language")
     @IgnoreFailure(thresholdInclude = Version.v1_20_R3, below = false)
-    default String serverboundClientInformationPacket$language(Object packet){
+    default String serverboundClientInformationPacket$language(Object packet) {
         Object info = serverboundClientInformationPacket$information(packet);
         return clientInformation$information(info);
     }
-
 
     @Internal
     @MethodTarget

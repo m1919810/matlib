@@ -1,30 +1,29 @@
 package me.matl114.matlib.algorithms.dataStructures.frames.mmap;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 public abstract class ValueAccess<T> {
     boolean validBit;
     T cache;
+
     public abstract T get0();
-    public T get(){
-        if(validBit){
+
+    public T get() {
+        if (validBit) {
             return cache;
-        }else {
+        } else {
             cache = get0();
             return cache;
         }
     }
 
     public abstract void set0(T val);
-    public void set(T value){
+
+    public void set(T value) {
         validBit = true;
         cache = value;
         set0(value);
     }
-    public void flush(){
+
+    public void flush() {
         validBit = false;
     }
-
-
 }

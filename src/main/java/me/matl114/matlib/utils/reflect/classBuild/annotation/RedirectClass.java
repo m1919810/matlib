@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface RedirectClass {
-    //can be jvm type name or Class name
-    String value() ;
+    // can be jvm type name or Class name
+    String value();
 }

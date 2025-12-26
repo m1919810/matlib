@@ -1,21 +1,21 @@
 package me.matl114.matlib.nmsMirror.core;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+
 import me.matl114.matlib.common.lang.annotations.Note;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.ConstructorTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
-import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import org.jetbrains.annotations.Contract;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
 
 @Descriptive(target = "net.minecraft.core.Vec3i")
 public interface Vec3iHelper extends TargetDescriptor {
     @ConstructorTarget
     Comparable<?> ofVec(int x, int y, int z);
 
-    default Comparable<?> cast(Object obj){
+    default Comparable<?> cast(Object obj) {
         return (Comparable<?>) obj;
     }
 
@@ -42,7 +42,7 @@ public interface Vec3iHelper extends TargetDescriptor {
     Object offset(Object vec, int x, int y, int z);
 
     @MethodTarget
-    Object offset(Object vec,@RedirectType(Vec3i) Object vec3);
+    Object offset(Object vec, @RedirectType(Vec3i) Object vec3);
 
     @MethodTarget
     @Contract("_,_ -> new")
@@ -50,12 +50,12 @@ public interface Vec3iHelper extends TargetDescriptor {
 
     @MethodTarget
     @Contract("_,_,_ -> new")
-    Object relative(Object vec, @RedirectType(Direction)Object dir, int distance);
+    Object relative(Object vec, @RedirectType(Direction) Object dir, int distance);
 
     @MethodTarget
     @Contract("_,_ -> new")
     @Note("叉乘")
-    Object cross(Object vec, @RedirectType(Vec3i)Object vec3);
+    Object cross(Object vec, @RedirectType(Vec3i) Object vec3);
 
     @MethodTarget
     String toShortString(Object vec);

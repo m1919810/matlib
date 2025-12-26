@@ -11,9 +11,8 @@ public interface ResourceLocationHelper extends TargetDescriptor {
     @ConstructorTarget
     Object newNSKey(String namespace, String key);
 
-
-    default Object newNSKey( String key){
-        return newNSKey("minecraft",key);
+    default Object newNSKey(String key) {
+        return newNSKey("minecraft", key);
     }
 
     @MethodTarget(isStatic = true)
@@ -28,11 +27,11 @@ public interface ResourceLocationHelper extends TargetDescriptor {
     @MethodTarget
     String getNamespace(Object obj);
 
-    default NamespacedKey toBukkit(Object obj){
+    default NamespacedKey toBukkit(Object obj) {
         return new NamespacedKey(getNamespace(obj), getPath(obj));
     }
-    default Object fromBukkit(NamespacedKey key){
+
+    default Object fromBukkit(NamespacedKey key) {
         return newNSKey(key.getNamespace(), key.getKey());
     }
-
 }

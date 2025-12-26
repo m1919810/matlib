@@ -5,15 +5,14 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.*;
 import me.matl114.matlib.algorithms.algorithm.FuncUtils;
 import me.matl114.matlib.algorithms.algorithm.MathUtils;
 import me.matl114.matlib.common.functions.core.TriFunction;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.*;
 
 public class ScreenBuilder implements Screen {
     private IntList pageContentIndex;
@@ -23,24 +22,27 @@ public class ScreenBuilder implements Screen {
     private List<SlotProvider> pageContentList;
     private Int2ReferenceMap<SlotProvider> overrideList;
     private String screenTitle;
-    //************************* default value can be changed ***************************
+    // ************************* default value can be changed ***************************
     private ItemStack backgroundItem = ScreenUtils.UI_BACKGROUND;
     private ItemStack backButtonItem = ScreenUtils.BACK_BUTTON;
-    private Function<InventoryBuilder, InteractHandler> backHandler = (i)->InteractHandler.task(p->goBackFrom(i, p));;
+    private Function<InventoryBuilder, InteractHandler> backHandler =
+            (i) -> InteractHandler.task(p -> goBackFrom(i, p));
+    ;
     private TriFunction<Integer, Integer, Integer, ItemStack> pageSwitchProvider = ScreenUtils::getPageSwitch;
-    private ToIntFunction<ScreenBuilder> maxPageProvider = (sc)->{
-        if(pageContentIndex.isEmpty())return 1;
-        return Math.max(1, (pageContentList.size() - 1)/pageContentIndex.size() +1);
+    private ToIntFunction<ScreenBuilder> maxPageProvider = (sc) -> {
+        if (pageContentIndex.isEmpty()) return 1;
+        return Math.max(1, (pageContentList.size() - 1) / pageContentIndex.size() + 1);
     };
-    private Function<InventoryBuilder, InteractHandler> blankClickHandler =(i)-> null;
-    private Function<InventoryBuilder, ScreenOpenHandler> openHandler = (i)->null;
-    private Function<InventoryBuilder, ScreenCloseHandler> closeHandler = (i)->null;
+    private Function<InventoryBuilder, InteractHandler> blankClickHandler = (i) -> null;
+    private Function<InventoryBuilder, ScreenOpenHandler> openHandler = (i) -> null;
+    private Function<InventoryBuilder, ScreenCloseHandler> closeHandler = (i) -> null;
     private ScreenHistoryStack relatedHistory;
-    //*************************...
-    public ScreenBuilder(ScreenTemplate screenTemplate){
-        this(screenTemplate.defaultTitle().orElse(null), screenTemplate.sizePerScreen() ,screenTemplate.toList());
+    // *************************...
+    public ScreenBuilder(ScreenTemplate screenTemplate) {
+        this(screenTemplate.defaultTitle().orElse(null), screenTemplate.sizePerScreen(), screenTemplate.toList());
     }
-    public ScreenBuilder(String defaultTitle, int sizePerPage,List<SlotType> pageSlotType){
+
+    public ScreenBuilder(String defaultTitle, int sizePerPage, List<SlotType> pageSlotType) {
         this.screenTitle = defaultTitle;
         this.sizePerPage = sizePerPage;
         this.basicList = new Int2ReferenceArrayMap<>();
@@ -49,115 +51,126 @@ public class ScreenBuilder implements Screen {
         int size0 = pageSlotType.size();
         this.pageContentIndex = new IntArrayList();
         this.buttonedIndex = new Int2ReferenceArrayMap<>();
-        SlotProvider backgroundProvider = SlotProvider.instance().withStack(()->backgroundItem);
-        SlotProvider blankProvider = SlotProvider.instance().withStack(()->null);
-        for (int i = 0 ; i< size0; ++i){
+        SlotProvider backgroundProvider = SlotProvider.instance().withStack(() -> backgroundItem);
+        SlotProvider blankProvider = SlotProvider.instance().withStack(() -> null);
+        for (int i = 0; i < size0; ++i) {
             SlotType slotType = pageSlotType.get(i);
-            switch (slotType){
+            switch (slotType) {
                 case BLANK -> basicList.put(i, blankProvider);
                 case BACKGROUND -> basicList.put(i, backgroundProvider);
                 case PAGE_CONTENT -> pageContentIndex.add(i);
-                case COMMON_BUTTON,PREV_PAGE,NEXT_PAGE,BACK_BUTTON -> buttonedIndex.put(i, slotType);
+                case COMMON_BUTTON, PREV_PAGE, NEXT_PAGE, BACK_BUTTON -> buttonedIndex.put(i, slotType);
                 default -> basicList.put(i, blankProvider);
             }
         }
-
-    }
-    public ScreenBuilder background(ItemStack background){
-       this.backgroundItem = background.clone();
-       return this;
     }
 
-    public ScreenBuilder maxPage(ToIntFunction<ScreenBuilder> builder){
+    public ScreenBuilder background(ItemStack background) {
+        this.backgroundItem = background.clone();
+        return this;
+    }
+
+    public ScreenBuilder maxPage(ToIntFunction<ScreenBuilder> builder) {
         this.maxPageProvider = builder;
         return this;
     }
 
-    public ScreenBuilder pageSwitcher(TriFunction<Integer, Integer, Integer, ItemStack> pageSwitchProvider){
+    public ScreenBuilder pageSwitcher(TriFunction<Integer, Integer, Integer, ItemStack> pageSwitchProvider) {
         this.pageSwitchProvider = pageSwitchProvider;
         return this;
     }
 
-    public ScreenBuilder backHandler(Function<InventoryBuilder, InteractHandler> backHandler){
+    public ScreenBuilder backHandler(Function<InventoryBuilder, InteractHandler> backHandler) {
         this.backHandler = backHandler;
         return this;
     }
-    private void ensureSize(int i){
-        while (this.pageContentList.size() <= i)
-        {
+
+    private void ensureSize(int i) {
+        while (this.pageContentList.size() <= i) {
             this.pageContentList.add(null);
         }
     }
-    public ScreenBuilder pageContent(int i, SlotProvider provider){
+
+    public ScreenBuilder pageContent(int i, SlotProvider provider) {
         ensureSize(i);
         this.pageContentList.set(i, provider);
         return this;
     }
 
-    public ScreenBuilder pageContent(int i, Supplier<ItemStack> stack){
+    public ScreenBuilder pageContent(int i, Supplier<ItemStack> stack) {
         ensureSize(i);
         SlotProvider provider = this.pageContentList.get(i);
-        if(provider != null){
+        if (provider != null) {
             provider.withStack(stack);
-        }else {
+        } else {
             this.pageContentList.set(i, SlotProvider.instance().withStack(stack));
         }
         return this;
     }
-    public ScreenBuilder pageContent(int i, Supplier<ItemStack> stack, Supplier<InteractHandler> handlerSupplier){
+
+    public ScreenBuilder pageContent(int i, Supplier<ItemStack> stack, Supplier<InteractHandler> handlerSupplier) {
         ensureSize(i);
         SlotProvider provider = this.pageContentList.get(i);
-        if(provider != null){
+        if (provider != null) {
             provider.withStack(stack).withHandler(handlerSupplier);
-        }else {
+        } else {
             this.pageContentList.set(i, SlotProvider.instance().withStack(stack).withHandler(handlerSupplier));
         }
         return this;
     }
-    public ScreenBuilder pageContent(int i, ItemStack stack, InteractHandler handler){
+
+    public ScreenBuilder pageContent(int i, ItemStack stack, InteractHandler handler) {
         return pageContent(i, FuncUtils.value(stack), FuncUtils.value(handler));
     }
-    public ScreenBuilder pageContentHandler(int i, Supplier<InteractHandler> handlerSupplier){
+
+    public ScreenBuilder pageContentHandler(int i, Supplier<InteractHandler> handlerSupplier) {
         ensureSize(i);
         SlotProvider provider = this.pageContentList.get(i);
-        if(provider != null){
+        if (provider != null) {
             provider.withHandler(handlerSupplier);
-        }else {
+        } else {
             this.pageContentList.set(i, SlotProvider.instance().withHandler(handlerSupplier));
         }
         return this;
     }
-    public ScreenBuilder pageContent(int i, UnaryOperator<SlotProvider> operator){
+
+    public ScreenBuilder pageContent(int i, UnaryOperator<SlotProvider> operator) {
         ensureSize(i);
         SlotProvider provider = this.pageContentList.get(i);
-        if(provider == null)provider = SlotProvider.instance();
+        if (provider == null) provider = SlotProvider.instance();
         this.pageContentList.set(i, operator.apply(provider));
         return this;
     }
-    public ScreenBuilder pageContent(SlotProvider provider){
+
+    public ScreenBuilder pageContent(SlotProvider provider) {
         this.pageContentList.add(provider);
         return this;
     }
-    public ScreenBuilder pageContent(Supplier<ItemStack> itemStackSupplier){
+
+    public ScreenBuilder pageContent(Supplier<ItemStack> itemStackSupplier) {
         return pageContent(SlotProvider.instance().withStack(itemStackSupplier));
     }
-    public ScreenBuilder pageContentHandler(Supplier<InteractHandler> handlerSupplier){
+
+    public ScreenBuilder pageContentHandler(Supplier<InteractHandler> handlerSupplier) {
         return pageContent(SlotProvider.instance().withHandler(handlerSupplier));
     }
-    public ScreenBuilder pageContent(Supplier<ItemStack> itemStackSupplier, Supplier<InteractHandler> handlerSupplier){
+
+    public ScreenBuilder pageContent(Supplier<ItemStack> itemStackSupplier, Supplier<InteractHandler> handlerSupplier) {
         return pageContent(SlotProvider.instance().withStack(itemStackSupplier).withHandler(handlerSupplier));
     }
-    public ScreenBuilder pageContent(ItemStack stack, InteractHandler handler){
+
+    public ScreenBuilder pageContent(ItemStack stack, InteractHandler handler) {
         return pageContent(FuncUtils.value(stack), FuncUtils.value(handler));
     }
 
-    public ScreenBuilder override(int i, SlotProvider override){
+    public ScreenBuilder override(int i, SlotProvider override) {
         this.overrideList.put(i, override);
         return this;
     }
-    public ScreenBuilder override(int i, Supplier<ItemStack> stack){
-        this.overrideList.compute(i, (t,v)->{
-            if(v ==null){
+
+    public ScreenBuilder override(int i, Supplier<ItemStack> stack) {
+        this.overrideList.compute(i, (t, v) -> {
+            if (v == null) {
                 v = SlotProvider.instance();
             }
             v.withStack(stack);
@@ -165,9 +178,10 @@ public class ScreenBuilder implements Screen {
         });
         return this;
     }
-    public ScreenBuilder overrideHandler(int i, Supplier<InteractHandler> stack){
-        this.overrideList.compute(i, (t,v)->{
-            if(v ==null){
+
+    public ScreenBuilder overrideHandler(int i, Supplier<InteractHandler> stack) {
+        this.overrideList.compute(i, (t, v) -> {
+            if (v == null) {
                 v = SlotProvider.instance();
             }
             v.withHandler(stack);
@@ -176,53 +190,56 @@ public class ScreenBuilder implements Screen {
         return this;
     }
 
-    public ScreenBuilder override(int i, ItemStack stack){
+    public ScreenBuilder override(int i, ItemStack stack) {
         return override(i, FuncUtils.value(stack));
     }
-    public ScreenBuilder override(int i, InteractHandler handler){
+
+    public ScreenBuilder override(int i, InteractHandler handler) {
         return overrideHandler(i, FuncUtils.value(handler));
     }
 
-    public ScreenBuilder override(int i, ItemStack stack, InteractHandler handler){
+    public ScreenBuilder override(int i, ItemStack stack, InteractHandler handler) {
         return override(i, SlotProvider.instance().withStack(stack).withHandler(handler));
     }
 
-    public ScreenBuilder override(int i, UnaryOperator<SlotProvider> slotProviderUnaryOperator){
-        this.overrideList.compute(i, (t,v)->{
-            if(v == null)v = SlotProvider.instance();
+    public ScreenBuilder override(int i, UnaryOperator<SlotProvider> slotProviderUnaryOperator) {
+        this.overrideList.compute(i, (t, v) -> {
+            if (v == null) v = SlotProvider.instance();
             return slotProviderUnaryOperator.apply(v);
         });
         return this;
     }
 
-    public ScreenBuilder title(String title){
+    public ScreenBuilder title(String title) {
         this.screenTitle = title;
         return this;
     }
 
-    public ScreenBuilder openHandler(ScreenOpenHandler handler){
-        this.openHandler = (i)->handler;
+    public ScreenBuilder openHandler(ScreenOpenHandler handler) {
+        this.openHandler = (i) -> handler;
         return this;
     }
-    public ScreenBuilder openHandler(Function<InventoryBuilder, ScreenOpenHandler> handlerFunction){
+
+    public ScreenBuilder openHandler(Function<InventoryBuilder, ScreenOpenHandler> handlerFunction) {
         this.openHandler = handlerFunction;
         return this;
     }
 
-    public ScreenBuilder closeHandler(ScreenCloseHandler handler){
-        this.closeHandler = (i)->handler;
+    public ScreenBuilder closeHandler(ScreenCloseHandler handler) {
+        this.closeHandler = (i) -> handler;
         return this;
     }
-    public ScreenBuilder closeHandler(Function<InventoryBuilder, ScreenCloseHandler> handlerFunction){
+
+    public ScreenBuilder closeHandler(Function<InventoryBuilder, ScreenCloseHandler> handlerFunction) {
         this.closeHandler = handlerFunction;
         return this;
     }
 
-    public ScreenBuilder screenClick(InteractHandler handler){
-        return screenClick((i)->handler);
+    public ScreenBuilder screenClick(InteractHandler handler) {
+        return screenClick((i) -> handler);
     }
 
-    public ScreenBuilder screenClick(Function<InventoryBuilder, InteractHandler> handlerFunction){
+    public ScreenBuilder screenClick(Function<InventoryBuilder, InteractHandler> handlerFunction) {
         this.blankClickHandler = handlerFunction;
         return this;
     }
@@ -235,52 +252,62 @@ public class ScreenBuilder implements Screen {
      * @return
      */
     @Override
-    public ScreenBuilder relateToHistory(ScreenHistoryStack stack){
+    public ScreenBuilder relateToHistory(ScreenHistoryStack stack) {
         this.relatedHistory = stack;
         return this;
     }
 
-
-    public <T, W extends InventoryBuilder<T>> W createInventory(int page0, InventoryBuilder.InventoryFactory<T, W> fact){
-        //Preconditions.checkArgument(page>= 1);
+    public <T, W extends InventoryBuilder<T>> W createInventory(
+            int page0, InventoryBuilder.InventoryFactory<T, W> fact) {
+        // Preconditions.checkArgument(page>= 1);
         int currentMax = this.maxPageProvider.applyAsInt(this);
 
         Preconditions.checkArgument(1 <= currentMax, "Max page < 1");
         int page = MathUtils.clamp(page0, 1, currentMax);
         W factory = fact.visitBuilder(this);
         factory.visitPage(this, this.screenTitle, page, this.sizePerPage, currentMax);
-        for (var entry: this.basicList.int2ReferenceEntrySet()){
+        for (var entry : this.basicList.int2ReferenceEntrySet()) {
             int index = entry.getIntKey();
-            if(index >= 0 && index < this.sizePerPage){
-                factory.visitSlot(index, entry.getValue().getStack(factory), entry.getValue().getHandler(factory));
+            if (index >= 0 && index < this.sizePerPage) {
+                factory.visitSlot(
+                        index,
+                        entry.getValue().getStack(factory),
+                        entry.getValue().getHandler(factory));
             }
         }
-        int pageIndexRangeStart = (page - 1)* this.pageContentIndex.size();
+        int pageIndexRangeStart = (page - 1) * this.pageContentIndex.size();
         int pageIndexRangeEnd = pageIndexRangeStart + this.pageContentIndex.size();
-        for (int i= pageIndexRangeStart ; i< pageIndexRangeEnd; ++i){
-            if(i < pageContentList.size()){
+        for (int i = pageIndexRangeStart; i < pageIndexRangeEnd; ++i) {
+            if (i < pageContentList.size()) {
                 SlotProvider provider = pageContentList.get(i);
-                if(provider != null){
-                    factory.visitSlot(this.pageContentIndex.getInt(i - pageIndexRangeStart), provider.getStack(factory), provider.getHandler(factory));
+                if (provider != null) {
+                    factory.visitSlot(
+                            this.pageContentIndex.getInt(i - pageIndexRangeStart),
+                            provider.getStack(factory),
+                            provider.getHandler(factory));
                 }
             }
         }
-        for (var entry: buttonedIndex.int2ReferenceEntrySet()){
+        for (var entry : buttonedIndex.int2ReferenceEntrySet()) {
             int index = entry.getIntKey();
-            if(index >=0 && index < this.sizePerPage){
-                ItemStack stack ;
+            if (index >= 0 && index < this.sizePerPage) {
+                ItemStack stack;
                 InteractHandler handler = InteractHandler.EMPTY;
-                switch (entry.getValue()){
+                switch (entry.getValue()) {
                     case PREV_PAGE:
-                        stack = this.pageSwitchProvider == null? null: this.pageSwitchProvider.apply(page, page-1,currentMax);
-                        if(page > 1){
-                            handler = InteractHandler.task(p-> openPage(fact, p,page - 1));
+                        stack = this.pageSwitchProvider == null
+                                ? null
+                                : this.pageSwitchProvider.apply(page, page - 1, currentMax);
+                        if (page > 1) {
+                            handler = InteractHandler.task(p -> openPage(fact, p, page - 1));
                         }
                         break;
                     case NEXT_PAGE:
-                        stack = this.pageSwitchProvider == null? null: this.pageSwitchProvider.apply(page, page+1,currentMax);
-                        if(page < currentMax){
-                            handler = InteractHandler.task(p->openPage(fact, p,page + 1));
+                        stack = this.pageSwitchProvider == null
+                                ? null
+                                : this.pageSwitchProvider.apply(page, page + 1, currentMax);
+                        if (page < currentMax) {
+                            handler = InteractHandler.task(p -> openPage(fact, p, page + 1));
                         }
                         break;
                     case BACK_BUTTON:
@@ -293,14 +320,13 @@ public class ScreenBuilder implements Screen {
                 factory.visitSlot(index, stack, handler);
             }
         }
-        for (var entry: this.overrideList.int2ReferenceEntrySet()){
+        for (var entry : this.overrideList.int2ReferenceEntrySet()) {
             int index = entry.getIntKey();
-            if(index >= 0 && index < this.sizePerPage){
+            if (index >= 0 && index < this.sizePerPage) {
                 SlotProvider value = entry.getValue();
-                if(value != null){
+                if (value != null) {
                     factory.visitSlot(index, value.getStack(factory), value.getHandler(factory));
                 }
-
             }
         }
         factory.visitScreenClick(this.blankClickHandler.apply(factory));
@@ -310,12 +336,10 @@ public class ScreenBuilder implements Screen {
         return factory;
     }
 
-
-
     /**
      * invoke when player try to open this screen with history records
      */
-    public void trackScreenOpen(InventoryBuilder builder, Player player){
+    public void trackScreenOpen(InventoryBuilder builder, Player player) {
         trackScreenOpen(player, builder.getPage());
     }
 
@@ -324,33 +348,30 @@ public class ScreenBuilder implements Screen {
      * @param builder
      * @param player
      */
-    public void goBackFrom(InventoryBuilder builder, Player player){
+    public void goBackFrom(InventoryBuilder builder, Player player) {
         goBack(builder.getFactory(), player);
     }
 
-    public void switchCurrentScreenPage(Player player, int page){
-        if(this.relatedHistory != null){
+    public void switchCurrentScreenPage(Player player, int page) {
+        if (this.relatedHistory != null) {
             this.relatedHistory.switchTopPage(this, player, page);
         }
     }
 
-    public void trackScreenOpen( Player player, int page){
-        if(this.relatedHistory != null){
+    public void trackScreenOpen(Player player, int page) {
+        if (this.relatedHistory != null) {
             this.relatedHistory.pushNew(this, player, page);
         }
     }
 
-
-    public void goBack(InventoryBuilder.InventoryFactory factory, Player player){
-        if(this.relatedHistory != null){
-            if(this.relatedHistory.goBackToLast(factory, player)){
+    public void goBack(InventoryBuilder.InventoryFactory factory, Player player) {
+        if (this.relatedHistory != null) {
+            if (this.relatedHistory.goBackToLast(factory, player)) {
                 return;
             }
         }
         player.closeInventory();
     }
-
-
 
     @Override
     public void openPage(InventoryBuilder.InventoryFactory screenType, Player player, int page) {
@@ -358,7 +379,7 @@ public class ScreenBuilder implements Screen {
         builder.open(player);
     }
 
-    public void openPageWithHistory(InventoryBuilder.InventoryFactory screenType, Player player, int page){
+    public void openPageWithHistory(InventoryBuilder.InventoryFactory screenType, Player player, int page) {
         var builder = createInventory(page, screenType);
         builder.openWithHistory(player);
     }

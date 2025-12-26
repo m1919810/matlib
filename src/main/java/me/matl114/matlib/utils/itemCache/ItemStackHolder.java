@@ -6,6 +6,9 @@ import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.inventory.ItemRarity;
 import io.papermc.paper.inventory.tooltip.TooltipContext;
 import io.papermc.paper.registry.set.RegistryKeySet;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.*;
@@ -18,18 +21,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.*;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
+public class ItemStackHolder extends ItemStack {
 
-public class ItemStackHolder  extends ItemStack{
-
-
-    public ItemStackHolder(ItemStack delegate){
+    public ItemStackHolder(ItemStack delegate) {
         super();
         this.handle = delegate;
     }
+
     public ItemStack handle;
+
     public @NotNull Material getType() {
         return this.handle.getType();
     }
@@ -41,10 +41,7 @@ public class ItemStackHolder  extends ItemStack{
         this.handle.setType(type);
     }
 
-    @Contract(
-        value = "_ -> new",
-        pure = true
-    )
+    @Contract(value = "_ -> new", pure = true)
     public @NotNull ItemStack withType(@NotNull Material type) {
         return this.handle.withType(type);
     }
@@ -58,36 +55,25 @@ public class ItemStackHolder  extends ItemStack{
     }
 
     /** @deprecated */
-    @Deprecated(
-        forRemoval = true,
-        since = "1.13"
-    )
+    @Deprecated(forRemoval = true, since = "1.13")
     public @Nullable MaterialData getData() {
         return this.handle.getData();
     }
 
     /** @deprecated */
-    @Deprecated(
-        forRemoval = true,
-        since = "1.13"
-    )
+    @Deprecated(forRemoval = true, since = "1.13")
     public void setData(@Nullable MaterialData data) {
         this.handle.setData(data);
-
     }
 
     /** @deprecated */
-    @Deprecated(
-        since = "1.13"
-    )
+    @Deprecated(since = "1.13")
     public void setDurability(short durability) {
         this.handle.setDurability(durability);
     }
 
     /** @deprecated */
-    @Deprecated(
-        since = "1.13"
-    )
+    @Deprecated(since = "1.13")
     public short getDurability() {
         return this.handle.getDurability();
     }
@@ -95,7 +81,6 @@ public class ItemStackHolder  extends ItemStack{
     public int getMaxStackSize() {
         return this.handle.getMaxStackSize();
     }
-
 
     public String toString() {
         return this.handle.toString();
@@ -131,7 +116,6 @@ public class ItemStackHolder  extends ItemStack{
 
     public void addEnchantments(@NotNull Map<Enchantment, Integer> enchantments) {
         this.handle.addEnchantments(enchantments);
-
     }
 
     public void addEnchantment(@NotNull Enchantment ench, int level) {
@@ -140,7 +124,6 @@ public class ItemStackHolder  extends ItemStack{
 
     public void addUnsafeEnchantments(@NotNull Map<Enchantment, Integer> enchantments) {
         this.handle.addUnsafeEnchantments(enchantments);
-
     }
 
     public void addUnsafeEnchantment(@NotNull Enchantment ench, int level) {
@@ -156,31 +139,31 @@ public class ItemStackHolder  extends ItemStack{
     }
 
     public @NotNull Map<String, Object> serialize() {
-       return this.handle.serialize();
+        return this.handle.serialize();
     }
 
     public static @NotNull ItemStack deserialize(@NotNull Map<String, Object> args) {
-        int version = args.containsKey("v") ? ((Number)args.get("v")).intValue() : -1;
+        int version = args.containsKey("v") ? ((Number) args.get("v")).intValue() : -1;
         short damage = 0;
         int amount = 1;
         if (args.containsKey("damage")) {
-            damage = ((Number)args.get("damage")).shortValue();
+            damage = ((Number) args.get("damage")).shortValue();
         }
 
         Material type;
         if (version < 0) {
-            type = Material.getMaterial("LEGACY_" + (String)args.get("type"));
-            byte dataVal = type != null && type.getMaxDurability() == 0 ? (byte)damage : 0;
+            type = Material.getMaterial("LEGACY_" + (String) args.get("type"));
+            byte dataVal = type != null && type.getMaxDurability() == 0 ? (byte) damage : 0;
             type = Bukkit.getUnsafe().fromLegacy(new MaterialData(type, dataVal), true);
             if (dataVal != 0) {
                 damage = 0;
             }
         } else {
-            type = Bukkit.getUnsafe().getMaterial((String)args.get("type"), version);
+            type = Bukkit.getUnsafe().getMaterial((String) args.get("type"), version);
         }
 
         if (args.containsKey("amount")) {
-            amount = ((Number)args.get("amount")).intValue();
+            amount = ((Number) args.get("amount")).intValue();
         }
 
         ItemStack result = new ItemStack(type, amount, damage);
@@ -188,29 +171,29 @@ public class ItemStackHolder  extends ItemStack{
         if (args.containsKey("enchantments")) {
             raw = args.get("enchantments");
             if (raw instanceof Map) {
-                Map<?, ?> map = (Map)raw;
+                Map<?, ?> map = (Map) raw;
                 Iterator var8 = map.entrySet().iterator();
 
-                while(var8.hasNext()) {
-                    Map.Entry<?, ?> entry = (Map.Entry)var8.next();
+                while (var8.hasNext()) {
+                    Map.Entry<?, ?> entry = (Map.Entry) var8.next();
                     String stringKey = entry.getKey().toString();
                     stringKey = Bukkit.getUnsafe().get(Enchantment.class, stringKey);
                     NamespacedKey key = NamespacedKey.fromString(stringKey.toLowerCase(Locale.ROOT));
-                    Enchantment enchantment = (Enchantment)Bukkit.getUnsafe().get(Registry.ENCHANTMENT, key);
+                    Enchantment enchantment = (Enchantment) Bukkit.getUnsafe().get(Registry.ENCHANTMENT, key);
                     if (enchantment != null && entry.getValue() instanceof Integer) {
-                        result.addUnsafeEnchantment(enchantment, (Integer)entry.getValue());
+                        result.addUnsafeEnchantment(enchantment, (Integer) entry.getValue());
                     }
                 }
             }
         } else if (args.containsKey("meta")) {
             raw = args.get("meta");
             if (raw instanceof ItemMeta) {
-                ((ItemMeta)raw).setVersion(version);
-                if (version < 3837 && ((ItemMeta)raw).hasItemFlag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)) {
-                    ((ItemMeta)raw).addItemFlags(new ItemFlag[]{ItemFlag.HIDE_STORED_ENCHANTS});
+                ((ItemMeta) raw).setVersion(version);
+                if (version < 3837 && ((ItemMeta) raw).hasItemFlag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)) {
+                    ((ItemMeta) raw).addItemFlags(new ItemFlag[] {ItemFlag.HIDE_STORED_ENCHANTS});
                 }
 
-                result.setItemMeta((ItemMeta)raw);
+                result.setItemMeta((ItemMeta) raw);
             }
         }
 
@@ -243,21 +226,18 @@ public class ItemStackHolder  extends ItemStack{
     }
 
     /** @deprecated */
-    @Deprecated(
-        forRemoval = true
-    )
+    @Deprecated(forRemoval = true)
     public @NotNull String getTranslationKey() {
         return Bukkit.getUnsafe().getTranslationKey(this.handle);
     }
 
-    public @NotNull ItemStack enchantWithLevels(@Range(
-        from = 1L,
-        to = 30L
-    ) int levels, boolean allowTreasure, @NotNull Random random) {
+    public @NotNull ItemStack enchantWithLevels(
+            @Range(from = 1L, to = 30L) int levels, boolean allowTreasure, @NotNull Random random) {
         return Bukkit.getServer().getItemFactory().enchantWithLevels(this.handle, levels, allowTreasure, random);
     }
 
-    public @NotNull ItemStack enchantWithLevels(int levels, @NotNull RegistryKeySet<@NotNull Enchantment> keySet, @NotNull Random random) {
+    public @NotNull ItemStack enchantWithLevels(
+            int levels, @NotNull RegistryKeySet<@NotNull Enchantment> keySet, @NotNull Random random) {
         return Bukkit.getItemFactory().enchantWithLevels(this.handle, levels, keySet, random);
     }
 
@@ -281,12 +261,9 @@ public class ItemStackHolder  extends ItemStack{
         return Bukkit.getUnsafe().serializeItem(this.handle);
     }
 
-
     public static byte @NotNull [] serializeItemsAsBytes(@Nullable ItemStack @NotNull [] items) {
-        return serializeItemsAsBytes((Collection)Arrays.asList(items));
+        return serializeItemsAsBytes((Collection) Arrays.asList(items));
     }
-
-
 
     /** @deprecated */
     @Deprecated
@@ -295,11 +272,9 @@ public class ItemStackHolder  extends ItemStack{
     }
 
     /** @deprecated */
-    @Deprecated(
-        forRemoval = true
-    )
+    @Deprecated(forRemoval = true)
     public int getMaxItemUseDuration() {
-        return this.getMaxItemUseDuration((LivingEntity)null);
+        return this.getMaxItemUseDuration((LivingEntity) null);
     }
 
     public int getMaxItemUseDuration(@NotNull LivingEntity entity) {
@@ -375,10 +350,7 @@ public class ItemStackHolder  extends ItemStack{
     }
 
     /** @deprecated */
-    @Deprecated(
-        forRemoval = true,
-        since = "1.20.5"
-    )
+    @Deprecated(forRemoval = true, since = "1.20.5")
     public @NotNull ItemRarity getRarity() {
         return ItemRarity.valueOf(this.getItemMeta().getRarity().name());
     }
@@ -399,31 +371,25 @@ public class ItemStackHolder  extends ItemStack{
         return this.handle.isEmpty();
     }
 
-    public @NotNull @Unmodifiable List<Component> computeTooltipLines(@NotNull TooltipContext tooltipContext, @Nullable Player player) {
+    public @NotNull @Unmodifiable List<Component> computeTooltipLines(
+            @NotNull TooltipContext tooltipContext, @Nullable Player player) {
         return Bukkit.getUnsafe().computeTooltipLines(this.handle, tooltipContext, player);
     }
 
-    @Contract(
-        pure = true
-    )
+    @Contract(pure = true)
     @ApiStatus.Experimental
     public <T> @Nullable T getData(DataComponentType.@NotNull Valued<T> type) {
         return this.handle.getData(type);
     }
 
-    @Contract(
-        value = "_, !null -> !null",
-        pure = true
-    )
+    @Contract(value = "_, !null -> !null", pure = true)
     @ApiStatus.Experimental
     public <T> @Nullable T getDataOrDefault(DataComponentType.@NotNull Valued<? extends T> type, @Nullable T fallback) {
         T object = this.getData(type);
         return object != null ? object : fallback;
     }
 
-    @Contract(
-        pure = true
-    )
+    @Contract(pure = true)
     @ApiStatus.Experimental
     public boolean hasData(@NotNull DataComponentType type) {
         return this.handle.hasData(type);
@@ -464,5 +430,4 @@ public class ItemStackHolder  extends ItemStack{
     public boolean isDataOverridden(@NotNull DataComponentType type) {
         return this.handle.isDataOverridden(type);
     }
-
 }

@@ -5,11 +5,12 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class State<S> implements Cloneable{
+public class State<S> implements Cloneable {
     public S value = null;
     public boolean state = false;
     private static final State INSTANCE = new State();
-    public static <T> State<T> newInstance(){
+
+    public static <T> State<T> newInstance() {
         return INSTANCE.clone();
     }
 

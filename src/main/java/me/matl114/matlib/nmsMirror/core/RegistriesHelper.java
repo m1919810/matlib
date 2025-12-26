@@ -1,28 +1,23 @@
 package me.matl114.matlib.nmsMirror.core;
 
+import static me.matl114.matlib.nmsMirror.Import.*;
+
 import com.mojang.serialization.DynamicOps;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.nmsMirror.impl.NMSCore;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.CastCheck;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
-import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.CastCheck;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import me.matl114.matlib.utils.version.Version;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
-
-import static me.matl114.matlib.nmsMirror.Import.*;
 
 @MultiDescriptive(targetDefault = "net.minecraft.core.Registry")
 public interface RegistriesHelper extends TargetDescriptor {
@@ -57,7 +52,8 @@ public interface RegistriesHelper extends TargetDescriptor {
     @MethodTarget(isStatic = true)
     @RedirectClass(ResourceKey)
     @RedirectName("create")
-    Object createResourceKey(@RedirectType(ResourceLocation)Object registryLocation, @RedirectType(ResourceLocation)Object value);
+    Object createResourceKey(
+            @RedirectType(ResourceLocation) Object registryLocation, @RedirectType(ResourceLocation) Object value);
 
     @MethodTarget
     Object key(Object registry);
@@ -72,28 +68,26 @@ public interface RegistriesHelper extends TargetDescriptor {
     Object getKey(Object registry, Object value);
 
     @MethodTarget
-    Object get(Object registry, @RedirectType(ResourceLocation)Object namespacedKey);
+    Object get(Object registry, @RedirectType(ResourceLocation) Object namespacedKey);
 
     @MethodTarget
     @IgnoreFailure(thresholdInclude = Version.v1_21_R2, below = true)
-    default Object getValue(Object registry, @RedirectType(ResourceLocation)Object namespacedKey){
+    default Object getValue(Object registry, @RedirectType(ResourceLocation) Object namespacedKey) {
         return get(registry, namespacedKey);
     }
 
-//    default Object getRegistryByKey(Object registry, String key){
-//        return getRegistryByKey(registry, NMSCore.NAMESPACE_KEY.newNSKey(key));
-//    }
-
+    //    default Object getRegistryByKey(Object registry, String key){
+    //        return getRegistryByKey(registry, NMSCore.NAMESPACE_KEY.newNSKey(key));
+    //    }
 
     @Note("Suggested")
     @MethodTarget
-    Optional getOptional(Object registry, @RedirectType(ResourceLocation)Object id);
+    Optional getOptional(Object registry, @RedirectType(ResourceLocation) Object id);
 
     @MethodTarget
-    boolean containsKey(Object registry, @RedirectType(ResourceLocation)Object id);
+    boolean containsKey(Object registry, @RedirectType(ResourceLocation) Object id);
 
-
-    default boolean containsKey(Object registry, String id){
+    default boolean containsKey(Object registry, String id) {
         return containsKey(registry, NMSCore.NAMESPACE_KEY.newNSKey(id));
     }
 
@@ -103,7 +97,7 @@ public interface RegistriesHelper extends TargetDescriptor {
     @MethodTarget
     Set keySet(Object registry);
 
-    default Iterable<?> toIterable(Object registries){
+    default Iterable<?> toIterable(Object registries) {
         return (Iterable<?>) registries;
     }
 }

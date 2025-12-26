@@ -4,15 +4,14 @@ import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMaps;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.Contract;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public enum EnumFormat {
     BLACK("BLACK", '0', 0, 0),
@@ -36,7 +35,7 @@ public enum EnumFormat {
     STRIKETHROUGH("STRIKETHROUGH", 'm', true),
     UNDERLINE("UNDERLINE", 'n', true),
     ITALIC("ITALIC", 'o', true),
-    RESET("RESET", 'r', -1, (Integer)null);
+    RESET("RESET", 'r', -1, (Integer) null);
 
     public static final char PREFIX_CODE = '§';
 
@@ -46,23 +45,26 @@ public enum EnumFormat {
     private final boolean isFormat;
     private final String toString;
     private final int id;
-    @Nullable
-    private final Integer color;
-    private static final Map<String, EnumFormat> FORMATTING_BY_NAME = (Map)Arrays.stream(values()).collect(Collectors.toMap((var0) -> {
-        return cleanName(var0.name);
-    }, (var0) -> {
-        return var0;
-    }));
-    private static final Char2ObjectMap<EnumFormat> formatMap ;
+
+    @Nullable private final Integer color;
+
+    private static final Map<String, EnumFormat> FORMATTING_BY_NAME = (Map) Arrays.stream(values())
+            .collect(Collectors.toMap(
+                    (var0) -> {
+                        return cleanName(var0.name);
+                    },
+                    (var0) -> {
+                        return var0;
+                    }));
+    private static final Char2ObjectMap<EnumFormat> formatMap;
+
     static {
         Char2ObjectMap<EnumFormat> re = new Char2ObjectOpenHashMap<>();
         for (EnumFormat format : EnumFormat.values()) {
             re.put(Character.toLowerCase(format.toString().charAt(1)), format);
             re.put(Character.toUpperCase(format.toString().charAt(1)), format);
         }
-        formatMap =Char2ObjectMaps.unmodifiable(
-            re
-        );
+        formatMap = Char2ObjectMaps.unmodifiable(re);
     }
 
     public static EnumFormat getColor(ChatColor color) {
@@ -86,7 +88,7 @@ public enum EnumFormat {
     }
 
     private EnumFormat(final String var2, final char var3, final boolean var4) {
-        this(var2, var3, var4, -1, (Integer)null);
+        this(var2, var3, var4, -1, (Integer) null);
     }
 
     private EnumFormat(final String var2, final char var3, final boolean var4, final int var5, final Integer var6) {
@@ -114,8 +116,7 @@ public enum EnumFormat {
         return !this.isFormat && this != RESET;
     }
 
-    @Nullable
-    public Integer getColor() {
+    @Nullable public Integer getColor() {
         return this.color;
     }
 
@@ -127,26 +128,23 @@ public enum EnumFormat {
         return this.toString;
     }
 
-    @Nullable
-    @Contract("!null->!null;_->_")
+    @Nullable @Contract("!null->!null;_->_")
     public static String stripFormatting(@Nullable String var0) {
         return var0 == null ? null : STRIP_FORMATTING_PATTERN.matcher(var0).replaceAll("");
     }
 
-    @Nullable
-    public static EnumFormat getByName(@Nullable String var0) {
-        return var0 == null ? null : (EnumFormat)FORMATTING_BY_NAME.get(cleanName(var0));
+    @Nullable public static EnumFormat getByName(@Nullable String var0) {
+        return var0 == null ? null : (EnumFormat) FORMATTING_BY_NAME.get(cleanName(var0));
     }
 
-    @Nullable
-    public static EnumFormat getById(int var0) {
+    @Nullable public static EnumFormat getById(int var0) {
         if (var0 < 0) {
             return RESET;
         } else {
             EnumFormat[] var1 = values();
             int var2 = var1.length;
 
-            for(int var3 = 0; var3 < var2; ++var3) {
+            for (int var3 = 0; var3 < var2; ++var3) {
                 EnumFormat var4 = var1[var3];
                 if (var4.getId() == var0) {
                     return var4;
@@ -157,13 +155,12 @@ public enum EnumFormat {
         }
     }
 
-    @Nullable
-    public static EnumFormat getByCode(char var0) {
+    @Nullable public static EnumFormat getByCode(char var0) {
         char var1 = Character.toLowerCase(var0);
         EnumFormat[] var2 = values();
         int var3 = var2.length;
 
-        for(int var4 = 0; var4 < var3; ++var4) {
+        for (int var4 = 0; var4 < var3; ++var4) {
             EnumFormat var5 = var2[var4];
             if (var5.code == var1) {
                 return var5;
@@ -178,7 +175,7 @@ public enum EnumFormat {
         EnumFormat[] var3 = values();
         int var4 = var3.length;
 
-        for(int var5 = 0; var5 < var4; ++var5) {
+        for (int var5 = 0; var5 < var4; ++var5) {
             EnumFormat var6 = var3[var5];
             if ((!var6.isColor() || var0) && (!var6.isFormat() || var1)) {
                 var2.add(var6.getName());
@@ -192,9 +189,7 @@ public enum EnumFormat {
         return this.getName();
     }
 
-    @Nullable
-    public TextColor toAdventure(){
-        return color == null? null: NamedTextColor.namedColor(color);
+    @Nullable public TextColor toAdventure() {
+        return color == null ? null : NamedTextColor.namedColor(color);
     }
 }
-

@@ -1,7 +1,7 @@
 package me.matl114.matlib.utils;
 
-import com.google.common.base.Preconditions;
-
+import java.util.*;
+import javax.annotation.Nonnull;
 import me.matl114.matlib.algorithms.algorithm.MathUtils;
 import me.matl114.matlib.utils.inventory.itemStacks.CleanItemStack;
 import net.md_5.bungee.api.ChatColor;
@@ -18,67 +18,56 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.annotation.Nonnull;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-
 public class AddUtils {
 
-    private static final Random random=new Random();
-    private static final Enchantment GLOW_EFFECT= Enchantment.getByKey(new NamespacedKey("minecraft","infinity"));
-    public static final ItemStack RESOLVE_FAILED=AddUtils.addGlow( new CleanItemStack(Material.BARRIER,"&c解析物品失败"));
+    private static final Random random = new Random();
+    private static final Enchantment GLOW_EFFECT = Enchantment.getByKey(new NamespacedKey("minecraft", "infinity"));
+    public static final ItemStack RESOLVE_FAILED = AddUtils.addGlow(new CleanItemStack(Material.BARRIER, "&c解析物品失败"));
 
-   
     /**
      * Creates a copy of an ItemStack.
-     * 
+     *
      * <p>This method creates a clean copy of the provided ItemStack using
      * the {@link #getCleaned(ItemStack)} method.
-     * 
+     *
      * @param stack The ItemStack to copy
      * @return A clean copy of the ItemStack
      * @see #getCleaned(ItemStack)
      */
-    public static ItemStack getCopy(ItemStack stack){
+    public static ItemStack getCopy(ItemStack stack) {
         return getCleaned(stack);
     }
     /**
      * Creates a clean copy of an ItemStack.
-     * 
+     *
      * <p>This method creates a clean version of the provided ItemStack using
      * the CleanItemStack utility. If the input is null, it returns an AIR ItemStack.
-     * 
+     *
      * @param stack The ItemStack to clean
      * @return A clean ItemStack, or AIR if the input is null
      */
-    public static ItemStack getCleaned(ItemStack stack){
-        return stack==null?new ItemStack(Material.AIR): CleanItemStack.ofBukkitClean(stack);
+    public static ItemStack getCleaned(ItemStack stack) {
+        return stack == null ? new ItemStack(Material.AIR) : CleanItemStack.ofBukkitClean(stack);
     }
-
 
     /**
      * Copies properties from one ItemStack to another.
-     * 
+     *
      * <p>This method copies the amount, type, data, and item metadata from
      * the source ItemStack to the target ItemStack. Both ItemStacks must
      * not be null for the operation to succeed.
-     * 
+     *
      * @param from The source ItemStack to copy from
      * @param to The target ItemStack to copy to
      * @return true if the copy operation was successful, false otherwise
      */
-    public static boolean copyItem(ItemStack from,ItemStack to){
-        if(from==null||to==null)return false;
+    public static boolean copyItem(ItemStack from, ItemStack to) {
+        if (from == null || to == null) return false;
         to.setAmount(from.getAmount());
         to.setType(from.getType());
         to.setData(from.getData());
         return to.setItemMeta(from.getItemMeta());
     }
-
-
 
     /**
      * Returns a random integer in the range [0, length).
@@ -86,7 +75,7 @@ public class AddUtils {
      * @param length The exclusive upper bound
      * @return A random integer between 0 (inclusive) and length (exclusive)
      */
-    public static int random(int length){
+    public static int random(int length) {
         return random.nextInt(length);
     }
     /**
@@ -94,11 +83,10 @@ public class AddUtils {
      *
      * @return A random double between 0.0 (inclusive) and 1.0 (exclusive)
      */
-    public static double standardRandom(){
+    public static double standardRandom() {
         return random.nextDouble();
     }
-    //we supposed that u have checked these shits
-
+    // we supposed that u have checked these shits
 
     /**
      * Gives a player a specified amount of an ItemStack, dropping leftovers if inventory is full.
@@ -111,12 +99,12 @@ public class AddUtils {
      */
     public static void forceGive(Player p, ItemStack toGive, int amount) {
         ItemStack incoming;
-        int maxSize=toGive.getMaxStackSize();
-        while(amount>0) {
+        int maxSize = toGive.getMaxStackSize();
+        while (amount > 0) {
             incoming = getCopy(toGive);
-            int amount2=Math.min(maxSize, amount);
+            int amount2 = Math.min(maxSize, amount);
             incoming.setAmount(amount2);
-            amount-=amount2;
+            amount -= amount2;
             Collection<ItemStack> leftover = p.getInventory().addItem(incoming).values();
             for (ItemStack itemStack : leftover) {
                 p.getWorld().dropItemNaturally(p.getLocation(), itemStack);
@@ -132,9 +120,9 @@ public class AddUtils {
      * @param stack The ItemStack to modify
      * @return The same ItemStack with a glowing effect
      */
-    public static ItemStack addGlow(ItemStack stack){
-        //stack.addEnchantment(Enchantment.ARROW_INFINITE, 1);
-        ItemMeta meta=stack.getItemMeta();
+    public static ItemStack addGlow(ItemStack stack) {
+        // stack.addEnchantment(Enchantment.ARROW_INFINITE, 1);
+        ItemMeta meta = stack.getItemMeta();
         meta.addEnchant(GLOW_EFFECT, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         stack.setItemMeta(meta);
@@ -146,9 +134,9 @@ public class AddUtils {
      * @param stack The ItemStack to modify
      * @return The same ItemStack with all flags hidden
      */
-    public static ItemStack hideAllFlags(ItemStack stack){
-        ItemMeta meta=stack.getItemMeta();
-        for (ItemFlag flag:ItemFlag.values()){
+    public static ItemStack hideAllFlags(ItemStack stack) {
+        ItemMeta meta = stack.getItemMeta();
+        for (ItemFlag flag : ItemFlag.values()) {
             meta.addItemFlags(flag);
         }
         stack.setItemMeta(meta);
@@ -160,9 +148,9 @@ public class AddUtils {
      * @param stack The ItemStack to modify
      * @return The same ItemStack with all flags shown
      */
-    public static ItemStack showAllFlags(ItemStack stack){
-        ItemMeta meta=stack.getItemMeta();
-        for (ItemFlag flag:ItemFlag.values()){
+    public static ItemStack showAllFlags(ItemStack stack) {
+        ItemMeta meta = stack.getItemMeta();
+        for (ItemFlag flag : ItemFlag.values()) {
             meta.removeItemFlags(flag);
         }
         stack.setItemMeta(meta);
@@ -175,8 +163,8 @@ public class AddUtils {
      * @param unbreakable Whether the item should be unbreakable
      * @return The same ItemStack with the unbreakable property set
      */
-    public static ItemStack setUnbreakable(ItemStack stack,boolean unbreakable){
-        ItemMeta meta=stack.getItemMeta();
+    public static ItemStack setUnbreakable(ItemStack stack, boolean unbreakable) {
+        ItemMeta meta = stack.getItemMeta();
         meta.setUnbreakable(unbreakable);
         stack.setItemMeta(meta);
         return stack;
@@ -188,10 +176,11 @@ public class AddUtils {
      * @param name Additional lines for the display
      * @return An ItemStack representing the info display
      */
-    public static ItemStack getInfoShow(String title,String... name){
-        return new CleanItemStack(Material.BOOK,title,name);
+    public static ItemStack getInfoShow(String title, String... name) {
+        return new CleanItemStack(Material.BOOK, title, name);
     }
-    public static String resolveColor(String s){
+
+    public static String resolveColor(String s) {
         return org.bukkit.ChatColor.translateAlternateColorCodes('&', s);
     }
     /**
@@ -200,7 +189,7 @@ public class AddUtils {
      * @param p The CommandSender to send the message to
      * @param msg The message to send
      */
-    public static void sendMessage(CommandSender p, String msg){
+    public static void sendMessage(CommandSender p, String msg) {
         p.sendMessage(resolveColor(msg));
     }
 
@@ -230,21 +219,20 @@ public class AddUtils {
      * @param hover The hover text
      * @param copy The text to copy to clipboard
      */
-    public static void displayCopyString(Player player,String display,String hover,String copy){
+    public static void displayCopyString(Player player, String display, String hover, String copy) {
         final TextComponent link = new TextComponent(display);
         link.setColor(ChatColor.YELLOW);
         link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hover)));
-        link.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,copy));
+        link.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, copy));
         player.spigot().sendMessage(link);
     }
-
 
     /**
      * Generates a random UUID string.
      *
      * @return A random UUID as a string
      */
-    public static String randUUID(){
+    public static String randUUID() {
         return UUID.randomUUID().toString();
     }
     /**
@@ -252,7 +240,7 @@ public class AddUtils {
      *
      * @param string The message to broadcast
      */
-    public static void broadCast(String string){
+    public static void broadCast(String string) {
         Bukkit.getServer().broadcastMessage(resolveColor(string));
     }
     /**
@@ -262,8 +250,8 @@ public class AddUtils {
      * @param amount The amount to set
      * @return A new ItemStack with the specified amount
      */
-    public static ItemStack copyWithAmount(ItemStack stack,int amount){
-        ItemStack result= CleanItemStack.ofBukkitClean(stack);
+    public static ItemStack copyWithAmount(ItemStack stack, int amount) {
+        ItemStack result = CleanItemStack.ofBukkitClean(stack);
         result.setAmount(amount);
         return result;
     }
@@ -273,9 +261,9 @@ public class AddUtils {
      * @param strs The strings to concatenate
      * @return The concatenated string
      */
-    public static String concat(String... strs){
-        StringBuilder sb=new StringBuilder();
-        for(int i=0;i<strs.length;++i){
+    public static String concat(String... strs) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < strs.length; ++i) {
             sb.append(strs[i]);
         }
         return sb.toString();
@@ -286,7 +274,7 @@ public class AddUtils {
      * @param e The entity to damage
      * @param f The amount of damage
      */
-    public static void damageGeneric(Damageable e, double f){
-        e.setHealth(MathUtils.clamp( e.getHealth()-f,0.0,e.getMaxHealth()));
+    public static void damageGeneric(Damageable e, double f) {
+        e.setHealth(MathUtils.clamp(e.getHealth() - f, 0.0, e.getMaxHealth()));
     }
 }

@@ -1,6 +1,5 @@
 package me.matl114.matlib;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import it.unimi.dsi.fastutil.BidirectionalIterator;
@@ -8,7 +7,7 @@ import me.matl114.matlib.algorithms.dataStructures.struct.LinkNode;
 import org.junit.jupiter.api.Test;
 
 public class LinkNodeTest {
-    private void log(String val){
+    private void log(String val) {
         System.out.println(val);
     }
     // ==================== 基础功能测试 ====================
@@ -198,9 +197,9 @@ public class LinkNodeTest {
     public void testInvalidInsertAtLast() {
         LinkNode.Head head = (LinkNode.Head) LinkNode.createHead();
         // 头节点不应支持insertAtLast
-        try{
+        try {
             head.insertAtLast("ShouldFail");
-        }catch (Throwable e){
+        } catch (Throwable e) {
             assertTrue(e instanceof IllegalArgumentException);
         }
         log("Node test6 success");

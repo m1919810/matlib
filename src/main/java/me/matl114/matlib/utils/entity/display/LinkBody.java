@@ -14,18 +14,23 @@ import org.joml.Vector3f;
  */
 public interface LinkBody extends RobotPart, TransformApplicable {
     public Location getCoreLocation();
+
     public LinkBody getParentLink();
+
     public void setCoreLocation(Location location);
+
     public Iterable<Pair<Joint, LinkBody>> getChildJoints();
+
     public void killGroup();
-    default void forwardKinematics(MatrixStack currentTransformation, RobotConfigure configure){
-        //move self and update display
+
+    default void forwardKinematics(MatrixStack currentTransformation, RobotConfigure configure) {
+        // move self and update display
         TransformationUtils.LCTransformation trans = currentTransformation.peek();
         Vector3f bias = trans.bias();
         setCoreLocation(configure.getRootLocation().clone().add(bias.x, bias.y, bias.z));
         applyTransformation(trans.noBias(), true);
-        //calculate child joints
-        for(Pair<Joint, LinkBody> entry : getChildJoints()){
+        // calculate child joints
+        for (Pair<Joint, LinkBody> entry : getChildJoints()) {
             currentTransformation.push();
             entry.getA().forwardKinematics(currentTransformation, configure);
             entry.getB().forwardKinematics(currentTransformation, configure);

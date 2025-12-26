@@ -12,9 +12,10 @@ public enum ComponentContentType {
     TRANSLATABLE,
     KEYBIND,
     EMPTY;
-    public static ComponentBuilder initBuilder(ComponentContentType type){
-        return switch (type){
-            case TRANSLATABLE ->  Component.translatable();
+
+    public static ComponentBuilder initBuilder(ComponentContentType type) {
+        return switch (type) {
+            case TRANSLATABLE -> Component.translatable();
             case LITERAL -> Component.text();
             case EMPTY -> null;
             case NBT -> throw new NotImplementedYet();
@@ -22,6 +23,5 @@ public enum ComponentContentType {
             case KEYBIND -> Component.keybind();
             case SELECTOR -> Component.selector();
         };
-
     }
 }

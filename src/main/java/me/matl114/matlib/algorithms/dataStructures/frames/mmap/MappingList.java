@@ -1,34 +1,33 @@
 package me.matl114.matlib.algorithms.dataStructures.frames.mmap;
 
-import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
-import it.unimi.dsi.fastutil.booleans.BooleanBigList;
-import it.unimi.dsi.fastutil.booleans.BooleanList;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import lombok.Getter;
 import me.matl114.matlib.algorithms.dataStructures.frames.bits.BitList;
 import me.matl114.matlib.algorithms.dataStructures.frames.collection.ListMapView;
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
+public class MappingList<W, T> extends AbstractList<T> implements ListMapView<W, T> {
+    BitList validBits;
+    Function<W, T> reader;
+    Function<T, W> writer;
 
-public class MappingList<W,T> extends AbstractList<T> implements ListMapView<W,T> {
-    BitList validBits ;
-    Function<W,T> reader;
-    Function<T,W> writer;
     @Getter
-    protected List<W> origin ;
+    protected List<W> origin;
+
     Object[] cache;
-    protected Consumer<MappingList<W,T>> writeback;
-    public void batchWriteback(){
-        if(writeback != null){
+    protected Consumer<MappingList<W, T>> writeback;
+
+    public void batchWriteback() {
+        if (writeback != null) {
             writeback.accept(this);
         }
     }
-    public MappingList<W,T> withWriteBack(Consumer<MappingList<W,T>> callback){
+
+    public MappingList<W, T> withWriteBack(Consumer<MappingList<W, T>> callback) {
         this.writeback = callback;
         return this;
     }
-
 
     @Override
     public boolean isDelayWrite() {
@@ -40,32 +39,34 @@ public class MappingList<W,T> extends AbstractList<T> implements ListMapView<W,T
         this.validBits.clear();
     }
 
-    public MappingList(Function<W,T> reader, Function<T,W> writer, List<W> origin){
+    public MappingList(Function<W, T> reader, Function<T, W> writer, List<W> origin) {
         this.reader = reader;
         this.writer = writer;
         this.origin = origin;
-        cache = new Object[origin.size()+1];
+        cache = new Object[origin.size() + 1];
         validBits = new BitList();
     }
-    private void ensureSize(int index){
-        if(index >= cache.length){
+
+    private void ensureSize(int index) {
+        if (index >= cache.length) {
             int newSize = cache.length;
             do {
                 newSize <<= 1;
-            }while (index >= newSize);
+            } while (index >= newSize);
             cache = Arrays.copyOf(cache, newSize);
         }
     }
 
-    private void flushCache(){
+    private void flushCache() {
         validBits.clear();
     }
 
-    private T getCacheInternal(int index){
+    private T getCacheInternal(int index) {
         ensureSize(index);
-        return (T)cache[index];
+        return (T) cache[index];
     }
-    private void setCacheInternal(int index, T value){
+
+    private void setCacheInternal(int index, T value) {
         ensureSize(index);
         cache[index] = value;
         validBits.setTrue(index);
@@ -73,7 +74,7 @@ public class MappingList<W,T> extends AbstractList<T> implements ListMapView<W,T
 
     @Override
     public T get(int index) {
-        if(validBits.get(index)){
+        if (validBits.get(index)) {
             return getCacheInternal(index);
         }
         W originValue = origin.get(index);
@@ -81,17 +82,18 @@ public class MappingList<W,T> extends AbstractList<T> implements ListMapView<W,T
         setCacheInternal(index, mappingValue);
         return mappingValue;
     }
+
     @Override
-    public T set(int index, T element){
+    public T set(int index, T element) {
         W originValue = writer.apply(element);
         origin.set(index, originValue);
-        if(validBits.get(index)){
+        if (validBits.get(index)) {
             T retCache = getCacheInternal(index);
             setCacheInternal(index, element);
             return retCache;
-        }else {
+        } else {
             setCacheInternal(index, element);
-            //to be more quick
+            // to be more quick
             return null;
         }
     }
@@ -102,8 +104,8 @@ public class MappingList<W,T> extends AbstractList<T> implements ListMapView<W,T
         int size = size();
         origin.add(index, mappingValue);
         ensureSize(size + 1);
-        //from index ~ size ->copyto index +1 size+1
-        System.arraycopy(cache, index, cache, index +1, size - index);
+        // from index ~ size ->copyto index +1 size+1
+        System.arraycopy(cache, index, cache, index + 1, size - index);
         setCacheInternal(index, element);
         validBits.addFalse(index);
     }
@@ -123,7 +125,7 @@ public class MappingList<W,T> extends AbstractList<T> implements ListMapView<W,T
         cache[size - 1] = null;
         // 调整 BitSet
         validBits.remove(index);
-        //to be more quick
+        // to be more quick
         return null;
     }
 
@@ -138,5 +140,4 @@ public class MappingList<W,T> extends AbstractList<T> implements ListMapView<W,T
     public int size() {
         return origin.size();
     }
-
 }

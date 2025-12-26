@@ -1,5 +1,9 @@
 package me.matl114.matlib.unitTest.autoTests.nmsTests;
 
+import static me.matl114.matlib.nmsMirror.impl.NMSCore.*;
+import static me.matl114.matlib.nmsMirror.impl.NMSItem.*;
+
+import java.util.ArrayList;
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import me.matl114.matlib.nmsUtils.ServerUtils;
 import me.matl114.matlib.unitTest.OnlineTest;
@@ -7,14 +11,9 @@ import me.matl114.matlib.unitTest.TestCase;
 import me.matl114.matlib.utils.Debug;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-
-import static me.matl114.matlib.nmsMirror.impl.NMSCore.*;
-import static me.matl114.matlib.nmsMirror.impl.NMSItem.*;
-
 public class ItemDataTests implements TestCase {
     @OnlineTest(name = "test item nbtData save and show")
-    public void test_byd1(){
+    public void test_byd1() {
         ItemStack stack = ItemMetaViewTests.generateComplex();
         Object nms = ItemUtils.unwrapHandle(stack);
         Debug.logger(ITEMSTACK.saveNbtAsTag(nms));

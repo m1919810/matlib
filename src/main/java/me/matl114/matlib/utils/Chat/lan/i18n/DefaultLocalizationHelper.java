@@ -1,5 +1,8 @@
 package me.matl114.matlib.utils.chat.lan.i18n;
 
+import static me.matl114.matlib.utils.chat.lan.TranslateKeyUtils.*;
+
+import java.util.Objects;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -8,9 +11,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Objects;
-import static me.matl114.matlib.utils.chat.lan.TranslateKeyUtils.*;
 
 public class DefaultLocalizationHelper implements RegistryLocalizationHelper {
     public String getItemName(ItemStack itemStack) {
@@ -26,7 +26,7 @@ public class DefaultLocalizationHelper implements RegistryLocalizationHelper {
     }
 
     public String getBiomeName(Biome biome) {
-        return getKeyedTranslationDefault("biome.minecraft",biome);
+        return getKeyedTranslationDefault("biome.minecraft", biome);
     }
 
     public String getEnchantmentName(Enchantment ench) {

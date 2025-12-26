@@ -10,17 +10,17 @@ public class NMSItem {
     public static final ItemsAPI ITEMS;
     public static final ContainerHelper CONTAINER;
     public static final TradingHelper TRADE;
-//    public static final ContainerMenuHelper MENU;
+    //    public static final ContainerMenuHelper MENU;
     static {
         Version version = Version.getVersionInstance();
-        if(version.isAtLeast(Version.v1_20_R4)){
+        if (version.isAtLeast(Version.v1_20_R4)) {
             ITEMSTACK = DescriptorImplBuilder.createHelperImpl(ItemStackHelper_1_20_R4.class);
-        }else {
-            ITEMSTACK =  DescriptorImplBuilder.createHelperImpl(ItemStackHelperDefault.class);
+        } else {
+            ITEMSTACK = DescriptorImplBuilder.createHelperImpl(ItemStackHelperDefault.class);
         }
         ITEMS = DescriptorImplBuilder.createMultiHelper(ItemsAPI.class);
         CONTAINER = DescriptorImplBuilder.createMultiHelper(ContainerHelper.class);
-//        MENU = DescriptorImplBuilder.createMultiHelper(ContainerMenuHelper.class);
+        //        MENU = DescriptorImplBuilder.createMultiHelper(ContainerMenuHelper.class);
         TRADE = DescriptorImplBuilder.createMultiHelper(TradingHelper.class);
     }
 }

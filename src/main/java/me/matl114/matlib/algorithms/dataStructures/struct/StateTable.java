@@ -3,23 +3,25 @@ package me.matl114.matlib.algorithms.dataStructures.struct;
 import lombok.Getter;
 import lombok.Setter;
 
-public class StateTable implements Cloneable{
+public class StateTable implements Cloneable {
     @Getter
     @Setter
     public boolean abort;
 
     public Throwable exception;
     private static final StateTable INSTANCE = new StateTable();
-    private StateTable(){
 
-    }
-    public static StateTable get(){
+    private StateTable() {}
+
+    public static StateTable get() {
         return INSTANCE.clone();
     }
-    public void setError(Throwable e){
+
+    public void setError(Throwable e) {
         this.exception = e;
     }
-    public Throwable getError(){
+
+    public Throwable getError() {
         return this.exception;
     }
 
@@ -33,7 +35,7 @@ public class StateTable implements Cloneable{
             throw new AssertionError();
         }
     }
-//    public int getErrCode(){
-//        return this.errCode;
-//    }
+    //    public int getErrCode(){
+    //        return this.errCode;
+    //    }
 }

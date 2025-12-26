@@ -1,5 +1,8 @@
 package me.matl114.matlib.utils.entity.display.Implementation;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nonnull;
 import me.matl114.matlib.algorithms.algorithm.TransformationUtils;
 import me.matl114.matlib.utils.entity.display.BuildableBluePrinted;
 import me.matl114.matlib.utils.entity.display.DisplayManager;
@@ -9,12 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Marker;
 
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-
-public class DisplayGroup extends FixedEntityGroup<Display,Marker> implements BuildableBluePrinted {
-    public DisplayGroup(String namespace,@Nonnull Marker entityParent) {
+public class DisplayGroup extends FixedEntityGroup<Display, Marker> implements BuildableBluePrinted {
+    public DisplayGroup(String namespace, @Nonnull Marker entityParent) {
         super(namespace, entityParent);
         this.partMap = new HashMap<>();
         this.coreLocation = entityParent.getLocation();
@@ -23,12 +22,13 @@ public class DisplayGroup extends FixedEntityGroup<Display,Marker> implements Bu
     TransformationUtils.LCTransformation trans = TransformationUtils.LCTransformation.ofIdentical();
     Map<String, DisplayPart> partMap;
     Location coreLocation;
+
     @Override
     public Map<String, DisplayPart> getDisplayParts() {
         return partMap;
     }
 
-    public DisplayGroup addDisplayPart(DisplayManager.DisplayPart part){
+    public DisplayGroup addDisplayPart(DisplayManager.DisplayPart part) {
         partMap.put(part.partIdentifier, part);
         return this;
     }
@@ -41,10 +41,10 @@ public class DisplayGroup extends FixedEntityGroup<Display,Marker> implements Bu
     @Override
     public void setCoreLocation(Location location) {
         var parent = getParent();
-        if(parent != null){
+        if (parent != null) {
             parent.setLocation(location);
             coreLocation = parent.getLocation();
-        }else {
+        } else {
             coreLocation = location.clone();
         }
         updateLocation();
@@ -54,7 +54,6 @@ public class DisplayGroup extends FixedEntityGroup<Display,Marker> implements Bu
     public EntityGroup<Display> getDisplayGroup() {
         return this;
     }
-
 
     @Override
     public TransformationUtils.LCTransformation getCurrentTransformation() {

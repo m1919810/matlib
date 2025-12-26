@@ -19,5 +19,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface MixImpl {
     String subClass() default "java.lang.Object";
+
     String[] interfaces() default {};
 }

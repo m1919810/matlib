@@ -1,5 +1,6 @@
 package me.matl114.matlib.slimefunUtils.blockInventory.records;
 
+import javax.annotation.Nonnull;
 import me.matl114.matlib.common.lang.annotations.NotRecommended;
 import me.matl114.matlib.utils.inventory.inventoryRecords.InventoryRecord;
 import me.matl114.matlib.utils.inventory.inventoryRecords.SimpleInventoryRecord;
@@ -9,10 +10,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import javax.annotation.Nonnull;
-
 @NotRecommended
-public record OldSlimefunInventoryRecord(@Nonnull Inventory inventory,@Nonnull BlockMenu optionalHolder) implements InventoryRecord {
+public record OldSlimefunInventoryRecord(@Nonnull Inventory inventory, @Nonnull BlockMenu optionalHolder)
+        implements InventoryRecord {
     @Override
     public Location invLocation() {
         return optionalHolder.getLocation();
@@ -22,9 +22,10 @@ public record OldSlimefunInventoryRecord(@Nonnull Inventory inventory,@Nonnull B
     public InventoryKind invKind() {
         return InventoryKind.PLUGIN_BLOCKMENU;
     }
+
     @Override
     public boolean stillValid() {
-        return BlockStorage.getInventory(optionalHolder.getLocation())==optionalHolder;
+        return BlockStorage.getInventory(optionalHolder.getLocation()) == optionalHolder;
     }
 
     @Override
@@ -38,21 +39,22 @@ public record OldSlimefunInventoryRecord(@Nonnull Inventory inventory,@Nonnull B
     }
 
     @Override
-    public boolean hasData(){
+    public boolean hasData() {
         return BlockStorage.hasBlockInfo(optionalHolder.getLocation());
     }
 
-    public boolean canPlayerOpen(Player p){
-        return optionalHolder!=null && optionalHolder.canOpen(optionalHolder.getBlock(),p);
+    public boolean canPlayerOpen(Player p) {
+        return optionalHolder != null && optionalHolder.canOpen(optionalHolder.getBlock(), p);
     }
 
-    public static InventoryRecord getInventoryRecord(Location loc,boolean checkVanilla){
+    public static InventoryRecord getInventoryRecord(Location loc, boolean checkVanilla) {
         BlockMenu inv = BlockStorage.getInventory(loc);
-        if(inv != null){
-            return new OldSlimefunInventoryRecord(inv.toInventory(),inv);
-            //also contains vanilla inventory with Slimefun Item
+        if (inv != null) {
+            return new OldSlimefunInventoryRecord(inv.toInventory(), inv);
+            // also contains vanilla inventory with Slimefun Item
         }
-        return checkVanilla? SimpleInventoryRecord.getInventoryRecord(loc):new SimpleInventoryRecord(null,null,loc);
-
+        return checkVanilla
+                ? SimpleInventoryRecord.getInventoryRecord(loc)
+                : new SimpleInventoryRecord(null, null, loc);
     }
 }

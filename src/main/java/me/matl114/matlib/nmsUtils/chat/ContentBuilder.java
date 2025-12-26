@@ -2,11 +2,11 @@ package me.matl114.matlib.nmsUtils.chat;
 
 import me.matl114.matlib.nmsMirror.chat.ChatEnum;
 
-public interface ContentBuilder extends BuildResult{
+public interface ContentBuilder extends BuildResult {
 
     public ContentBuilder clone();
 
-    default ContentBuilder toImmutable(){
+    default ContentBuilder toImmutable() {
         Object value = toNMS();
         return new ContentBuilder() {
             @Override
@@ -19,7 +19,7 @@ public interface ContentBuilder extends BuildResult{
                 return this;
             }
 
-            public ContentBuilder toImmutable(){
+            public ContentBuilder toImmutable() {
                 return this;
             }
 
@@ -40,16 +40,18 @@ public interface ContentBuilder extends BuildResult{
         public Object toNMS() {
             return ChatEnum.PLAIN_TEXT_EMPTY;
         }
+
         @Override
         public boolean isImmutable() {
             return true;
         }
-        public ContentBuilder toImmutable(){
+
+        public ContentBuilder toImmutable() {
             return this;
         }
     };
 
-    static ContentBuilder empty(){
+    static ContentBuilder empty() {
         return EMPTY;
     }
 }

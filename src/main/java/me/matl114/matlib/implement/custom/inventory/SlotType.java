@@ -10,7 +10,6 @@ public enum SlotType {
     BACK_BUTTON,
     PREV_PAGE,
     NEXT_PAGE,
-    BLANK
-    ;
+    BLANK;
     public static final Codec<SlotType> CODEC = Codecs.enumLowerCase(SlotType.class);
 }

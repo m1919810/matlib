@@ -12,5 +12,4 @@ public interface ServerGamePacketListenerImplHelper extends TargetDescriptor {
 
     @FieldTarget
     SimpleChannelInboundHandler<?> connectionGetter(Object impl);
-
 }

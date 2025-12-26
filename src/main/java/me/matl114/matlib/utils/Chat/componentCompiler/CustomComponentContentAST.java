@@ -6,9 +6,10 @@ import me.matl114.matlib.utils.chat.ComponentContentType;
 import me.matl114.matlib.utils.chat.component.ComponentContentVisitor;
 
 @AllArgsConstructor
-public class CustomComponentContentAST extends ComponentContentAST{
+public class CustomComponentContentAST extends ComponentContentAST {
     MutableComponentAST owner;
     String customType;
+
     @Override
     public ComponentContentType contentType() {
         return ComponentContentType.LITERAL;
@@ -16,7 +17,7 @@ public class CustomComponentContentAST extends ComponentContentAST{
 
     @Override
     public void acceptContent(ComponentContentVisitor visitor, SimpleLinkList<BaseTypeAST> data) {
-        if(visitor != null){
+        if (visitor != null) {
             visitor.visitCustom(customType, owner);
         }
     }

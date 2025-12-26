@@ -1,10 +1,9 @@
 package me.matl114.matlib.utils.config;
 
+import java.util.List;
 import me.matl114.matlib.common.lang.exceptions.DoNotCallException;
 
-import java.util.List;
-
-public class ListView implements DataView<List>{
+public class ListView implements DataView<List> {
     List<String> cache;
     private final NodeReference<List> parent;
     boolean initialize = false;
@@ -28,16 +27,15 @@ public class ListView implements DataView<List>{
         return Type.STRING_LIST;
     }
 
-
     @Override
     public boolean setString(String val) {
         throw new DoNotCallException();
     }
 
-    public List<String> getAsList(){
-        if(!initialize){
+    public List<String> getAsList() {
+        if (!initialize) {
             cache = (List<String>) parent.get();
-            initialize=false;
+            initialize = false;
         }
         return cache;
     }

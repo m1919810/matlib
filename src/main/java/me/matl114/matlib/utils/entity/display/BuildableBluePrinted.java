@@ -1,5 +1,11 @@
 package me.matl114.matlib.utils.entity.display;
 
+import static me.matl114.matlib.algorithms.algorithm.TransformationUtils.shrink;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import me.matl114.matlib.algorithms.algorithm.TransformationUtils;
 import me.matl114.matlib.common.lang.annotations.ForceOnMainThread;
 import me.matl114.matlib.common.lang.annotations.Protected;
@@ -9,17 +15,10 @@ import org.bukkit.entity.Display;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
-import static me.matl114.matlib.algorithms.algorithm.TransformationUtils.shrink;
-
 /**
  * this interface represents the building from a blueprint to real-world display gathered in a group
  */
-public interface BuildableBluePrinted extends BluePrinted{
+public interface BuildableBluePrinted extends BluePrinted {
     /**
      * a display group should holds a core Location, which determines its abs-location
      * @return
@@ -31,9 +30,10 @@ public interface BuildableBluePrinted extends BluePrinted{
      * @param location
      */
     public void setCoreLocation(Location location);
+
     @Protected
     @ForceOnMainThread
-    default void updateLocation(){
+    default void updateLocation() {
         Location core = getCoreLocation();
         this.getDisplayGroup().applyToAllMemberRecords(entityRecord -> {
             entityRecord.setLocation(core);
@@ -46,35 +46,36 @@ public interface BuildableBluePrinted extends BluePrinted{
      * @param createIfNoExist
      */
     @Protected
-    default void buildAt(Location location, BiConsumer<String, Supplier<Display>> createIfNoExist){
-        for (var part : getDisplayParts().entrySet()){
-            createIfNoExist.accept(part.getKey(), ()-> part.getValue().getContext().newEntity(location));
+    default void buildAt(Location location, BiConsumer<String, Supplier<Display>> createIfNoExist) {
+        for (var part : getDisplayParts().entrySet()) {
+            createIfNoExist.accept(
+                    part.getKey(), () -> part.getValue().getContext().newEntity(location));
         }
     }
 
-
-    default void updateStatus(boolean force){
+    default void updateStatus(boolean force) {
         Map<String, Transformation> transMap = new HashMap<>();
         TransformationUtils.LCTransformation ltran = getCurrentTransformation();
         Vector3f reshape = getCurrentReshape();
-        for(var part : getDisplayParts().entrySet()){
-            transMap.put(part.getKey(),ltran.transformOrigin( shrink( part.getValue().getTransformation(), reshape) ));
+        for (var part : getDisplayParts().entrySet()) {
+            transMap.put(
+                    part.getKey(), ltran.transformOrigin(shrink(part.getValue().getTransformation(), reshape)));
         }
 
-        //todo effect to origin transformation
-        //todo add conjugate operation
-        //什么玩意 忽略
-        if(force){
-           getDisplayGroup().applyToAllMembers((str,display) -> {
-                var trans= transMap.get(str);
+        // todo effect to origin transformation
+        // todo add conjugate operation
+        // 什么玩意 忽略
+        if (force) {
+            getDisplayGroup().applyToAllMembers((str, display) -> {
+                var trans = transMap.get(str);
                 display.setTransformation(trans);
             });
-        }else {
-            getDisplayGroup().applyToAllMembersUnsafe((str,display)-> {display.setTransformation(transMap.get(str));});
+        } else {
+            getDisplayGroup().applyToAllMembersUnsafe((str, display) -> {
+                display.setTransformation(transMap.get(str));
+            });
         }
     }
 
     public EntityGroup<Display> getDisplayGroup();
-
-
 }

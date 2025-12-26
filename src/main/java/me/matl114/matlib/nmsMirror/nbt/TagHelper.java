@@ -18,11 +18,10 @@ public interface TagHelper extends TargetDescriptor {
 
     @MethodTarget
     @IgnoreFailure(thresholdInclude = Version.v1_21_R4)
-    default String getAsString(Object tag){
+    default String getAsString(Object tag) {
         return tag.toString();
     }
 
-
     @MethodTarget
-    void accept(Object self, @RedirectType(Import.TagVisitor)Object visitor);
+    void accept(Object self, @RedirectType(Import.TagVisitor) Object visitor);
 }

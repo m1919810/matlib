@@ -1,6 +1,14 @@
 package me.matl114.matlib.utils;
 
 import com.google.common.base.Preconditions;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import javax.annotation.Nonnull;
 import me.matl114.matlib.algorithms.algorithm.MathUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -9,15 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import javax.annotation.Nonnull;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
 
 public class TextUtils {
     private static final DecimalFormat FORMAT = new DecimalFormat("###,###,###,###,###,###.#");
@@ -31,11 +30,11 @@ public class TextUtils {
      * @param s The double value to format
      * @return A formatted string representation of the number
      */
-    public static String formatDouble(double s){
+    public static String formatDouble(double s) {
         return FORMAT.format(s);
     }
 
-    public static final String C="§";
+    public static final String C = "§";
 
     /**
      * Adds a gray color prefix to a string for description formatting.
@@ -49,18 +48,12 @@ public class TextUtils {
     public static String description(String str) {
         return "§7" + str;
     }
-    public static final String[] COLOR_MAP=new String[]{
-        "§0","§1","§2","§3","§4","§5","§6","§7","§8","§9","§A","§B","§C","§D","§E","§F"
-    };
+
+    public static final String[] COLOR_MAP =
+            new String[] {"§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§A", "§B", "§C", "§D", "§E", "§F"
+            };
     public static final int RGB_MASK = 16777215;
-    public static final int[] RGB_MASKS = new int[]{
-        15,
-        15<<4,
-        15<<8,
-        15<<12,
-        15<<16,
-        15<<20
-    };
+    public static final int[] RGB_MASKS = new int[] {15, 15 << 4, 15 << 8, 15 << 12, 15 << 16, 15 << 20};
 
     /**
      * Converts an RGB integer to a Minecraft hex color string.
@@ -72,11 +65,11 @@ public class TextUtils {
      * @param rgb The RGB integer value (24-bit)
      * @return A Minecraft hex color string
      */
-    public static String toHexString(int rgb){
+    public static String toHexString(int rgb) {
         rgb = rgb & RGB_MASK;
-        StringBuilder builder=new StringBuilder("§x");
-        for(int i=0;i<6;i++){
-            int value = (RGB_MASKS[i] & rgb) >> (i*4);
+        StringBuilder builder = new StringBuilder("§x");
+        for (int i = 0; i < 6; i++) {
+            int value = (RGB_MASKS[i] & rgb) >> (i * 4);
             builder.append(COLOR_MAP[value]);
         }
         return builder.toString();
@@ -115,7 +108,7 @@ public class TextUtils {
      * @return A Minecraft color code string
      */
     public static String toHexSingleColor(int c) {
-        //return C+toHexChar(c);
+        // return C+toHexChar(c);
         return COLOR_MAP[c];
     }
 
@@ -130,13 +123,13 @@ public class TextUtils {
      * @throws IllegalArgumentException if the input string is not exactly 6 characters long
      */
     public static String hexToLegacyHex(String rgb) throws IllegalArgumentException {
-        if(rgb.length()!=6){
+        if (rgb.length() != 6) {
             throw new IllegalArgumentException("Invalid RGB String");
         }
 
-        StringBuilder builder=new StringBuilder("§x");
-        for (int i=0;i<6;i++){
-            builder.append("§").append(Character.toUpperCase( rgb.charAt(i)));
+        StringBuilder builder = new StringBuilder("§x");
+        for (int i = 0; i < 6; i++) {
+            builder.append("§").append(Character.toUpperCase(rgb.charAt(i)));
         }
         return builder.toString();
     }
@@ -149,25 +142,31 @@ public class TextUtils {
      * @param c The hexadecimal character to convert
      * @return The decimal value (0-15), or 0 for invalid characters
      */
-    public static int hexCharToDecimal(char c){
-        if(c>='0' && c<='9'){
+    public static int hexCharToDecimal(char c) {
+        if (c >= '0' && c <= '9') {
             return c - '0';
         }
         switch (c) {
-            case 'A' :
-            case 'a' : return 10;
-            case 'B' :
-            case 'b' : return 11;
-            case 'C' :
-            case 'c' : return 12;
-            case 'D' :
-            case 'd' : return 13;
-            case 'E' :
-            case 'e' : return 14;
-            case 'F' :
-            case 'f' : return 15;
+            case 'A':
+            case 'a':
+                return 10;
+            case 'B':
+            case 'b':
+                return 11;
+            case 'C':
+            case 'c':
+                return 12;
+            case 'D':
+            case 'd':
+                return 13;
+            case 'E':
+            case 'e':
+                return 14;
+            case 'F':
+            case 'f':
+                return 15;
             default:
-                return  0;
+                return 0;
         }
     }
     /**
@@ -181,19 +180,20 @@ public class TextUtils {
      * @return The RGB integer value
      * @throws IllegalArgumentException if the input string is not exactly 6 characters long or contains invalid hex characters
      */
-    public static int rgbHexToInt(String rgb) throws IllegalArgumentException{
-        if(rgb.length()!=6){
+    public static int rgbHexToInt(String rgb) throws IllegalArgumentException {
+        if (rgb.length() != 6) {
             throw new IllegalArgumentException("Invalid RGB String");
         }
-        try{
+        try {
             return RGB_MASK & Integer.parseInt(rgb, 16);
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new IllegalArgumentException("Invalid RGB String", e);
         }
     }
-    public static final int START_CODE=rgbHexToInt("eb33eb");
-    //15409899;
-    public static final int END_CODE=rgbHexToInt("970097");
+
+    public static final int START_CODE = rgbHexToInt("eb33eb");
+    // 15409899;
+    public static final int END_CODE = rgbHexToInt("970097");
     /**
      * Applies Logitech-style color formatting to a string.
      *
@@ -203,8 +203,8 @@ public class TextUtils {
      * @param str The string to format
      * @return The string with Logitech-style color formatting
      */
-    public static String logitechStyle(String str){
-        return toHexString(START_CODE)+str;
+    public static String logitechStyle(String str) {
+        return toHexString(START_CODE) + str;
     }
     /**
      * Applies Logitech-style fading color formatting to a string.
@@ -217,24 +217,28 @@ public class TextUtils {
      * @return The string with fading color formatting applied to each character
      */
     public static String logitechFadingStyle(String str) {
-        int len=str.length()-1;
-        if(len<=0){
-            return toHexString(START_CODE)+str;
-        }
-        else{
-            int start=START_CODE;
-            int end=END_CODE;
-            int[] rgbs=new int[9];
-            for(int i=0;i<3;++i){
-                rgbs[i]=start%256;
-                rgbs[i+3]=end%256;
-                rgbs[i+6]=rgbs[i+3]-rgbs[i];
-                start=start/256;
-                end=end/256;
+        int len = str.length() - 1;
+        if (len <= 0) {
+            return toHexString(START_CODE) + str;
+        } else {
+            int start = START_CODE;
+            int end = END_CODE;
+            int[] rgbs = new int[9];
+            for (int i = 0; i < 3; ++i) {
+                rgbs[i] = start % 256;
+                rgbs[i + 3] = end % 256;
+                rgbs[i + 6] = rgbs[i + 3] - rgbs[i];
+                start = start / 256;
+                end = end / 256;
             }
-            String str2="";
-            for(int i=0;i<=len;i++){
-                str2=str2+toHexString(START_CODE+65536*((rgbs[8]*i)/len)+256*((rgbs[7]*i)/len)+((rgbs[6]*i)/len))+str.substring(i,i+1);
+            String str2 = "";
+            for (int i = 0; i <= len; i++) {
+                str2 = str2
+                        + toHexString(START_CODE
+                                + 65536 * ((rgbs[8] * i) / len)
+                                + 256 * ((rgbs[7] * i) / len)
+                                + ((rgbs[6] * i) / len))
+                        + str.substring(i, i + 1);
             }
             return str2;
         }
@@ -254,7 +258,7 @@ public class TextUtils {
      * @return A new {@link java.awt.Color} object representing the RGB values
      * @see java.awt.Color#getRGB()
      */
-    public static java.awt.Color rgbIntToColor(int color){
+    public static java.awt.Color rgbIntToColor(int color) {
         // Extract RGB components from the integer
         int red = (color >> 16) & 0xFF;
         int green = (color >> 8) & 0xFF;
@@ -284,14 +288,14 @@ public class TextUtils {
      * @return A new {@link java.awt.Color} representing the interpolated color
      * @see #colorInHSVLerp(java.awt.Color, java.awt.Color, double)
      */
-    public static java.awt.Color colorLerp(java.awt.Color color1, java.awt.Color color2, double percentage){
+    public static java.awt.Color colorLerp(java.awt.Color color1, java.awt.Color color2, double percentage) {
         // Clamp percentage between 0 and 1
         percentage = Math.max(0.0, Math.min(1.0, percentage));
 
         // Linear interpolation for each RGB component
-        int red = (int) (color1.getRed() +  percentage * (color2.getRed() - color1.getRed()));
-        int green = (int) (color1.getGreen() +  percentage * (color2.getGreen() - color1.getGreen()));
-        int blue = (int) (color1.getBlue() +  percentage * (color2.getBlue() - color1.getBlue()));
+        int red = (int) (color1.getRed() + percentage * (color2.getRed() - color1.getRed()));
+        int green = (int) (color1.getGreen() + percentage * (color2.getGreen() - color1.getGreen()));
+        int blue = (int) (color1.getBlue() + percentage * (color2.getBlue() - color1.getBlue()));
 
         return new java.awt.Color(red, green, blue);
     }
@@ -328,7 +332,7 @@ public class TextUtils {
      * @see java.awt.Color#RGBtoHSB(int, int, int, float[])
      * @see java.awt.Color#getHSBColor(float, float, float)
      */
-    public static java.awt.Color colorInHSVLerp(java.awt.Color color1, java.awt.Color color2, double percentage){
+    public static java.awt.Color colorInHSVLerp(java.awt.Color color1, java.awt.Color color2, double percentage) {
         // Clamp percentage between 0 and 1
         percentage = MathUtils.clamp(percentage, 0.0d, 1.0d);
 
@@ -376,19 +380,26 @@ public class TextUtils {
         }
         String string = string0.replaceAll("%s", PLACEHOLDER);
         for (int i = 0, length = string.length() - 1; i <= length; i++) {
-            double p =( ((double) i) / length ) * (colorList.size() - 1);
+            double p = (((double) i) / length) * (colorList.size() - 1);
             Color color1 = colorList.get((int) Math.floor(p));
             Color color2 = colorList.get((int) Math.ceil(p));
             int blue = (int) (color1.getBlue() * (1 - p + Math.floor(p)) + color2.getBlue() * (p - Math.floor(p)));
             int green = (int) (color1.getGreen() * (1 - p + Math.floor(p)) + color2.getGreen() * (p - Math.floor(p)));
             int red = (int) (color1.getRed() * (1 - p + Math.floor(p)) + color2.getRed() * (p - Math.floor(p)));
-            stringBuilder.append("§x")
-                .append("§").append(toHexChar(red / 16))
-                .append("§").append(toHexChar(red % 16))
-                .append("§").append(toHexChar(green / 16))
-                .append("§").append(toHexChar(green % 16))
-                .append("§").append(toHexChar(blue / 16))
-                .append("§").append(toHexChar(blue % 16));
+            stringBuilder
+                    .append("§x")
+                    .append("§")
+                    .append(toHexChar(red / 16))
+                    .append("§")
+                    .append(toHexChar(red % 16))
+                    .append("§")
+                    .append(toHexChar(green / 16))
+                    .append("§")
+                    .append(toHexChar(green % 16))
+                    .append("§")
+                    .append(toHexChar(blue / 16))
+                    .append("§")
+                    .append(toHexChar(blue % 16));
             stringBuilder.append(string.charAt(i));
         }
         String re = stringBuilder.toString();
@@ -412,14 +423,14 @@ public class TextUtils {
     public static String colorRandomString(@Nonnull String string) {
         List<Color> colorList = new ArrayList<>();
         double r = 0;
-        Random random = new Random(string.hashCode() / 2 +1919810);
+        Random random = new Random(string.hashCode() / 2 + 1919810);
         do {
             int red = (int) ((random.nextDouble() * 8 + 8) * 15 + random.nextDouble() * 12 + 4);
             int green = (int) ((random.nextDouble() * 8 + 8) * 15 + random.nextDouble() * 12 + 4);
             int blue = (int) ((random.nextDouble() * 8 + 8) * 15 + random.nextDouble() * 12 + 4);
             colorList.add(Color.fromRGB(red, green, blue));
             r++;
-        }while (1 / r >= random.nextDouble() && r * r <= string.length()+1);
+        } while (1 / r >= random.nextDouble() && r * r <= string.length() + 1);
 
         return colorString(string, colorList);
     }
@@ -448,11 +459,12 @@ public class TextUtils {
             int blue = (int) ((random.nextDouble() * 8 + 8) * 15 + random.nextDouble() * 12 + 4);
             colorList.add(Color.fromRGB(red, green, blue));
             r++;
-        }while (1 / r >= random.nextDouble() && r * r <= string.length()+1);
+        } while (1 / r >= random.nextDouble() && r * r <= string.length() + 1);
 
         return colorString(string, colorList);
     }
-    private static final String DISPLAY_PATTERN="[%s,%.0f,%.0f,%.0f]";
+
+    private static final String DISPLAY_PATTERN = "[%s,%.0f,%.0f,%.0f]";
     /**
      * Converts a Bukkit Location to a string representation.
      *
@@ -463,12 +475,19 @@ public class TextUtils {
      * @param loc The Bukkit Location to convert
      * @return A string representation of the location, or "null" if the location is null
      */
-    public static String locationToString(Location loc){
-        if(loc==null){
+    public static String locationToString(Location loc) {
+        if (loc == null) {
             return "null";
-        }else{
-            return new StringBuilder().append(loc.getWorld().getName()).append(',')
-                .append(loc.getX()).append(',').append(loc.getY()).append(',').append(loc.getZ()).toString();
+        } else {
+            return new StringBuilder()
+                    .append(loc.getWorld().getName())
+                    .append(',')
+                    .append(loc.getX())
+                    .append(',')
+                    .append(loc.getY())
+                    .append(',')
+                    .append(loc.getZ())
+                    .toString();
         }
     }
     /**
@@ -485,12 +504,19 @@ public class TextUtils {
      * @return A string representation of the block location, or "null" if the location is null
      * @see #locationToString(Location)
      */
-    public static String blockLocationToString(Location loc){
-        if(loc==null){
+    public static String blockLocationToString(Location loc) {
+        if (loc == null) {
             return "null";
-        }else{
-            return new StringBuilder().append(loc.getWorld().getName()).append(',')
-                .append(loc.getBlockX()).append(',').append(loc.getBlockY()).append(',').append(loc.getBlockZ()).toString();
+        } else {
+            return new StringBuilder()
+                    .append(loc.getWorld().getName())
+                    .append(',')
+                    .append(loc.getBlockX())
+                    .append(',')
+                    .append(loc.getBlockY())
+                    .append(',')
+                    .append(loc.getBlockZ())
+                    .toString();
         }
     }
     /**
@@ -506,19 +532,19 @@ public class TextUtils {
      * @return A Bukkit Location object, or null if parsing fails or the string is "null"
      * @see #locationToString(Location)
      */
-    public static Location locationFromString(String loc){
-        try{
-            if("null".equals(loc)){
+    public static Location locationFromString(String loc) {
+        try {
+            if ("null".equals(loc)) {
                 return null;
             }
-            String[] list=loc.split(",");
-            if(list.length!=4)return null;
-            String world =list[0];
+            String[] list = loc.split(",");
+            if (list.length != 4) return null;
+            String world = list[0];
             double x = Double.parseDouble(list[1]);
             double y = Double.parseDouble(list[2]);
             double z = Double.parseDouble(list[3]);
             return new Location(Bukkit.getWorld(world), x, y, z);
-        }catch (Throwable e){
+        } catch (Throwable e) {
         }
         return null;
     }
@@ -535,23 +561,22 @@ public class TextUtils {
      * @return A Bukkit Location object, or null if parsing fails or the string is "null"
      * @see #blockLocationToString(Location)
      */
-    public static Location blockLocationFromString(String loc){
-        try{
-            if("null".equals(loc)){
+    public static Location blockLocationFromString(String loc) {
+        try {
+            if ("null".equals(loc)) {
                 return null;
             }
-            String[] list=loc.split(",");
-            if(list.length!=4)return null;
-            String world =list[0];
+            String[] list = loc.split(",");
+            if (list.length != 4) return null;
+            String world = list[0];
             int x = Integer.parseInt(list[1]);
             int y = Integer.parseInt(list[2]);
             int z = Integer.parseInt(list[3]);
             return new Location(Bukkit.getWorld(world), x, y, z);
-        }catch (Throwable e){
+        } catch (Throwable e) {
         }
         return null;
     }
-
 
     /**
      * Converts a Bukkit Location to a formatted display string.
@@ -564,7 +589,9 @@ public class TextUtils {
      * @return A formatted display string, or "null" if the location is null
      */
     public static String locationToDisplayString(Location loc) {
-        return loc!=null? DISPLAY_PATTERN.formatted(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ()):"null";
+        return loc != null
+                ? DISPLAY_PATTERN.formatted(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ())
+                : "null";
     }
     /**
      * Adds lore lines to an ItemStack.
@@ -577,12 +604,12 @@ public class TextUtils {
      * @param lores The lore lines to add (varargs)
      * @return A new ItemStack with the added lore
      */
-    public static ItemStack addLore(ItemStack item, String... lores){
+    public static ItemStack addLore(ItemStack item, String... lores) {
 
-        ItemStack item2=item.clone();
-        ItemMeta meta=item2.getItemMeta();
-        List<String> finallist=meta.hasLore() ? meta.getLore() : new ArrayList<>();
-        for (String l:lores){
+        ItemStack item2 = item.clone();
+        ItemMeta meta = item2.getItemMeta();
+        List<String> finallist = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+        for (String l : lores) {
             finallist.add(resolveColor(l));
         }
         meta.setLore(finallist);
@@ -599,9 +626,9 @@ public class TextUtils {
      * @param name The new display name
      * @return A new ItemStack with the updated name
      */
-    public static ItemStack renameItem(ItemStack item,String name){
-        ItemStack item2=item.clone();
-        ItemMeta meta=item2.getItemMeta();
+    public static ItemStack renameItem(ItemStack item, String name) {
+        ItemStack item2 = item.clone();
+        ItemMeta meta = item2.getItemMeta();
         meta.setDisplayName(resolveColor(name));
         item2.setItemMeta(meta);
         return item2;
@@ -615,7 +642,7 @@ public class TextUtils {
      * @param s The string to resolve color codes in
      * @return The string with color codes resolved
      */
-    public static String resolveColor(String s){
+    public static String resolveColor(String s) {
         return translateAlternateColorCodes('&', s);
     }
     /**
@@ -628,11 +655,11 @@ public class TextUtils {
      * @param textToTranslate The string to translate
      * @return The string with alternate color codes translated
      */
-    public static String translateAlternateColorCodes(char altColorChar,  String textToTranslate) {
+    public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
         Preconditions.checkArgument(textToTranslate != null, "Cannot translate null text");
         char[] b = textToTranslate.toCharArray();
 
-        for(int i = 0; i < b.length - 1; ++i) {
+        for (int i = 0; i < b.length - 1; ++i) {
             if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
                 b[i] = 167;
             }
@@ -647,7 +674,7 @@ public class TextUtils {
      * @param b The value to format as a percentage
      * @return The formatted percentage string
      */
-    public static String getPercentFormat(double b){
+    public static String getPercentFormat(double b) {
         DecimalFormat df = new DecimalFormat("#.##");
         NumberFormat nf = NumberFormat.getPercentInstance();
         return nf.format(Double.parseDouble(df.format(b)));
@@ -661,13 +688,13 @@ public class TextUtils {
      * @param str The new lore line
      * @return The same ItemStack with the updated lore line
      */
-    public static ItemStack setLore(ItemStack stack,int index,String str){
-        ItemMeta meta=stack.getItemMeta();
-        List<String> lore=meta.getLore();
-        while(index>=lore.size()){
+    public static ItemStack setLore(ItemStack stack, int index, String str) {
+        ItemMeta meta = stack.getItemMeta();
+        List<String> lore = meta.getLore();
+        while (index >= lore.size()) {
             lore.add("");
         }
-        lore.set(index,resolveColor(str));
+        lore.set(index, resolveColor(str));
         meta.setLore(lore);
         stack.setItemMeta(meta);
         return stack;
@@ -679,11 +706,11 @@ public class TextUtils {
      * @param str The new lore lines
      * @return The same ItemStack with the updated lore
      */
-    public static ItemStack setLore(ItemStack stack,String... str){
-        ItemMeta meta=stack.getItemMeta();
-        List<String> lore=new ArrayList<>();
-        int len=str.length;
-        for (int i=0;i<len;++i) {
+    public static ItemStack setLore(ItemStack stack, String... str) {
+        ItemMeta meta = stack.getItemMeta();
+        List<String> lore = new ArrayList<>();
+        int len = str.length;
+        for (int i = 0; i < len; ++i) {
             lore.add(resolveColor(str[i]));
         }
         meta.setLore(lore);
@@ -697,7 +724,7 @@ public class TextUtils {
      * @param p The CommandSender to send the message to
      * @param msg The message to send
      */
-    public static void sendMessage(CommandSender p, String msg){
+    public static void sendMessage(CommandSender p, String msg) {
         p.sendMessage(resolveColor(msg));
     }
     /**
@@ -707,8 +734,8 @@ public class TextUtils {
      * @param title The title text
      * @param subtitle The subtitle text
      */
-    public static void sendTitle(Player p, String title, String subtitle){
-        p.sendTitle(resolveColor(title),resolveColor(subtitle),-1,-1,-1);
+    public static void sendTitle(Player p, String title, String subtitle) {
+        p.sendTitle(resolveColor(title), resolveColor(subtitle), -1, -1, -1);
     }
 
     /**
@@ -718,7 +745,7 @@ public class TextUtils {
      * @param name The new display name
      * @return The modified ItemMeta
      */
-    public static ItemMeta setName(ItemMeta meta ,String name){
+    public static ItemMeta setName(ItemMeta meta, String name) {
         meta.setDisplayName(AddUtils.resolveColor(name));
         return meta;
     }
@@ -727,7 +754,7 @@ public class TextUtils {
      *
      * @return The current date as a string
      */
-    public static String getDateString(){
+    public static String getDateString() {
         return new SimpleDateFormat("yyyyMMdd").format(new Date());
     }
 }

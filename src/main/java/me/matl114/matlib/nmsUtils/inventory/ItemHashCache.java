@@ -4,6 +4,8 @@ import org.bukkit.inventory.ItemStack;
 
 public interface ItemHashCache {
     int getHashCode();
+
     int getHashCodeNoLore();
+
     ItemStack getCraftStack();
 }

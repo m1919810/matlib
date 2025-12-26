@@ -1,10 +1,12 @@
 package me.matl114.matlib.nmsUtils.nbt;
 
-import com.destroystokyo.paper.Namespaced;
+import static me.matl114.matlib.nmsMirror.impl.NMSItem.ITEMSTACK;
+
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import java.util.*;
 import me.matl114.matlib.algorithms.algorithm.CollectionUtils;
 import me.matl114.matlib.algorithms.dataStructures.frames.collection.ListMapView;
 import me.matl114.matlib.algorithms.dataStructures.frames.mmap.ValueAccess;
@@ -13,10 +15,7 @@ import me.matl114.matlib.nmsMirror.impl.CraftBukkit;
 import me.matl114.matlib.nmsUtils.ChatUtils;
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import me.matl114.matlib.nmsUtils.VersionedUtils;
-import me.matl114.matlib.utils.Debug;
-import me.matl114.matlib.utils.version.Version;
 import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -28,14 +27,10 @@ import org.bukkit.tag.DamageTypeTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-
-import static me.matl114.matlib.nmsMirror.impl.NMSItem.ITEMSTACK;
-
 abstract class AbstractItemMetaView implements ItemMetaView {
 
-    public AbstractItemMetaView(Object itemStack){
-        this.itemStack =itemStack;
+    public AbstractItemMetaView(Object itemStack) {
+        this.itemStack = itemStack;
         this.nmsNameView = ITEMSTACK.getDisplayNameView(itemStack);
         this.nmsLoreView = ITEMSTACK.getLoreView(itemStack, true);
     }
@@ -47,29 +42,37 @@ abstract class AbstractItemMetaView implements ItemMetaView {
 
     Object itemStack;
     ValueAccess<Iterable<?>> nmsNameView;
-    public ValueAccess<Iterable<?>> getNMSNameView(){
+
+    public ValueAccess<Iterable<?>> getNMSNameView() {
         return nmsNameView;
     }
+
     ListMapView<?, Iterable<?>> nmsLoreView;
-    public ListMapView<?, Iterable<?>> getNMSLoreView(){
+
+    public ListMapView<?, Iterable<?>> getNMSLoreView() {
         return nmsLoreView;
     }
+
     @Lazily(nonnull = true, constVal = true)
     Object2IntMap<Enchantment> enchMap;
-    protected static final Comparator<Enchantment> ENCH_SORTOR = Comparator.comparing(o->o.getKey().toString());
-    protected final Object2IntMap<Enchantment> enchantmentMap(){
-        if(enchMap == null){
+
+    protected static final Comparator<Enchantment> ENCH_SORTOR =
+            Comparator.comparing(o -> o.getKey().toString());
+
+    protected final Object2IntMap<Enchantment> enchantmentMap() {
+        if (enchMap == null) {
             enchMap = initMap();
         }
         return enchMap;
-
     }
 
     protected abstract Object2IntMap<Enchantment> initMap();
+
     @Override
     public boolean hasDisplayName() {
         return ITEMSTACK.hasCustomHoverName(itemStack);
     }
+
     @Override
     public @NotNull String getDisplayName() {
         return ChatUtils.serializeToLegacy(nmsNameView.get());
@@ -79,7 +82,6 @@ abstract class AbstractItemMetaView implements ItemMetaView {
     public void setDisplayName(@Nullable String s) {
         nmsNameView.set(ChatUtils.deserializeLegacy(s));
     }
-
 
     @Override
     public @NotNull BaseComponent[] getDisplayNameComponent() {
@@ -96,11 +98,10 @@ abstract class AbstractItemMetaView implements ItemMetaView {
         return ITEMSTACK.hasLore(itemStack);
     }
 
-
     @Override
     public @Nullable List<String> getLore() {
         List<String> itemLore = new ArrayList<>();
-        for (var entry: this.nmsLoreView){
+        for (var entry : this.nmsLoreView) {
             itemLore.add(ChatUtils.serializeToLegacy(entry));
         }
         return itemLore;
@@ -121,7 +122,6 @@ abstract class AbstractItemMetaView implements ItemMetaView {
     public void setLoreComponents(@Nullable List<BaseComponent[]> list) {
         throw new UnsupportedOperationException("spigot");
     }
-
 
     @Override
     public boolean hasEnchants() {
@@ -146,15 +146,12 @@ abstract class AbstractItemMetaView implements ItemMetaView {
     @Override
     public boolean hasConflictingEnchant(@NotNull Enchantment enchantment) {
         Object2IntMap<Enchantment> ench = enchantmentMap();
-        if(ench.isEmpty())return false;
-        for (var en : ench.keySet()){
-            if(enchantment.conflictsWith(en))return true;
+        if (ench.isEmpty()) return false;
+        for (var en : ench.keySet()) {
+            if (enchantment.conflictsWith(en)) return true;
         }
         return false;
     }
-
-
-
 
     @Override
     public boolean isFireResistant() {
@@ -163,30 +160,30 @@ abstract class AbstractItemMetaView implements ItemMetaView {
 
     @Override
     public void setFireResistant(boolean b) {
-        if(b)
-            this.setDamageResistant(DamageTypeTags.IS_FIRE);
-        else
-            this.setDamageResistant(null);
+        if (b) this.setDamageResistant(DamageTypeTags.IS_FIRE);
+        else this.setDamageResistant(null);
     }
 
     @Lazily(constVal = false, nonnull = true)
     protected Multimap<Attribute, AttributeModifier> modifierMultimap;
-    protected final  Multimap<Attribute, AttributeModifier> modifiers(){
-        if(modifierMultimap == null){
+
+    protected final Multimap<Attribute, AttributeModifier> modifiers() {
+        if (modifierMultimap == null) {
             modifierMultimap = initModifiers();
         }
         return modifierMultimap;
     }
-    protected abstract Multimap<Attribute, AttributeModifier> initModifiers();
 
+    protected abstract Multimap<Attribute, AttributeModifier> initModifiers();
 
     @Override
     public @Nullable Multimap<Attribute, AttributeModifier> getAttributeModifiers() {
-        if(!hasAttributeModifiers()){
+        if (!hasAttributeModifiers()) {
             return null;
         }
         return modifiers();
     }
+
     @Override
     public @NotNull Multimap<Attribute, AttributeModifier> getAttributeModifiers(@NotNull EquipmentSlot slot) {
         SetMultimap<Attribute, AttributeModifier> result = LinkedHashMultimap.create();
@@ -197,21 +194,21 @@ abstract class AbstractItemMetaView implements ItemMetaView {
         }
         return result;
     }
-    protected abstract void syncModifierChange();
 
+    protected abstract void syncModifierChange();
 
     @Override
     public @Nullable Collection<AttributeModifier> getAttributeModifiers(@NotNull Attribute attribute) {
-        if(!hasAttributeModifiers()){
+        if (!hasAttributeModifiers()) {
             return null;
         }
-        return modifiers().containsKey(attribute)? modifiers().get(attribute): null;
+        return modifiers().containsKey(attribute) ? modifiers().get(attribute) : null;
     }
 
     @Override
     public boolean addAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier attributeModifier) {
         boolean re = modifiers().put(attribute, attributeModifier);
-        if(re){
+        if (re) {
             syncModifierChange();
         }
         return re;
@@ -219,28 +216,29 @@ abstract class AbstractItemMetaView implements ItemMetaView {
 
     @Override
     public void setAttributeModifiers(@Nullable Multimap<Attribute, AttributeModifier> multimap) {
-        this.modifierMultimap = multimap==null? LinkedHashMultimap.create(): LinkedHashMultimap.create( multimap);
+        this.modifierMultimap = multimap == null ? LinkedHashMultimap.create() : LinkedHashMultimap.create(multimap);
         syncModifierChange();
     }
 
     @Override
     public boolean removeAttributeModifier(@NotNull Attribute attribute) {
-        if(!hasAttributeModifiers()){
+        if (!hasAttributeModifiers()) {
             return false;
         }
         var re = modifiers().removeAll(attribute);
-        if(re.isEmpty())return false;
+        if (re.isEmpty()) return false;
         syncModifierChange();
         return true;
     }
 
     @Override
     public boolean removeAttributeModifier(@NotNull EquipmentSlot equipmentSlot) {
-        if(!hasAttributeModifiers()){
+        if (!hasAttributeModifiers()) {
             return false;
         }
         int removed = 0;
-        Iterator<Map.Entry<Attribute, AttributeModifier>> iter = this.modifiers().entries().iterator();
+        Iterator<Map.Entry<Attribute, AttributeModifier>> iter =
+                this.modifiers().entries().iterator();
 
         while (iter.hasNext()) {
             Map.Entry<Attribute, AttributeModifier> entry = iter.next();
@@ -249,7 +247,7 @@ abstract class AbstractItemMetaView implements ItemMetaView {
                 ++removed;
             }
         }
-        if( removed > 0){
+        if (removed > 0) {
             syncModifierChange();
             return true;
         }
@@ -258,11 +256,12 @@ abstract class AbstractItemMetaView implements ItemMetaView {
 
     @Override
     public boolean removeAttributeModifier(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
-        if(!hasAttributeModifiers()){
+        if (!hasAttributeModifiers()) {
             return false;
         }
         int removed = 0;
-        Iterator<Map.Entry<Attribute, AttributeModifier>> iter = this.modifiers().entries().iterator();
+        Iterator<Map.Entry<Attribute, AttributeModifier>> iter =
+                this.modifiers().entries().iterator();
 
         while (iter.hasNext()) {
             Map.Entry<Attribute, AttributeModifier> entry = iter.next();
@@ -277,18 +276,18 @@ abstract class AbstractItemMetaView implements ItemMetaView {
                 ++removed;
             }
         }
-        if(removed > 0){
+        if (removed > 0) {
             syncModifierChange();
             return true;
-        }return false;
+        }
+        return false;
     }
 
-    public Object getAsTag(){
+    public Object getAsTag() {
         return ITEMSTACK.saveNbtAsTag(itemStack);
     }
+
     public abstract Object getAsComponentPatch();
-
-
 
     @Override
     public @NotNull CustomItemTagContainer getCustomTagContainer() {
@@ -296,13 +295,11 @@ abstract class AbstractItemMetaView implements ItemMetaView {
     }
 
     @Override
-    public void setVersion(int i) {
-
-    }
+    public void setVersion(int i) {}
 
     @Override
     public ItemMeta clone() {
-        //left as not completed
+        // left as not completed
         return ItemMetaView.of(this.itemStack);
     }
 
@@ -316,8 +313,7 @@ abstract class AbstractItemMetaView implements ItemMetaView {
         return ItemUtils.getPersistentDataContainerView(this.itemStack, false);
     }
 
-    public PersistentDataContainer getInternalNbt(){
+    public PersistentDataContainer getInternalNbt() {
         return new TagCompoundView(ITEMSTACK.getCustomedNbtView(this.itemStack, false));
     }
-
 }

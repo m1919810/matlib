@@ -1,16 +1,18 @@
 package me.matl114.matlib.utils.config;
 
-public class ObjectView<T> implements DataView<T>{
+public class ObjectView<T> implements DataView<T> {
     private final NodeReference<T> parent;
-    public ObjectView(NodeReference<T> parent){
+
+    public ObjectView(NodeReference<T> parent) {
         this.parent = parent;
     }
+
     @Override
     public T get() {
         return this.parent.get();
     }
 
-    public boolean set(T value){
+    public boolean set(T value) {
         return this.parent.set(value);
     }
 

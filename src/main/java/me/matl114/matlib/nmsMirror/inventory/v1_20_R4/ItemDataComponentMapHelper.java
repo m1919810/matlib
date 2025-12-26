@@ -1,13 +1,12 @@
 package me.matl114.matlib.nmsMirror.inventory.v1_20_R4;
 
-import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
-import me.matl114.matlib.common.lang.annotations.Note;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
-import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-
-import java.util.Optional;
-
 import static me.matl114.matlib.nmsMirror.Import.*;
+
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import java.util.Optional;
+import me.matl114.matlib.common.lang.annotations.Note;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
 
 @Descriptive(target = "net.minecraft.core.component.PatchedDataComponentMap")
 public interface ItemDataComponentMapHelper extends DataComponentMapHelper {
@@ -18,8 +17,8 @@ public interface ItemDataComponentMapHelper extends DataComponentMapHelper {
     @MethodTarget
     void ensureMapOwnership(Object patchedMap);
 
-    default void removeFromPatch(Object patchMap, Object type){
-        //copy on write
+    default void removeFromPatch(Object patchMap, Object type) {
+        // copy on write
         ensureMapOwnership(patchMap);
         patchGetter(patchMap).remove(type);
     }
@@ -42,5 +41,5 @@ public interface ItemDataComponentMapHelper extends DataComponentMapHelper {
     public void setAll(Object patchedMap, @RedirectType(DataComponentMap) Object comp);
 
     @MethodTarget
-    public void restorePatch(Object patchedMap, @RedirectType(DataComponentPatch)Object changes);
+    public void restorePatch(Object patchedMap, @RedirectType(DataComponentPatch) Object changes);
 }

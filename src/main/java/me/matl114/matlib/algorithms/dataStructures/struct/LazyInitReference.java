@@ -5,16 +5,20 @@ public class LazyInitReference<T extends Object> implements Cloneable {
     public T value;
     public boolean init;
     private static LazyInitReference INSTANCE = new LazyInitReference();
+
     private LazyInitReference() {}
-    public static <W extends Object> LazyInitReference<W> ofEmpty(){
+
+    public static <W extends Object> LazyInitReference<W> ofEmpty() {
         return INSTANCE.clone();
     }
-    public static <W extends Object> LazyInitReference<W> ofValue(W value){
+
+    public static <W extends Object> LazyInitReference<W> ofValue(W value) {
         LazyInitReference<W> result = INSTANCE.clone();
         result.value = value;
         result.init = true;
         return result;
     }
+
     @Override
     public LazyInitReference clone() {
         try {

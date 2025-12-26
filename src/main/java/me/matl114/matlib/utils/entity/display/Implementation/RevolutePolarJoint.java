@@ -15,6 +15,7 @@ public class RevolutePolarJoint extends Joint {
     Vector3f axisY;
     String idX;
     String idY;
+
     public RevolutePolarJoint(String id, Vector3f bias, Vector3f axisX, Vector3f axisY) {
         super(id, bias);
         this.axisX = axisX;
@@ -22,8 +23,10 @@ public class RevolutePolarJoint extends Joint {
         this.idX = id + "_x";
         this.idY = id + "_y";
     }
+
     @Override
     public Quaternionf getRotation(RobotConfigure config) {
-        return TransformationUtils.fromAxisAngle(axisY, (float) config.getRotationAngle(idY)).mul(TransformationUtils.fromAxisAngle(axisX, (float) config.getRotationAngle(idX)));
+        return TransformationUtils.fromAxisAngle(axisY, (float) config.getRotationAngle(idY))
+                .mul(TransformationUtils.fromAxisAngle(axisX, (float) config.getRotationAngle(idX)));
     }
 }

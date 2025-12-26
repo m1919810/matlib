@@ -1,9 +1,8 @@
 package me.matl114.matlib.algorithms.dataStructures.frames.listenedCollection;
 
+import java.util.*;
 import me.matl114.matlib.algorithms.dataStructures.frames.simpleCollection.SimpleList;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
 
 public abstract class ListenedList<T> extends ListenedCollectionImpl<List<T>, T> implements List<T>, SimpleList<T> {
 
@@ -53,19 +52,17 @@ public abstract class ListenedList<T> extends ListenedCollectionImpl<List<T>, T>
         return this.delegate.lastIndexOf(o);
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public ListIterator<T> listIterator() {
         return new ListenedListIterator(this.delegate.listIterator());
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public ListIterator<T> listIterator(int index) {
         return new ListenedListIterator(this.delegate.listIterator(index));
     }
 
-    protected class ListenedListIterator extends ListenedIterator<ListIterator<T>> implements ListIterator<T>{
+    protected class ListenedListIterator extends ListenedIterator<ListIterator<T>> implements ListIterator<T> {
 
         ListenedListIterator(ListIterator<T> delegate) {
             super(delegate);
@@ -106,8 +103,7 @@ public abstract class ListenedList<T> extends ListenedCollectionImpl<List<T>, T>
         }
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public List<T> subList(int fromIndex, int toIndex) {
         return new ListenedSubList(this.delegate.subList(fromIndex, toIndex));
     }
@@ -116,13 +112,12 @@ public abstract class ListenedList<T> extends ListenedCollectionImpl<List<T>, T>
 
         public ListenedSubList(List<T> delegate) {
             super(delegate, false);
-            //just a view of this (delegate), no need to trigger update for elements
+            // just a view of this (delegate), no need to trigger update for elements
         }
+
         @Override
         public void onUpdate(T val, boolean val2) {
             ListenedList.this.onUpdate(val, val2);
         }
-
-
     }
 }

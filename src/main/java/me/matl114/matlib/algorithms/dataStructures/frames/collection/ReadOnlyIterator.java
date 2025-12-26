@@ -1,8 +1,7 @@
 package me.matl114.matlib.algorithms.dataStructures.frames.collection;
 
-import lombok.AllArgsConstructor;
-
 import java.util.Iterator;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class ReadOnlyIterator<W> implements Iterator<W> {
