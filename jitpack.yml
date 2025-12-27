@@ -1,0 +1,14 @@
+# .jitpack.yml
+jdk:
+  - openjdk21
+
+install:
+  - mvn clean install -DskipTests -B
+
+# 明确指定要发布的构件
+artifacts:
+  - matlib-adaptor/target/*.jar
+  - matlib-all/target/*.jar
+  - matlib-common/target/*.jar
+  - matlib-nms/target/*.jar
+  - matlib-slimefun/target/*.jar

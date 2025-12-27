@@ -3,6 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.matl114</groupId>
   <artifactId>matlib</artifactId>
+  <packaging>pom</packaging>
   <version>1.0.0</version>
   <build>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
@@ -97,8 +98,28 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <java>
+            <palantirJavaFormat>
+              <version>2.38.0</version>
+              <style>PALANTIR</style>
+            </palantirJavaFormat>
+            <removeUnusedImports />
+            <formatAnnotations />
+          </java>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+  <modules>
+    <module>matlib-common</module>
+    <module>matlib-test</module>
+    <module>matlib-adaptor</module>
+  </modules>
   <repositories>
     <repository>
       <id>paper-repo</id>
