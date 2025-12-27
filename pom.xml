@@ -48,7 +48,7 @@
 
     <build>
         <finalName>${project.name} v${project.version}</finalName>
-        <defaultGoal>clean package</defaultGoal>
+        <defaultGoal>clean compile package</defaultGoal>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <plugins>
             <plugin>
@@ -102,7 +102,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>

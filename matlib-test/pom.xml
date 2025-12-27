@@ -15,55 +15,6 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.0</version>
-                <configuration>
-                    <!--                    <minimizeJar>true</minimizeJar>-->
-                    <relocations>
-                        <relocation>
-                            <pattern>com.jeff_media.morepersistentdatatypes</pattern>
-                            <shadedPattern>me.matl114.matlib.libs.morepersistentdatatypes</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.objectweb.asm</pattern>
-                            <shadedPattern>me.matl114.matlib.libs.libasm</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.apache.commons.collections4</pattern>
-                            <shadedPattern>me.matl114.matlib.libs.collections4</shadedPattern>
-                        </relocation>
-                    </relocations>
-
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/*</exclude>
-                            </excludes>
-                        </filter>
-                        <!--                        <filter>-->
-                        <!--                            <artifact>com.esotericsoftware:reflectasm</artifact>-->
-                        <!--                            <includes>-->
-                        <!--                                <include>**/*</include> &lt;!&ndash; 确保它不会被 minimize 或移除 &ndash;&gt;-->
-                        <!--                            </includes>-->
-                        <!--                        </filter>-->
-                    </filters>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>me.matl114</groupId>

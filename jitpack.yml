@@ -3,7 +3,7 @@ jdk:
   - openjdk21
 
 install:
-  - mvn clean package
+  - mvn clean compile -DskipTests -B
   - mvn install -DskipTests -B
 
 
