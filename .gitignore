@@ -16,3 +16,4 @@ debug_history/
 *.pyc
 *__pycache__*
 /agent/
+*/target/
