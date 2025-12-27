@@ -111,7 +111,7 @@ public class ItemBuilder {
 
     public ItemBuilder glow() {
         ensureStack();
-        if (ItemMetaView.isVersionAtLeast1_20_R4()) {
+        if (ItemMetaView.versionAtLeast1_20_R4) {
             metaView.setEnchantmentGlintOverride(true);
         } else {
             metaView.addEnchant(VersionedRegistry.enchantment("luck_of_the_sea"), 1, true);

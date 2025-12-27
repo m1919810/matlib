@@ -3,9 +3,10 @@ jdk:
   - openjdk21
 
 install:
-  - mvn clean install -DskipTests -B
+  - mvn clean package
+  - mvn install -DskipTests -B
 
-# 明确指定要发布的构件
+
 artifacts:
   - matlib-adaptor/target/*.jar
   - matlib-all/target/*.jar
