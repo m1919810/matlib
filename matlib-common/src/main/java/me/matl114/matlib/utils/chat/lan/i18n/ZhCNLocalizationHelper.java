@@ -81,7 +81,7 @@ public interface ZhCNLocalizationHelper extends RegistryLocalizationHelper, Targ
 
     public static interface A {
 
-        ZhCNLocalizationHelper I = DescriptorBuilder.createASMHelperImpl(ZhCNLocalizationHelper.class);
+        ZhCNLocalizationHelper I = DescriptorBuilder.createASMMultiHelper(ZhCNLocalizationHelper.class);
     }
 
     public static interface P {

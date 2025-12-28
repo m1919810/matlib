@@ -44,7 +44,7 @@ public interface DataHelper extends TargetDescriptor {
     public <R> DataResult<R> error(Supplier<String> message);
 
     public static interface A {
-        DataHelper I = DescriptorBuilder.createASMHelperImpl(DataHelper.class);//DescriptorImplBuilder.createMultiHelper(DataHelper.class);
+        DataHelper I = DescriptorBuilder.createASMMultiHelper(DataHelper.class);//DescriptorImplBuilder.createMultiHelper(DataHelper.class);
     }
 
     public static interface P {

@@ -116,7 +116,7 @@ public interface PinyinHelper extends TargetDescriptor {
     }
 
     public static final class A {
-        public static final PinyinHelper I = DescriptorBuilder.createASMHelperImpl(PinyinHelper.class);
+        public static final PinyinHelper I = DescriptorBuilder.createASMMultiHelper(PinyinHelper.class);
 
 
     }
