@@ -56,10 +56,10 @@ public class CustomMenuGroup {
     private boolean placePresets = false;
     // private boolean placeBackHandlers=false;
     @Getter
-    private HashSet<Integer> prev = new HashSet<>();
+    private final HashSet<Integer> prev = new HashSet<>();
 
     @Getter
-    private HashSet<Integer> next = new HashSet<>();
+    private final HashSet<Integer> next = new HashSet<>();
     //    @Getter
     //    private HashSet<Integer> back=new HashSet<>();
     private boolean enablePageChangeSlot;
@@ -332,7 +332,7 @@ public class CustomMenuGroup {
                     return false;
                 }));
             });
-            this.prev.forEach(i -> {
+            this.next.forEach(i -> {
                 menu.getMenu().replaceExistingItem(i, MenuUtils.getNextButton(menu.getPage(), this.pages));
                 menu.getMenu().addMenuClickHandler(i, ((player, i1, itemStack, clickAction) -> {
                     if (menu.getPage() < pages) {
