@@ -8,7 +8,7 @@ import java.util.*;
 import javax.annotation.Nullable;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.utils.reflect.*;
-import me.matl114.matlib.utils.reflect.classBuild.ClassBuilder;
+import me.matl114.matlib.utils.reflect.classBuild.ClassBuildingUtils;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.*;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.DescriptorBuildException;
@@ -305,7 +305,7 @@ public class DescriptorImplBuilder {
                 continue;
             }
             List<Constructor<?>> constructors1 =
-                    matchConstructors(constructorAccess, targetClass0.getDeclaredConstructors());
+                    ClassBuildingUtils.matchConstructors(constructorAccess, targetClass0.getDeclaredConstructors());
             if (constructors1.isEmpty()) {
                 uncompletedMethod.add(constructorAccess);
             } else {
@@ -352,7 +352,7 @@ public class DescriptorImplBuilder {
     }
 
     static Pair<Field, Boolean> matchFields(Method fieldAccess, List<Field> fields) {
-        return ClassBuilder.matchFields(
+        return ClassBuildingUtils.matchFields(
                 fieldAccess,
                 fields,
                 fieldAccess.getAnnotation(FieldTarget.class).isStatic());
@@ -360,7 +360,7 @@ public class DescriptorImplBuilder {
 
     static List<Method> matchMethods(Method methodAccess, List<Method> methods) {
 
-        return ClassBuilder.matchMethods(
+        return ClassBuildingUtils.matchMethods(
                 methodAccess,
                 methods,
                 methodAccess.getAnnotation(MethodTarget.class).isStatic(),

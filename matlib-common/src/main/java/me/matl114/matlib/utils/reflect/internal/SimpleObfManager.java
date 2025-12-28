@@ -1,7 +1,10 @@
-package me.matl114.matlib.utils.reflect.internel;
+package me.matl114.matlib.utils.reflect.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import java.util.ServiceLoader;
+
 import me.matl114.matlib.algorithms.dataStructures.struct.LazyInitValue;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
@@ -12,14 +15,22 @@ public interface SimpleObfManager {
     }
 
     static LazyInitValue<SimpleObfManager> manager = LazyInitValue.ofLazy(() -> {
-        try {
-            return new SimpleObfManagerImpl();
-        } catch (Throwable e) {
-            var e1 = e.getCause();
-            Debug.logger(e1 != null ? e1 : e, "Error while creating SimpleObfManagerImpl:");
-            Debug.logger("Using Default Simple Obf Impl");
-            return new DefaultImpl();
+        try{
+            //use ObfManager if preset
+            Class<?> clazz = Class.forName( SimpleObfManager.class.getPackageName() + ".ObfManager");
+            Method m = clazz.getDeclaredMethod("getManager");
+            return (SimpleObfManager) m.invoke(null);
+        }catch (Throwable e0){
+            try {
+                return new SimpleObfManagerImpl();
+            } catch (Throwable e) {
+                var e1 = e.getCause();
+                Debug.logger(e1 != null ? e1 : e, "Error while creating SimpleObfManagerImpl:");
+                Debug.logger("Using Default Simple Obf Impl");
+                return new DefaultImpl();
+            }
         }
+
     });
     /**
      * this method should return the deobf class name of a optional-obf class, you should check whether the class is in the mapping
@@ -85,7 +96,15 @@ public interface SimpleObfManager {
         return Objects.equals(deobfMethodInClass(reobfClassName, targetDescriptor), methodName);
     }
 
-    static class DefaultImpl implements ObfManager {
+
+
+
+    default String deobfField(Field field0) {
+        return field0.getName();
+    }
+
+
+    static class DefaultImpl implements SimpleObfManager {
 
         @Override
         public String deobfClassName(String currentName) {
@@ -102,7 +121,7 @@ public interface SimpleObfManager {
             return ByteCodeUtils.parseMethodNameFromDescriptor(methodDescriptor);
         }
 
-        @Override
+
         public String deobfFieldInClass(String mojangClassName, String obfMethodDescriptor) {
             return ByteCodeUtils.parseFieldNameFromDescriptor(obfMethodDescriptor);
         }

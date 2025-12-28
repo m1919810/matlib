@@ -1,10 +1,12 @@
-package me.matl114.matlib.utils.reflect.internel;
+package me.matl114.matlib.utils.reflect.internal;
 
 import java.util.Map;
 import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.FieldTarget;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 
 @Internal

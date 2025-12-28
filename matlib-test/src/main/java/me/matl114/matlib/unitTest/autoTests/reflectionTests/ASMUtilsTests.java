@@ -15,7 +15,10 @@ import me.matl114.matlib.utils.reflect.asm.DebugClassReader;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
 import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.ConstructorTarget;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.FieldTarget;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import org.objectweb.asm.*;
 

@@ -5,11 +5,13 @@ import static me.matl114.matlib.utils.chat.lan.TranslateKeyUtils.*;
 import java.util.Objects;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
-import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
+
+import me.matl114.matlib.utils.reflect.descriptor.DescriptorBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.DescriptorProxyBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
+import me.matl114.matlib.utils.service.CustomServiceLoader;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -78,7 +80,8 @@ public interface ZhCNLocalizationHelper extends RegistryLocalizationHelper, Targ
     }
 
     public static interface A {
-        ZhCNLocalizationHelper I = DescriptorImplBuilder.createMultiHelper(ZhCNLocalizationHelper.class);
+
+        ZhCNLocalizationHelper I = DescriptorBuilder.createASMHelperImpl(ZhCNLocalizationHelper.class);
     }
 
     public static interface P {

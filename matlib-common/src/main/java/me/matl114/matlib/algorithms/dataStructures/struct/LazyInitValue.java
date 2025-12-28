@@ -36,6 +36,7 @@ public class LazyInitValue<T extends Object> implements Cloneable {
     public T get() {
         if (!initialized) {
             value = supplier.get();
+            initialized = true;
         }
         return value;
     }

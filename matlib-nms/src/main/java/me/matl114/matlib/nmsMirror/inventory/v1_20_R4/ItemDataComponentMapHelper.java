@@ -6,7 +6,9 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import java.util.Optional;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.FieldTarget;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 
 @Descriptive(target = "net.minecraft.core.component.PatchedDataComponentMap")
 public interface ItemDataComponentMapHelper extends DataComponentMapHelper {

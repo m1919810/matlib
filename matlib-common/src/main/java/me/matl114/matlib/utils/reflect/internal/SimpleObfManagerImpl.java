@@ -1,4 +1,4 @@
-package me.matl114.matlib.utils.reflect.internel;
+package me.matl114.matlib.utils.reflect.internal;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.*;
@@ -8,11 +8,11 @@ import me.matl114.matlib.utils.version.Version;
 import org.bukkit.Bukkit;
 
 public class SimpleObfManagerImpl implements SimpleObfManager {
-    final Class<?> obfClass;
-    final ClassMapperHelper classMapperHelper;
-    final Map<String, ?> mappingsByObfName;
-    final Map<String, ?> mappingsByMojangName;
-    static final String originCraftbukkitPackageName = "org.bukkit.craftbukkit";
+    protected final Class<?> obfClass;
+    protected final ClassMapperHelper classMapperHelper;
+    protected final Map<String, ?> mappingsByObfName;
+    protected final Map<String, ?> mappingsByMojangName;
+    protected static final String originCraftbukkitPackageName = "org.bukkit.craftbukkit";
     final String craftbukkitPackageName;
     // map from higher version to lower version
     // we all use high version mojang name here
@@ -26,7 +26,7 @@ public class SimpleObfManagerImpl implements SimpleObfManager {
         return builder.build();
     }
 
-    final Map<String, String> mojangVersionedPath = build(
+    protected final Map<String, String> mojangVersionedPath = build(
             "net.minecraft.world.level.chunk.status.ChunkStatus", "net.minecraft.world.level.chunk.ChunkStatus",
             "net.minecraft.network.protocol.login.ClientboundLoginFinishedPacket",
                     "net.minecraft.network.protocol.login.ClientboundGameProfilePacket",
@@ -51,7 +51,7 @@ public class SimpleObfManagerImpl implements SimpleObfManager {
     final Map<String, String> mojangVersionedPathMapper;
     final Map<String, String> mojangVersionedPathMapperInverse;
 
-    SimpleObfManagerImpl() {
+    protected SimpleObfManagerImpl() {
         String[] path = Bukkit.getServer().getClass().getPackage().getName().split("\\.");
         if (path.length >= 4) {
             craftbukkitPackageName = Bukkit.getServer().getClass().getPackage().getName();

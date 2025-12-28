@@ -3,7 +3,9 @@ package me.matl114.matlib.nmsMirror.inventory.v1_20_R4;
 import static me.matl114.matlib.nmsMirror.Import.*;
 
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-import me.matl114.matlib.utils.reflect.descriptor.annotations.*;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.ConstructorTarget;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.Descriptive;
+import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 
 @Descriptive(target = "net.minecraft.world.item.component.CustomData")

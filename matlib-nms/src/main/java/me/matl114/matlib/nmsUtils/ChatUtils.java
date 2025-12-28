@@ -1,6 +1,5 @@
 package me.matl114.matlib.nmsUtils;
 
-import static me.matl114.matlib.nmsMirror.impl.NMSChat.*;
 import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Type.*;
 

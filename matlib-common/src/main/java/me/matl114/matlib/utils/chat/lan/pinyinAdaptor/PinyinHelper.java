@@ -8,11 +8,12 @@ import me.matl114.matlib.utils.reflect.classBuild.annotation.FailHard;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
-import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
+import me.matl114.matlib.utils.reflect.descriptor.DescriptorBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.DescriptorProxyBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
+import me.matl114.matlib.utils.service.CustomServiceLoader;
 import me.matl114.matlib.utils.version.Version;
 
 @FailHard(thresholdInclude = Version.v1_20_R1, below = false)
@@ -115,19 +116,9 @@ public interface PinyinHelper extends TargetDescriptor {
     }
 
     public static final class A {
-        public static final PinyinHelper I;
+        public static final PinyinHelper I = DescriptorBuilder.createASMHelperImpl(PinyinHelper.class);
 
-        static {
-            PinyinHelper helper;
-            try {
-                helper = DescriptorImplBuilder.createMultiHelper(PinyinHelper.class);
-            } catch (Throwable e) {
-                Debug.logger(e, "Error while initializing PinyinHelper");
-                Debug.logger("Use default PinyinHelper instead");
-                helper = createDefaultImpl();
-            }
-            I = helper;
-        }
+
     }
 
     public static final class P {

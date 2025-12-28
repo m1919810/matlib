@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>matlib-common</artifactId>
+    <artifactId>matlib-asm</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -23,32 +23,22 @@
             <version>1.0.0</version>
             <scope>provided</scope>
         </dependency>
-
-
-        <!--        <dependency>-->
-        <!--            <groupId>io.papermc.paper</groupId>-->
-        <!--            <artifactId>paper-api</artifactId>-->
-        <!--            <version>1.21.3-R0.1-MODIFIED</version>-->
-        <!--            <scope>provided</scope>-->
-        <!--&lt;!&ndash;            <systemPath>${project.basedir}/libs/paper-api-1.21.3-R0.1-MODIFIED.jar</systemPath>&ndash;&gt;-->
-        <!--        </dependency>-->
         <dependency>
-            <groupId>com.jeff-media</groupId>
-            <artifactId>MorePersistentDataTypes</artifactId>
-            <version>2.4.0</version>
+            <groupId>me.matl114</groupId>
+            <artifactId>matlib-common</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.7.1</version>
             <scope>compile</scope>
         </dependency>
-
-
-
-
-
-        <!--        <dependency>-->
-        <!--            <groupId>io.papermc</groupId>-->
-        <!--            <artifactId>paperlib</artifactId>-->
-        <!--            <version>1.0.8</version>-->
-        <!--            <scope>compile</scope>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-tree</artifactId>
+            <version>9.7.1</version>
+        </dependency>
     </dependencies>
-
 </project>

@@ -1,4 +1,4 @@
-package me.matl114.matlib.utils.reflect.internel;
+package me.matl114.matlib.utils.reflect.internal;
 
 import java.lang.invoke.MethodHandle;
 import java.util.Map;

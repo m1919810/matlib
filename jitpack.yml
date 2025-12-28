@@ -13,3 +13,5 @@ artifacts:
   - matlib-common/target/*.jar
   - matlib-nms/target/*.jar
   - matlib-slimefun/target/*.jar
+  - matlib-asm/target/*.jar
+

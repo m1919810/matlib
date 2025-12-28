@@ -4,14 +4,18 @@ import com.mojang.serialization.DataResult;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import me.matl114.matlib.utils.chat.lan.i18n.ZhCNLocalizationHelper;
+import me.matl114.matlib.utils.chat.lan.pinyinAdaptor.PinyinHelper;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
-import me.matl114.matlib.utils.reflect.descriptor.DescriptorImplBuilder;
+import me.matl114.matlib.utils.reflect.descriptor.DescriptorBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.DescriptorProxyBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
+import me.matl114.matlib.utils.service.CustomServiceLoader;
 import me.matl114.matlib.utils.version.Version;
 
 @MultiDescriptive(targetDefault = "com.mojang.serialization.DataResult")
@@ -40,7 +44,7 @@ public interface DataHelper extends TargetDescriptor {
     public <R> DataResult<R> error(Supplier<String> message);
 
     public static interface A {
-        DataHelper I = DescriptorImplBuilder.createMultiHelper(DataHelper.class);
+        DataHelper I = DescriptorBuilder.createASMHelperImpl(DataHelper.class);//DescriptorImplBuilder.createMultiHelper(DataHelper.class);
     }
 
     public static interface P {

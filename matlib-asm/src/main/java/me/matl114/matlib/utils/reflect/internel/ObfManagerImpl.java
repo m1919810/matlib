@@ -6,10 +6,14 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import me.matl114.matlib.utils.Debug;
+
 import me.matl114.matlib.utils.reflect.ASMUtils;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
+
 import me.matl114.matlib.utils.reflect.asm.CustomClassLoader;
+import me.matl114.matlib.utils.reflect.internal.SimpleObfManagerImpl;
+import me.matl114.matlib.utils.version.Version;
 import org.objectweb.asm.*;
 
 @SuppressWarnings("all")
@@ -19,28 +23,33 @@ public class ObfManagerImpl extends SimpleObfManagerImpl implements ObfManager {
     Map<String, ?> mappingsFieldByObf;
     Map<String, ?> mappingsFieldByMojang;
 
-    ObfManagerImpl() {
+    protected ObfManagerImpl() {
         super();
-        try {
-            // higher version with no obf
-            Class<?> clazz = ClassMapperHelperImpl.clazz0;
-            optionalFieldMappingAccess = Objects.requireNonNull(ReflectUtils.getMethodHandle(clazz, "fieldsByObf"));
-            Debug.logger("initializing with has fieldsByObf");
-        } catch (Throwable noSuchMethod) {
-            Debug.logger("initializing with no fieldsByObf");
-            optionalFieldMappingAccess = null;
+        if(this.classMapperHelper != null){
             try {
-                Set val = a();
-                this.mappingsFieldByObf = (Map<String, ?>) val.stream()
+                // higher version with no obf
+                Class<?> clazz = this.classMapperHelper.getClass();
+                optionalFieldMappingAccess = Objects.requireNonNull(ReflectUtils.getMethodHandle(clazz, "fieldsByObf"));
+                Debug.logger("initializing with has fieldsByObf");
+            } catch (Throwable noSuchMethod) {
+                Debug.logger("initializing with no fieldsByObf");
+                optionalFieldMappingAccess = null;
+                try {
+                    Set val = a();
+                    this.mappingsFieldByObf = (Map<String, ?>) val.stream()
                         .collect(Collectors.toUnmodifiableMap(classMapperHelper::obfNameGetter, map -> map));
-                this.mappingsFieldByMojang = (Map<String, ?>) val.stream()
+                    this.mappingsFieldByMojang = (Map<String, ?>) val.stream()
                         .collect(Collectors.toUnmodifiableMap(classMapperHelper::mojangNameGetter, map -> map));
-            } catch (Throwable e) {
-                Debug.logger(e, "Error while reading field reobf data, disabling field reobf:");
-                this.mappingsFieldByObf = null;
-                this.mappingsFieldByMojang = null;
+                } catch (Throwable e) {
+                    if(!Version.getVersionInstance().isAtLeast(Version.v1_21_R1)){
+                        Debug.logger(e, "Error while reading field reobf data, disabling field reobf:");
+                    }
+                    this.mappingsFieldByObf = null;
+                    this.mappingsFieldByMojang = null;
+                }
             }
         }
+
         Debug.logger("ObfManagerImpl successfully init");
     }
 
@@ -51,7 +60,7 @@ public class ObfManagerImpl extends SimpleObfManagerImpl implements ObfManager {
         // starting our class
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         String generatedName =
-                ObfManagerImpl.class.getName().replace("ObfManagerImpl", "Generated.InvokeLoadMappingsIfPresent");
+                ObfManagerImpl.class.getName().replace("ObfManagerImpl", "generated.InvokeLoadMappingsIfPresent");
         String generatedPath = generatedName.replace(".", "/");
         cw.visit(
                 reader.readShort(6),

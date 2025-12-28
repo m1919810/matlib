@@ -1,8 +1,5 @@
 package me.matl114.matlib.unitTest.autoTests.nmsTests;
 
-import static me.matl114.matlib.nmsMirror.impl.NMSCore.NAMESPACE_KEY;
-import static me.matl114.matlib.nmsMirror.impl.NMSCore.REGISTRIES;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;

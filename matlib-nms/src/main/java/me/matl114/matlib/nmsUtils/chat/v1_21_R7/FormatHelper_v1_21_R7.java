@@ -1,8 +1,5 @@
 package me.matl114.matlib.nmsUtils.chat.v1_21_R7;
 
-import static me.matl114.matlib.nmsMirror.Import.*;
-import static me.matl114.matlib.nmsMirror.Import.ResourceLocation;
-
 import javax.annotation.Nullable;
 
 import me.matl114.matlib.nmsMirror.Import;
