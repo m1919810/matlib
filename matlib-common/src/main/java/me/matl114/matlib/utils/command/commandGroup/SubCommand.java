@@ -8,16 +8,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
-import me.matl114.matlib.algorithms.dataStructures.struct.Triplet;
 import me.matl114.matlib.common.functions.core.TriFunction;
 import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.params.CommandArgumentMap;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
@@ -172,6 +169,30 @@ public class SubCommand implements CustomTabExecutor {
 
         public Collection<SubCommand> getSubCommands();
         //todo: add help interface
+
+        default  <R extends SubCommandCaller, W extends SubCommand> SubBuilder<R,W> subBuilder(Builder<W> builder){
+            return  new SubBuilder<>((R)this, builder);
+        }
+
+
+
+    }
+    public static class SubBuilder<R extends SubCommandCaller ,W extends SubCommand> extends Builder<W>{
+        R treeSubCommand;
+        protected SubBuilder(R root, Builder<W> builder) {
+            super(builder);
+            this.treeSubCommand = root;
+        }
+
+        public R complete(){
+            W sb = build();
+            treeSubCommand.registerSub(sb);
+            return treeSubCommand;
+        }
+
+        public <S extends SubCommandCaller> SubBuilder<S, W> cast(){
+            return (SubBuilder<S, W>) this;
+        }
     }
 
     /** Help text lines for this sub-command */

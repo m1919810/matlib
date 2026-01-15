@@ -34,22 +34,5 @@ public class TreeSubCommand extends SubCommand implements SubCommandDispatcher ,
         return subCommands.values();
     }
 
-    public <W extends SubCommand> TreeSubBuilder<W> subBuilder(Builder<W> builder){
-        return new TreeSubBuilder<>(this, builder);
-    }
 
-
-    public static class TreeSubBuilder<W extends SubCommand> extends Builder<W>{
-        TreeSubCommand treeSubCommand;
-        protected TreeSubBuilder(TreeSubCommand root, Builder<W> builder) {
-            super(builder);
-            this.treeSubCommand = root;
-        }
-
-        public TreeSubCommand complete(){
-            W sb = build();
-            treeSubCommand.registerSub(sb);
-            return treeSubCommand;
-        }
-    }
 }
