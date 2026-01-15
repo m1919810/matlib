@@ -1,5 +1,7 @@
 package me.matl114.matlib.algorithms.algorithm;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
@@ -11,6 +13,12 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Map;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.representer.Representer;
 
 /**
  * Utility class for file and resource operations.
@@ -325,6 +333,27 @@ public class FileUtils {
         }
     }
 
+    public static void writeFileString(File str, String string) {
+        writeFileString(str, string, false);
+    }
+
+    public static void writeFileString(File str, String string, boolean append) {
+        try {
+            Path path = str.toPath();
+            if (!Files.exists(path.getParent())) {
+                Files.createDirectories(path.getParent());
+            }
+            if (append) {
+                Files.writeString(path, string, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            } else {
+                Files.writeString(path, string, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Reads a file and parses it as JSON.
      *
@@ -350,5 +379,399 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static final Gson PRETTY_GSON = createDefaultGsonBuilder() // 可选：序列化null值
+            .create();
+
+    private static final Gson COMPACT_GSON = createCompactGsonBuilder().create();
+
+    /**
+     * Writes a JsonElement to a file with pretty formatting.
+     *
+     * @param file The file to write to
+     * @param json The JsonElement to write
+     */
+    public static void writeJson(File file, JsonElement json) {
+        writeJson(file, json, true);
+    }
+
+    /**
+     * Writes a JsonElement to a file.
+     *
+     * @param file The file to write to
+     * @param json The JsonElement to write
+     * @param pretty Whether to use pretty formatting
+     */
+    public static void writeJson(File file, JsonElement json, boolean pretty) {
+        try {
+            ensureParentDir(file);
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+                Gson gson = pretty ? PRETTY_GSON : COMPACT_GSON;
+                gson.toJson(json, writer);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Writes a JsonElement to a file with pretty formatting.
+     *
+     * @param path The path to the file
+     * @param json The JsonElement to write
+     */
+    public static void writeJson(String path, JsonElement json) {
+        writeJson(new File(path), json, true);
+    }
+
+    /**
+     * Writes a JsonElement to a file.
+     *
+     * @param path The path to the file
+     * @param json The JsonElement to write
+     * @param pretty Whether to use pretty formatting
+     *
+     */
+    public static void writeJson(String path, JsonElement json, boolean pretty) {
+        writeJson(new File(path), json, pretty);
+    }
+
+    /**
+     * Writes a JsonElement to a file with custom Gson configuration.
+     *
+     * @param file The file to write to
+     * @param json The JsonElement to write
+     * @param gson Custom Gson instance for serialization
+     */
+    public static void writeJson(File file, JsonElement json, Gson gson) {
+        try {
+            ensureParentDir(file);
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+                gson.toJson(json, writer);
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Appends a JsonElement to an existing JSON file.
+     * If the file doesn't exist, creates it with the given JsonElement.
+     * Note: This is only meaningful for JSON arrays or objects that can be merged.
+     *
+     * @param file The file to append to
+     * @param json The JsonElement to append
+     * @param pretty Whether to use pretty formatting
+     * @throws IOException if the file cannot be read or written
+     */
+    public static void appendJson(File file, JsonElement json, boolean pretty) throws IOException {
+        JsonElement existing = file.exists() ? readFileJson(file) : null;
+
+        if (existing == null || existing.isJsonNull()) {
+            // File doesn't exist or is empty, create new
+            writeJson(file, json, pretty);
+        } else if (existing.isJsonArray() && json.isJsonArray()) {
+            // Merge arrays
+            existing.getAsJsonArray().addAll(json.getAsJsonArray());
+            writeJson(file, existing, pretty);
+        } else if (existing.isJsonObject() && json.isJsonObject()) {
+            // Merge objects (overwrites duplicate keys)
+            json.getAsJsonObject().entrySet().forEach(entry -> existing.getAsJsonObject()
+                    .add(entry.getKey(), entry.getValue()));
+            writeJson(file, existing, pretty);
+        } else {
+            // Cannot merge different types, replace
+            writeJson(file, json, pretty);
+        }
+    }
+
+    private static final Yaml YAML = createDefaultYaml();
+
+    private static final Yaml COMPACT_YAML = createCompressedYaml();
+
+    public static <T> T readYamlString(String yamlString) {
+        return YAML.load(yamlString);
+    }
+
+    public static <T> T readYaml(InputStream inputStream) {
+        return YAML.load(inputStream);
+    }
+
+    public static <T> T readFileYaml(File file) {
+        try (var fileReader = readFile(file)) {
+            return readYaml(fileReader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T readFileYaml(String filePath) {
+        return readFileYaml(new File(filePath));
+    }
+
+    public static <T> T readResourceYaml(String resource) {
+        try (var resourceIn = readResource(resource)) {
+            return readYaml(resourceIn);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T readYaml(InputStream inputStream, Class<T> clazz) {
+        return YAML.loadAs(inputStream, clazz);
+    }
+
+    public static <T> T readFileYaml(File file, Class<T> clazz) {
+        try (var fileReader = readFile(file)) {
+            return readYaml(fileReader, clazz);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T readFileYaml(String filePath, Class<T> clazz) {
+        return readFileYaml(new File(filePath), clazz);
+    }
+
+    public static <T> T readResourceYaml(String resource, Class<T> tClass) {
+        try (var resourceIn = readResource(resource)) {
+            return readYaml(resourceIn, tClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> String dumpYaml(T object) {
+        return YAML.dump(object);
+    }
+
+    public static <T, W> String dumpYamlAsMap(T object) {
+        return YAML.dumpAsMap(object);
+    }
+
+    public static <T> void writeYaml(File path, T object, boolean pretty) {
+        try {
+            ensureParentDir(path);
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(path), StandardCharsets.UTF_8)) {
+                (pretty ? YAML : COMPACT_YAML).dump(object, writer);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Reads the entire binary content of a file into a byte array.
+     * This is suitable for small to medium-sized files.
+     *
+     * @param file The file to read
+     * @return The binary content as a byte array
+     * @throws RuntimeException if the file cannot be read
+     */
+    public static byte[] readBinaryFile(File file) {
+        if (!isAFile(file)) {
+            throw new RuntimeException("File does not exist: " + file);
+        }
+
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read binary file: " + file, e);
+        }
+    }
+
+    /**
+     * Reads the entire binary content of a file into a byte array.
+     *
+     * @param path The path to the file
+     * @return The binary content as a byte array
+     */
+    public static byte[] readBinaryFile(String path) {
+        return readBinaryFile(new File(path));
+    }
+
+    /**
+     * Writes binary data to a file.
+     *
+     * @param file The file to write to
+     * @param data The binary data to write
+     * @param append Whether to append to the file (false will overwrite)
+     * @throws RuntimeException if the file cannot be written
+     */
+    public static void writeBinaryFile(File file, byte[] data, boolean append) {
+        try {
+            ensureParentDir(file);
+            StandardOpenOption[] options = append ?
+                new StandardOpenOption[]{StandardOpenOption.CREATE, StandardOpenOption.APPEND} :
+                new StandardOpenOption[]{StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING};
+
+            Files.write(file.toPath(), data, options);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write binary file: " + file, e);
+        }
+    }
+
+    /**
+     * Writes binary data to a file (overwrites existing content).
+     *
+     * @param file The file to write to
+     * @param data The binary data to write
+     */
+    public static void writeBinaryFile(File file, byte[] data) {
+        writeBinaryFile(file, data, false);
+    }
+
+    /**
+     * Writes binary data to a file.
+     *
+     * @param path The path to the file
+     * @param data The binary data to write
+     * @param append Whether to append to the file (false will overwrite)
+     */
+    public static void writeBinaryFile(String path, byte[] data, boolean append) {
+        writeBinaryFile(new File(path), data, append);
+    }
+
+    // =========================== 辅助方法 ===========================
+    /**
+     * Creates a custom GsonBuilder with default settings.
+     * Can be used to create custom Gson instances for specific needs.
+     *
+     * @return A configured GsonBuilder
+     */
+    public static GsonBuilder createDefaultGsonBuilder() {
+        return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls();
+    }
+
+    /**
+     * Creates a compact GsonBuilder (no pretty printing).
+     *
+     * @return A configured GsonBuilder for compact output
+     */
+    public static GsonBuilder createCompactGsonBuilder() {
+        return new GsonBuilder().disableHtmlEscaping().serializeNulls();
+    }
+
+    protected static class CustomConstructor extends Constructor {
+
+        public CustomConstructor(LoaderOptions loadingConfig) {
+            this(loadingConfig, CustomConstructor.class.getClassLoader());
+        }
+
+        public CustomConstructor(LoaderOptions loadingConfig, ClassLoader lookup) {
+            super(loadingConfig);
+            this.loader = lookup;
+        }
+
+        ClassLoader loader;
+
+        @Override
+        protected Class<?> getClassForName(String name) throws ClassNotFoundException {
+            try {
+                return Class.forName(name, true, loader);
+            } catch (ClassNotFoundException e) {
+                return super.getClassForName(name);
+            }
+        }
+    }
+
+    public static Yaml createDefaultYaml() {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK); // Block风格，美观
+        dumperOptions.setIndent(2); // 缩进2个空格
+        dumperOptions.setPrettyFlow(true); // 美化流风格
+        dumperOptions.setLineBreak(DumperOptions.LineBreak.getPlatformLineBreak()); // 使用平台换行符
+
+        // Loader配置
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setCodePointLimit(Integer.MAX_VALUE);
+        loaderOptions.setNestingDepthLimit(100);
+        loaderOptions.setTagInspector(tag -> true);
+
+        Representer representer = new Representer(dumperOptions);
+        representer.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        return new Yaml(new CustomConstructor(loaderOptions), representer, dumperOptions, loaderOptions);
+    }
+
+    /**
+     * 创建压缩的YAML处理器
+     * 特性：
+     * - 紧凑格式（Flow风格或最小化Block）
+     * - 无缩进或最小缩进
+     * - 不换行（尽量）
+     * - 适合存储或网络传输
+     */
+    public static Yaml createCompressedYaml() {
+        DumperOptions dumperOptions = new DumperOptions();
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setTagInspector(tag -> true);
+        return new Yaml(
+                new CustomConstructor(loaderOptions), new Representer(dumperOptions), dumperOptions, loaderOptions);
+    }
+
+    /**
+     * 创建美观的YAML处理器
+     * 特性：
+     * - 4空格缩进
+     * - 双引号标量
+     * - 适合展示和文档
+     */
+    public static Yaml createPrettyYaml() {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        dumperOptions.setIndent(4); // 4空格缩进
+        dumperOptions.setPrettyFlow(true);
+        dumperOptions.setAllowUnicode(true);
+        dumperOptions.setSplitLines(true);
+        dumperOptions.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED); // 双引号
+        dumperOptions.setWidth(80); // 80字符宽度
+        dumperOptions.setLineBreak(DumperOptions.LineBreak.UNIX);
+
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setAllowDuplicateKeys(false);
+        loaderOptions.setMaxAliasesForCollections(50);
+        loaderOptions.setAllowRecursiveKeys(false);
+        loaderOptions.setNestingDepthLimit(50);
+        loaderOptions.setCodePointLimit(10 * 1024 * 1024);
+        loaderOptions.setTagInspector(tag -> true);
+
+        Representer representer = new Representer(dumperOptions);
+        representer.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        representer.setDefaultScalarStyle(DumperOptions.ScalarStyle.DOUBLE_QUOTED);
+
+        return new Yaml(new CustomConstructor(loaderOptions), representer, dumperOptions, loaderOptions);
+    }
+
+    /**
+     * 创建安全的YAML处理器
+     * 特性：
+     * - 严格的安全限制
+     * - 防止YAML炸弹
+     * - 适合处理不可信输入
+     */
+    public static Yaml createSafeYaml() {
+        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        dumperOptions.setIndent(2);
+        dumperOptions.setAllowUnicode(true);
+        dumperOptions.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
+
+        // 严格的安全配置
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setAllowDuplicateKeys(false);
+        loaderOptions.setMaxAliasesForCollections(10); // 严格限制别名数
+        loaderOptions.setAllowRecursiveKeys(false);
+        loaderOptions.setNestingDepthLimit(20); // 较浅的嵌套限制
+        loaderOptions.setCodePointLimit(1024 * 1024); // 1MB限制
+        loaderOptions.setProcessComments(false); // 不处理注释
+
+        // 使用安全的Constructor，限制可加载的类
+        SafeConstructor constructor = new SafeConstructor(loaderOptions);
+
+        Representer representer = new Representer(dumperOptions);
+        representer.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+        return new Yaml(constructor, representer, dumperOptions, loaderOptions);
     }
 }

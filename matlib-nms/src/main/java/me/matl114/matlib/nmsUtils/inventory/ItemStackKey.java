@@ -2,7 +2,7 @@ package me.matl114.matlib.nmsUtils.inventory;
 
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.nmsUtils.ItemUtils;
-import me.matl114.matlib.utils.itemCache.ItemStackHolder;
+import me.matl114.matlib.utils.stackCache.ItemStackHolder;
 import org.bukkit.inventory.ItemStack;
 
 public class ItemStackKey extends ItemStackHolder implements ItemHashCache {

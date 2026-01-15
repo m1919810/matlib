@@ -337,6 +337,28 @@ public class MathUtils {
     }
 
     /**
+     * Clamps a long value between a minimum and maximum.
+     *
+     * @param value The value to clamp
+     * @param min The minimum allowed value
+     * @param max The maximum allowed value
+     * @return The clamped value
+     */
+    public static long clamp(long value, long min, long max) {
+        return Math.min(max, Math.max(value, min));
+    }
+
+    /**
+     * Clamps a long value between INT_MIN and INT_MAX
+     *
+     * @param value The value to clamp
+     * @return The clamped value
+     */
+    public static int clampToInt(long value) {
+        return (int) clamp(value, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+
+    /**
      * Clamps a double value between a minimum and maximum.
      *
      * @param value The value to clamp
@@ -401,5 +423,21 @@ public class MathUtils {
 
     public static UUID uuidFromIntArray(int[] bits) {
         return new UUID((long) bits[0] << 32 | bits[1] & 4294967295L, (long) bits[2] << 32 | bits[3] & 4294967295L);
+    }
+
+    public static double square(double d){
+        return d * d;
+    }
+
+    public static int square(int d){
+        return d * d;
+    }
+
+    public static long square(long d){
+        return d * d;
+    }
+
+    public static float square(float d){
+        return d * d;
     }
 }

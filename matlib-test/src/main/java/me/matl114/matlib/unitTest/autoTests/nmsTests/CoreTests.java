@@ -20,6 +20,7 @@ import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import org.bukkit.Material;
 
+
 public class CoreTests implements TestCase {
     static TestReflection TEST = DescriptorImplBuilder.createMultiHelper(TestReflection.class);
 
@@ -43,9 +44,10 @@ public class CoreTests implements TestCase {
         Debug.logger("check material complete", count.get());
     }
 
-    @OnlineTest(name = "special test ", automatic = false)
+    @OnlineTest(name = "special item register test", automatic = false)
     public void test_test() throws Throwable {
-        if (NMSCore.REGISTRIES.containsKey(BuiltInRegistryEnum.ITEM, NMSCore.NAMESPACE_KEY.newNSKey("minecraft", "myitem"))) {
+        if (NMSCore.REGISTRIES.containsKey(
+                BuiltInRegistryEnum.ITEM, NMSCore.NAMESPACE_KEY.newNSKey("minecraft", "myitem"))) {
             Debug.logger("already registered");
             return;
         }

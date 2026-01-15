@@ -10,11 +10,10 @@ import me.matl114.matlib.algorithms.dataStructures.frames.lazyCollection.LazyArr
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
-import me.matl114.matlib.utils.CraftUtils;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.inventory.itemStacks.CleanItemStack;
-import me.matl114.matlib.utils.itemCache.ItemStackCache;
 import me.matl114.matlib.utils.reflect.LambdaUtils;
+import me.matl114.matlib.utils.stackCache.ItemStackMetaCache;
 import org.bukkit.inventory.ItemStack;
 
 public class SlimefunItemMatchTests implements TestCase {
@@ -40,14 +39,14 @@ public class SlimefunItemMatchTests implements TestCase {
         long b = System.nanoTime();
         Debug.logger("match result for 1st", b - a, "ns");
         a = System.nanoTime();
-        ItemProcessor<ItemStackCache> processor2 = ItemStackCache::get;
-        ItemMatcher<ItemStackCache> matcher2 = CraftUtils::matchItemCore;
+        ItemProcessor<ItemStackMetaCache> processor2 = ItemStackMetaCache::get;
+        ItemMatcher<ItemStackMetaCache> matcher2 = (ItemStackMetaCache::matchItem);
         boolean[][] amount2 = crossMatch(allSlimefunItems, cloned, processor2, matcher2, matchLore);
         b = System.nanoTime();
         Debug.logger("match result for 2st", b - a, "ns");
         a = System.nanoTime();
-        ItemProcessor<ItemStackCache> processor3 = ItemStackCache::get;
-        ItemMatcher<ItemStackCache> matcher3 = (t, w, c) -> {
+        ItemProcessor<ItemStackMetaCache> processor3 = ItemStackMetaCache::get;
+        ItemMatcher<ItemStackMetaCache> matcher3 = (t, w, c) -> {
             return t.getType() == w.getType() && (Objects.equals(t.getMeta(), w.getMeta()));
         };
         boolean[][] amount3 = crossMatch(allSlimefunItems, cloned, processor3, matcher3, matchLore);

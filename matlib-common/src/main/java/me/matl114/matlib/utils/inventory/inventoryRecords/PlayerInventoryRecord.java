@@ -1,5 +1,6 @@
 package me.matl114.matlib.utils.inventory.inventoryRecords;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,7 +24,7 @@ public record PlayerInventoryRecord(Player player, Inventory inventory) implemen
 
     @Override
     public boolean stillValid() {
-        return player.isOnline();
+        return Bukkit.getPlayer(player.getUniqueId()) == player;
     }
 
     @Override

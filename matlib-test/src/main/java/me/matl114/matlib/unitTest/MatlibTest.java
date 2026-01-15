@@ -3,15 +3,12 @@ package me.matl114.matlib.unitTest;
 import java.util.Locale;
 import lombok.Getter;
 import me.matl114.matlib.core.AddonInitialization;
-import me.matl114.matlib.implement.bukkit.chat.ChatInputManager;
-import me.matl114.matlib.implement.nms.chat.PacketTranslator;
-import me.matl114.matlib.implement.nms.network.PacketEventManager;
+import me.matl114.matlib.core.bukkit.chat.ChatInputManager;
+import me.matl114.matlib.core.nms.chat.PacketTranslator;
+import me.matl114.matlib.core.nms.network.PacketEventManager;
 import me.matl114.matlib.unitTest.autoTests.*;
 import me.matl114.matlib.unitTest.demo.DemoTestset;
-import me.matl114.matlib.unitTest.manualTests.DisplayManagerTest;
-import me.matl114.matlib.unitTest.manualTests.ManualTests;
-import me.matl114.matlib.unitTest.manualTests.NMSPlayerTest;
-import me.matl114.matlib.unitTest.manualTests.PlayerAndClientTest;
+import me.matl114.matlib.unitTest.manualTests.*;
 import me.matl114.matlib.utils.chat.lan.LanguageRegistry;
 import me.matl114.matlib.utils.experimential.FakeSchedular;
 import me.matl114.matlib.utils.version.Version;
@@ -82,6 +79,7 @@ public class MatlibTest extends JavaPlugin {
                 // manual tests
                 .registerTestCase(new DisplayManagerTest())
                 .registerTestCase(new PlayerAndClientTest())
+                .registerTestCase(new InventoryPlayerTest())
                 .registerTestCase(new NMSPlayerTest())
                 .registerTestCase(new NetworkTestset())
                 .registerTestCase(new AlgorithmTestset())
@@ -91,6 +89,11 @@ public class MatlibTest extends JavaPlugin {
                 .registerTestCase(new DemoTestset());
         if (packetEventManager != null) packetEventManager.registerListener(new TestPacketListener(), this);
         this.getServer().getPluginManager().registerEvents(new TestListeners(), this);
+        try {
+            Class.forName("org.spigotmc.WatchdogThread").getMethod("doStop").invoke(null);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void onDisable() {

@@ -4,7 +4,7 @@ import me.matl114.matlib.unitTest.TestSet;
 import me.matl114.matlib.unitTest.autoTests.bukkitTests.BukkitAPITests;
 
 public class BukkitTestset extends TestSet {
-    {
+    public void init() {
         addTest(new BukkitAPITests());
         //        addTest(new BukkitTranslationTests());
         // addTest(new PdcTests());

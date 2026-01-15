@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicReference;
-import me.matl114.matlib.implement.bukkit.schedule.ScheduleManager;
+import me.matl114.matlib.core.bukkit.schedule.ScheduleManager;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
 import me.matl114.matlib.utils.*;
@@ -38,7 +38,6 @@ public class InventoryUtilTests implements TestCase {
                 .getScheduledFuture(
                         () -> {
                             testBlock.setType(Material.CHEST);
-                            Debug.logger("Create a chest");
                             return null;
                         },
                         10,
@@ -52,7 +51,6 @@ public class InventoryUtilTests implements TestCase {
                             Assert(blockStateHere.get() instanceof InventoryHolder);
                             inventoryHere.set(((InventoryHolder) blockStateHere.get()).getInventory());
                             AssertNN(inventoryHere.get());
-                            Debug.logger("get chest block state: " + blockStateHere.get());
                             return null;
                         },
                         10,
@@ -64,7 +62,7 @@ public class InventoryUtilTests implements TestCase {
             Debug.logger(e);
         }
         Debug.logger("Back to Async Thread");
-        Debug.logger("check inventory here ");
+        Debug.logger("check inventory ");
         Inventory inventory = inventoryHere.get();
         AssertNN(inventory);
         Debug.logger("check inventory slot ");
@@ -106,14 +104,6 @@ public class InventoryUtilTests implements TestCase {
         Assert(inventory.getItem(0).getType() == Material.DIAMOND);
         Debug.logger("check tile Entity Removal");
         AssertNN(WorldUtils.getTileEntityRemovalHandle().get(tileEntity));
-        long start = System.nanoTime();
-        for (int i = 0; i < 1_000; ++i) {
-            // tileEntityRemovalHandle.get(tileEntityHandle.get(tileState));
-            WorldUtils.isTileEntityStillValid(tileState);
-            // 24112100
-        }
-        long end = System.nanoTime();
-        Debug.logger("Test Accessing tileState removal flag: cost", end - start);
         Debug.logger("check safety of Async inventory operation");
         // test Async Inventory Operation
         var iteration = WorldUtils.getInventoryHolderTypes();

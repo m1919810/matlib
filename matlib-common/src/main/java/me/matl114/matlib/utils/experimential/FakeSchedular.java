@@ -10,8 +10,8 @@ import me.matl114.matlib.utils.version.VersionAtLeast;
 import org.bukkit.Bukkit;
 
 @Experimental
-@Note("This util class provides method to create Fake primary thread that you can run sync task on")
-@NeedTest("version")
+@Deprecated
+@DoNotCall
 @NotRecommended
 @UnsafeOperation
 @VersionAtLeast(Version.v1_20_R2)

@@ -17,7 +17,6 @@ import me.matl114.matlib.algorithms.dataStructures.frames.cowCollection.COWImmut
 import me.matl114.matlib.algorithms.dataStructures.frames.mmap.COWView;
 import me.matl114.matlib.algorithms.dataStructures.struct.State;
 import me.matl114.matlib.common.lang.annotations.Internal;
-import me.matl114.matlib.common.lang.annotations.NeedTest;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.nmsMirror.core.v1_20_R4.DataComponentHolderHelper;
 import me.matl114.matlib.nmsMirror.impl.CodecEnum;
@@ -27,7 +26,6 @@ import me.matl114.matlib.nmsMirror.impl.NMSCore;
 import me.matl114.matlib.nmsMirror.impl.versioned.Env1_20_R4;
 import me.matl114.matlib.nmsMirror.inventory.ItemStackHelper;
 import me.matl114.matlib.nmsMirror.nbt.TagEnum;
-
 import me.matl114.matlib.nmsUtils.DynamicOpUtils;
 import me.matl114.matlib.nmsUtils.v1_20_R4.DataComponentUtils;
 import me.matl114.matlib.utils.Debug;
@@ -152,9 +150,9 @@ public interface ItemStackHelper_1_20_R4 extends TargetDescriptor, ItemStackHelp
         }
     }
 
-    default Map<String, ?> saveNbtAsHashMap(Object itemStack) {
+    default Map<String, ?> saveNbtAsMap(Object itemStack) {
         if (isEmpty(itemStack)) {
-            return new HashMap<>();
+            return new LinkedHashMap<>();
         } else {
             Object patch = getComponentsPatch(itemStack);
             return (Map<String, ?>)
@@ -573,7 +571,6 @@ public interface ItemStackHelper_1_20_R4 extends TargetDescriptor, ItemStackHelp
 
     @MethodTarget(isStatic = true)
     @RedirectName("hashItemAndComponents")
-    @NeedTest
     public int customHashcode(@Nonnull @RedirectType(ItemStack) Object item);
 
     @Override

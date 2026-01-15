@@ -15,5 +15,4 @@ import me.matl114.matlib.common.lang.annotations.NotRecommended;
 @NotRecommended
 @Retention(RetentionPolicy.RUNTIME)
 @java.lang.annotation.Target({ElementType.FIELD, ElementType.METHOD})
-public @interface StaticFieldAccess {
-}
+public @interface StaticFieldAccess {}

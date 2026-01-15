@@ -2,6 +2,7 @@ package me.matl114.matlib.nmsMirror.nbt;
 
 import static me.matl114.matlib.nmsMirror.Import.*;
 
+import com.mojang.brigadier.StringReader;
 import java.util.AbstractList;
 import java.util.List;
 import me.matl114.matlib.common.lang.annotations.Internal;
@@ -198,4 +199,23 @@ public interface TagAPI extends TargetDescriptor, TagHelper {
     @MethodTarget
     @RedirectName("visit")
     Iterable<?> visitAsChatComponent(Object chat, @RedirectType(Tag) Object tag);
+
+    @RedirectClass(TagParser)
+    @ConstructorTarget
+    @Internal
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4)
+    Object newTagParser(StringReader reader);
+
+    @RedirectClass(TagParser)
+    @MethodTarget
+    @RedirectName("readValue")
+    @Internal
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R4)
+    Object readTagParseValue(Object tagParser);
+
+
+    default Object parseNbt(String string) {
+        Object tagParser = newTagParser(new StringReader(string));
+        return readTagParseValue(tagParser);
+    }
 }

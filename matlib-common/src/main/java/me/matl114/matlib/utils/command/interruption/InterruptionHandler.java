@@ -23,4 +23,6 @@ public interface InterruptionHandler {
     public void handlePermissionDenied(CommandSender sender, String permission, @Nullable String commandNodeName);
 
     public void handleLogicalError(CommandSender sender, String fullMessage);
+
+    public void handleWrongArgumentFormat(CommandSender sender, String command, String[] arguments);
 }

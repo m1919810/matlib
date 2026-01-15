@@ -1,9 +1,10 @@
 package me.matl114.matlib.slimefunUtils.blockInventory.records;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
+import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import javax.annotation.Nonnull;
 import me.matl114.matlib.common.lang.annotations.ForceOnMainThread;
-import me.matl114.matlib.implement.slimefun.manager.BlockDataCache;
+import me.matl114.matlib.core.slimefun.manager.BlockDataCache;
 import me.matl114.matlib.utils.inventory.inventoryRecords.InventoryRecord;
 import me.matl114.matlib.utils.inventory.inventoryRecords.SimpleInventoryRecord;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -49,6 +50,10 @@ public record SlimefunInventoryRecord(Inventory inventory, @Nonnull SlimefunBloc
     public boolean canPlayerOpen(Player p) {
         return data.getBlockMenu() != null
                 && data.getBlockMenu().canOpen(data.getLocation().getBlock(), p);
+    }
+
+    public void ensureChunkLoad() {
+        StorageCacheUtils.requestLoad(data);
     }
 
     @ForceOnMainThread(condition = "checkVanilla = true")

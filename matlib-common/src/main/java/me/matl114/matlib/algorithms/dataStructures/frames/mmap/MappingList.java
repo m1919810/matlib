@@ -29,6 +29,10 @@ public class MappingList<W, T> extends AbstractList<T> implements ListMapView<W,
         return this;
     }
 
+    public static <T, W> W readOnly(T value) {
+        throw new RuntimeException("Unsupported operation : writing to a read-only mapping list");
+    }
+
     @Override
     public boolean isDelayWrite() {
         return false;

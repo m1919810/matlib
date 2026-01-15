@@ -1,10 +1,7 @@
 package me.matl114.matlib.implement.custom.inventory;
 
 import com.google.common.base.Preconditions;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.*;
@@ -16,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class ScreenBuilder implements Screen {
     private IntList pageContentIndex;
+    private Int2ReferenceMap<SlotType> slotTypeMap;
     private Int2ReferenceMap<SlotType> buttonedIndex;
     private final int sizePerPage;
     private Int2ReferenceMap<SlotProvider> basicList;
@@ -51,10 +49,12 @@ public class ScreenBuilder implements Screen {
         int size0 = pageSlotType.size();
         this.pageContentIndex = new IntArrayList();
         this.buttonedIndex = new Int2ReferenceArrayMap<>();
+        this.slotTypeMap = new Int2ReferenceOpenHashMap<>();
         SlotProvider backgroundProvider = SlotProvider.instance().withStack(() -> backgroundItem);
         SlotProvider blankProvider = SlotProvider.instance().withStack(() -> null);
         for (int i = 0; i < size0; ++i) {
             SlotType slotType = pageSlotType.get(i);
+            this.slotTypeMap.put(i, slotType);
             switch (slotType) {
                 case BLANK -> basicList.put(i, blankProvider);
                 case BACKGROUND -> basicList.put(i, backgroundProvider);
@@ -272,7 +272,8 @@ public class ScreenBuilder implements Screen {
                 factory.visitSlot(
                         index,
                         entry.getValue().getStack(factory),
-                        entry.getValue().getHandler(factory));
+                        entry.getValue().getHandler(factory),
+                        slotTypeMap.get(index));
             }
         }
         int pageIndexRangeStart = (page - 1) * this.pageContentIndex.size();
@@ -284,7 +285,8 @@ public class ScreenBuilder implements Screen {
                     factory.visitSlot(
                             this.pageContentIndex.getInt(i - pageIndexRangeStart),
                             provider.getStack(factory),
-                            provider.getHandler(factory));
+                            provider.getHandler(factory),
+                            SlotType.PAGE_CONTENT);
                 }
             }
         }
@@ -317,7 +319,7 @@ public class ScreenBuilder implements Screen {
                     default:
                         continue;
                 }
-                factory.visitSlot(index, stack, handler);
+                factory.visitSlot(index, stack, handler, entry.getValue());
             }
         }
         for (var entry : this.overrideList.int2ReferenceEntrySet()) {
@@ -325,7 +327,8 @@ public class ScreenBuilder implements Screen {
             if (index >= 0 && index < this.sizePerPage) {
                 SlotProvider value = entry.getValue();
                 if (value != null) {
-                    factory.visitSlot(index, value.getStack(factory), value.getHandler(factory));
+                    factory.visitSlot(
+                            index, value.getStack(factory), value.getHandler(factory), slotTypeMap.get(index));
                 }
             }
         }
@@ -374,13 +377,17 @@ public class ScreenBuilder implements Screen {
     }
 
     @Override
-    public void openPage(InventoryBuilder.InventoryFactory screenType, Player player, int page) {
-        var builder = createInventory(page, screenType);
-        builder.open(player);
+    public int getMaxPages() {
+        return this.maxPageProvider.applyAsInt(this);
     }
 
-    public void openPageWithHistory(InventoryBuilder.InventoryFactory screenType, Player player, int page) {
-        var builder = createInventory(page, screenType);
-        builder.openWithHistory(player);
+    @Override
+    public int getPageSize() {
+        return this.sizePerPage;
+    }
+
+    @Override
+    public SlotType getSlotType(int idx) {
+        return this.slotTypeMap.get(idx);
     }
 }

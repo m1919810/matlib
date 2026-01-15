@@ -54,6 +54,13 @@ public record SimpleInventoryRecord<T extends TileState & InventoryHolder>(
     public boolean canPlayerOpen(Player p) {
         return optionalHolder != null && InventoryUtils.canBlockInventoryOpenToPlayer(optionalHolder);
     }
+
+    public void ensureChunkLoad() {
+        if (optionalHolder != null) {
+            optionalHolder.getChunk();
+        }
+    }
+
     // todo need check of double chest
     @Nonnull
     @ForceOnMainThread
@@ -72,8 +79,7 @@ public record SimpleInventoryRecord<T extends TileState & InventoryHolder>(
     public static InventoryRecord getInventoryRecord(Location loc, boolean useOnMain) {
         // should force Sync
         Block b = loc.getBlock();
-        if (WorldUtils.getBlockStateNoSnapShot(b) instanceof InventoryHolder holder
-                && holder instanceof TileState state) {
+        if (b.getState(false) instanceof InventoryHolder holder && holder instanceof TileState state) {
             Inventory inventory = holder.getInventory();
             if ((useOnMain) || InventoryUtils.isInventoryTypeAsyncSafe(inventory.getType())) {
                 return inventory instanceof DoubleChestInventory chestchest

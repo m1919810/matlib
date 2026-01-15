@@ -5,14 +5,12 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mojang.serialization.codecs.UnboundedMapCodec;
-import me.matl114.matlib.utils.serialization.datafix.DataHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
+import me.matl114.matlib.utils.serialization.datafix.DataHelper;
 
 public record ScreenTemplate(Optional<String> defaultTitle, List<String> patterns, Map<Character, SlotType> key) {
     private static final Codec<List<String>> PATTERN_CODEC = Codec.STRING
@@ -85,4 +83,9 @@ public record ScreenTemplate(Optional<String> defaultTitle, List<String> pattern
                     SlotType.PREV_PAGE,
                     'n',
                     SlotType.NEXT_PAGE));
+
+    public static final ScreenTemplate EMPTY = new ScreenTemplate(
+            Optional.of("&6空"),
+            List.of("b".repeat(9), "b".repeat(9), "b".repeat(9), "b".repeat(9), "b".repeat(9), "b".repeat(9)),
+            Map.of('b', SlotType.PAGE_CONTENT));
 }

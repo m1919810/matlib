@@ -24,7 +24,6 @@ import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.ComponentCodecEnum;
 import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.DataComponentEnum;
 import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.ItemStackHelper_1_20_R4;
 import me.matl114.matlib.nmsUtils.*;
-
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import me.matl114.matlib.utils.reflect.internel.ObfManager;
 import me.matl114.matlib.utils.serialization.CodecUtils;
@@ -91,7 +90,8 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
         public void writeBack() {
             // set even when rawMap is empty: hide flag, it is different from empty
             if (!this.rawMap.isEmpty()
-                    || (hasTooltipField && !(Env1_20_R4.DATA_TYPES.itemEnchantMutable$showInTooltip(this.itemEnchantsMutable)))) {
+                    || (hasTooltipField
+                            && !(Env1_20_R4.DATA_TYPES.itemEnchantMutable$showInTooltip(this.itemEnchantsMutable)))) {
                 HELPER.setDataComponentValue(itemStack, DataComponentEnum.ENCHANTMENTS, this.immutableView);
             } else {
                 HELPER.removeFromPatch(itemStack, DataComponentEnum.ENCHANTMENTS);
@@ -214,12 +214,14 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
 
     @Override
     public @NotNull Component itemName() {
-        return CraftBukkit.ADVENTURE.asAdventure((Iterable<?>) HELPER.getFromPatch(itemStack, DataComponentEnum.ITEM_NAME));
+        return CraftBukkit.ADVENTURE.asAdventure(
+                (Iterable<?>) HELPER.getFromPatch(itemStack, DataComponentEnum.ITEM_NAME));
     }
 
     @Override
     public void itemName(@Nullable Component component) {
-        HELPER.setDataComponentValue(itemStack, DataComponentEnum.ITEM_NAME, CraftBukkit.ADVENTURE.asVanilla(component));
+        HELPER.setDataComponentValue(
+                itemStack, DataComponentEnum.ITEM_NAME, CraftBukkit.ADVENTURE.asVanilla(component));
     }
 
     @Override
@@ -301,7 +303,8 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
     public int getEnchantable() {
         // return DATA_TYPES.enchantable$value(HELPER.get(itemStack, DataComponentEnum.ENCHANTABLE));
         Object value = HELPER.get(itemStack, version(DataComponentEnum.ENCHANTABLE));
-        return (Integer) CodecUtils.encodeEnd(version(ComponentCodecEnum.ENCHANTABLE).encodeStart(TypeOps.I, value));
+        return (Integer)
+                CodecUtils.encodeEnd(version(ComponentCodecEnum.ENCHANTABLE).encodeStart(TypeOps.I, value));
     }
 
     @Override
@@ -647,7 +650,8 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
     public void setDamageResistant(@Nullable Tag<DamageType> tag) {
         if (tag != null) {
             String key = "#" + tag.getKey().toString();
-            Object decode = CodecUtils.decode(version(ComponentCodecEnum.DAMAGE_RESISTANT), TypeOps.I, Map.of("types", key));
+            Object decode =
+                    CodecUtils.decode(version(ComponentCodecEnum.DAMAGE_RESISTANT), TypeOps.I, Map.of("types", key));
             HELPER.setDataComponentValue(itemStack, version(DataComponentEnum.DAMAGE_RESISTANT), decode);
         } else {
             HELPER.removeFromPatch(itemStack, version(DataComponentEnum.DAMAGE_RESISTANT));
@@ -800,7 +804,8 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
         if (toolComponent == null) {
             HELPER.removeFromPatch(itemStack, DataComponentEnum.TOOL);
         } else {
-            HELPER.setDataComponentValue(itemStack, DataComponentEnum.TOOL, Env1_20_R4.DATA_TYPES.tool$Handle(toolComponent));
+            HELPER.setDataComponentValue(
+                    itemStack, DataComponentEnum.TOOL, Env1_20_R4.DATA_TYPES.tool$Handle(toolComponent));
         }
     }
 
@@ -812,7 +817,9 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
     @Override
     public @NotNull EquippableComponent getEquippable() {
         Object val = HELPER.getFromPatch(itemStack, version(DataComponentEnum.EQUIPPABLE));
-        return val != null ? (EquippableComponent) Env1_20_R4.DATA_TYPES.equippable$Craft(val) : SAMPLE_META.getEquippable();
+        return val != null
+                ? (EquippableComponent) Env1_20_R4.DATA_TYPES.equippable$Craft(val)
+                : SAMPLE_META.getEquippable();
     }
 
     @Override
@@ -966,7 +973,9 @@ class ItemMetaViewImpl_1_20_R4 extends AbstractItemMetaView {
             Optional<?> valValue = entry.getValue();
             if (valValue.isPresent()) {
                 Object tag = CodecUtils.encode(
-                        Objects.requireNonNull(Env1_20_R4.DATA_TYPES.getDataTypeCodec(compType)), nbtop, valValue.get());
+                        Objects.requireNonNull(Env1_20_R4.DATA_TYPES.getDataTypeCodec(compType)),
+                        nbtop,
+                        valValue.get());
                 stringJoiner.add(keyValue + "=" + NMSCore.TAGS.printAsSnbt(tag, "", 0, new ArrayList<>()));
             } else {
                 stringJoiner.add("!" + keyValue);

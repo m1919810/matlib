@@ -1,7 +1,5 @@
 package me.matl114.matlib.nmsUtils.chat;
 
-
-
 import lombok.ToString;
 import me.matl114.matlib.nmsMirror.chat.ChatEnum;
 import me.matl114.matlib.nmsMirror.impl.NMSChat;
@@ -25,7 +23,9 @@ public class LiteralContentBuilder implements ContentBuilder {
 
     @Override
     public Object toNMS() {
-        return stringBuilder.isEmpty() ? ChatEnum.PLAIN_TEXT_EMPTY : NMSChat.COMP_CONTENT.newLiteral(stringBuilder.toString());
+        return stringBuilder.isEmpty()
+                ? ChatEnum.PLAIN_TEXT_EMPTY
+                : NMSChat.COMP_CONTENT.newLiteral(stringBuilder.toString());
     }
 
     @Override

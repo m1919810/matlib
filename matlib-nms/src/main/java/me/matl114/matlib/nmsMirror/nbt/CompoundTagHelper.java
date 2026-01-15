@@ -69,10 +69,15 @@ public interface CompoundTagHelper extends TargetDescriptor, TagHelper {
     @MethodTarget
     @IgnoreFailure(thresholdInclude = Version.v1_21_R4)
     default UUID getUUID(Object nbt, String key) {
-        if (!contains(nbt, key, 11)
-                && this.contains(nbt, key + "Most", TagEnum.TAG_ANY_NUMERIC)
-                && this.contains(nbt, key + "Least", TagEnum.TAG_ANY_NUMERIC)) {
-            return new UUID(this.getLong(nbt, key + "Most"), this.getLong(nbt, key + "Least"));
+        if (!contains(nbt, key, TagEnum.TAG_INT_ARRAY)) {
+            if(this.contains(nbt, key, TagEnum.TAG_STRING)){
+                String str = getString(nbt, key);
+                return UUID.fromString(str);
+            }
+            if(this.contains(nbt, key + "Most", TagEnum.TAG_ANY_NUMERIC)
+                && this.contains(nbt, key + "Least", TagEnum.TAG_ANY_NUMERIC)){
+                return new UUID(this.getLong(nbt, key + "Most"), this.getLong(nbt, key + "Least"));
+            }
         }
         int[] array = getIntArray(nbt, key);
         if (array.length != 4) {

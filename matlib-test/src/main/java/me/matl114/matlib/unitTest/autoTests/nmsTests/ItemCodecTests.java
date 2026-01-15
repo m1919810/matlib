@@ -1,29 +1,37 @@
 package me.matl114.matlib.unitTest.autoTests.nmsTests;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import me.matl114.matlib.common.lang.exceptions.Abort;
-import me.matl114.matlib.nmsMirror.impl.Env;
-import me.matl114.matlib.nmsMirror.impl.NMSCore;
-import me.matl114.matlib.nmsMirror.impl.NMSItem;
+import me.matl114.matlib.implement.nms.serialization.ItemStackNbtCodec;
+import me.matl114.matlib.implement.serialization.ItemStackCodec;
+import me.matl114.matlib.nmsMirror.impl.*;
 import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.ComponentCodecEnum;
 import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.DataComponentEnum;
 import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.DataComponentKeys;
 import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.ItemStackHelper_1_20_R4;
+import me.matl114.matlib.nmsUtils.DynamicOpUtils;
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import me.matl114.matlib.nmsUtils.nbt.ItemDataValue;
-
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
 import me.matl114.matlib.utils.Debug;
+import me.matl114.matlib.utils.persistentDataContainer.SerializeUtils;
 import me.matl114.matlib.utils.serialization.CodecUtils;
+import me.matl114.matlib.utils.serialization.StringifyOps;
 import me.matl114.matlib.utils.serialization.TypeOps;
 import me.matl114.matlib.utils.version.Version;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -98,7 +106,7 @@ public class ItemCodecTests implements TestCase {
                 ? Map.of("minecraft:efficiency", 114)
                 : Map.of("levels", Map.of("minecraft:efficiency", 114), "show_in_tooltip", false);
         Map<String, ?> mapNbt3 = Map.of("minecraft:unbreakable", Map.of(), "minecraft:enchantments", levelMap);
-        Map<String, ?> mapComp = NMSItem.ITEMSTACK.saveNbtAsHashMap(nms);
+        Map<String, ?> mapComp = new LinkedHashMap<>(NMSItem.ITEMSTACK.saveNbtAsMap(nms));
         try {
             Assert(stack.getItemMeta().hasPlaceableKeys());
         } catch (Throwable e) {
@@ -115,7 +123,8 @@ public class ItemCodecTests implements TestCase {
         Assert(Version.getVersionInstance().isAtLeast(Version.v1_21_R4)
                 || stack.getItemMeta().hasItemFlag(ItemFlag.HIDE_ENCHANTS));
         if (!Version.getVersionInstance().isAtLeast(Version.v1_21_R4)) {
-            Map<String, ?> val = (Map<String, ?>) NMSItem.ITEMSTACK.saveElementInPath(nms, "minecraft:enchantments");
+            Map<String, ?> val = new LinkedHashMap<>(
+                    (Map<String, ?>) NMSItem.ITEMSTACK.saveElementInPath(nms, "minecraft:enchantments"));
             Debug.logger(val);
             val.remove("show_in_tooltip");
             NMSItem.ITEMSTACK.replaceElementInPath(nms, "minecraft:enchantments", val);
@@ -242,6 +251,65 @@ public class ItemCodecTests implements TestCase {
                 .applyToStack(nms);
         ItemDataValue.primitive(DataComponentKeys.MAX_STACK_SIZE, 64).applyToStack(nms);
         player.getInventory().addItem(stack3);
+    }
+    // Files.writeString(new File("./temp.json").toPath(), );
+
+    @OnlineTest(name = "test magicnumber json api")
+    public void test_magicnumber_api() throws Throwable {
+        version();
+        List<ItemStack> itemStacks = new ArrayList<>();
+        for (var iter : getTestCases("itemstack/complex_itemstack_nbt_string.json")) {
+            String itemStackString = iter.getValue().getAsString();
+            Object nbt = NMSCore.TAGS.parseNbt(itemStackString);
+            Object nms = CodecUtils.decode(CodecEnum.ITEMSTACK, DynamicOpUtils.nbtOp(), nbt);
+            ItemStack item = NMSItem.ITEMSTACK.getBukkitStack(nms);
+            // Debug.logger(item);
+            JsonObject json = Bukkit.getUnsafe().serializeItemAsJson(item);
+            //  Debug.logger(json);
+            String jsonString = new Gson().toJson(json);
+            // Debug.logger(jsonString);
+            JsonObject jsonObject = new Gson().fromJson(jsonString, JsonObject.class);
+            ItemStack item2 = Bukkit.getUnsafe().deserializeItemFromJson(jsonObject);
+            AssertEq(item, item2);
+            String jsonStringify = new Gson()
+                    .toJson(CodecUtils.encode(CodecEnum.ITEMSTACK, new StringifyOps(DynamicOpUtils.jsonOp()), nms));
+            Debug.logger("Successfully process itemStack");
+            itemStacks.add(item);
+        }
+        for (var iter : getTestCases("itemstack/complex_itemstack_nbt_stringify.json")) {
+            JsonElement itemStackString = iter.getValue().getAsJsonObject();
+            Object nms = CodecUtils.decode(
+                    CodecEnum.ITEMSTACK, new StringifyOps<>(DynamicOpUtils.jsonOp()), itemStackString);
+            ItemStack item = NMSItem.ITEMSTACK.getBukkitStack(nms);
+            AssertEq(item, itemStacks.get(iter.getIndex()));
+            Debug.logger("Successfully process stringified nbt");
+        }
+    }
+
+    @OnlineTest(name = "test magicnumber byte api")
+    public void test_magicnumber_byte_api() throws Throwable {
+        for (var iter : getTestCases("itemstack/complex_itemstack_bukkit_byte.json")) {
+            ByteArrayList list = new ByteArrayList(iter.getValue().getAsJsonArray().asList().stream()
+                    .map(JsonElement::getAsByte)
+                    .toList());
+            ItemStack item = SerializeUtils.deserializeFromBytes(list.toByteArray());
+            Debug.logger(item);
+            byte[] bytes = Bukkit.getUnsafe().serializeItem(item);
+            AssertNEq(bytes, list.toByteArray());
+        }
+    }
+
+    @OnlineTest(name = "test itemcodec codec")
+    public void test_itemcodec_codec() throws Throwable {
+        ItemStackNbtCodec.init();
+        // 测试 12345678种不同的物品
+        for (var iter : getTestCases("itemstack/itemcodec_all.json")) {
+            JsonElement element = iter.getValue().getAsJsonObject();
+            ItemStackCodec itemCodec =
+                    CodecUtils.decode(ItemStackCodec.CODEC, new StringifyOps<>(DynamicOpUtils.jsonOp()), element);
+            // Debug.logger(itemCodec);
+            Debug.logger("test", iter.getIndex(), "pass");
+        }
     }
 
     // TODO: add versioned DataEnum test

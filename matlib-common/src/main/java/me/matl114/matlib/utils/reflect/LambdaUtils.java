@@ -193,7 +193,7 @@ public class LambdaUtils {
                             : MethodType.methodType(functionalInterface, targetClass),
                     getMethodType(functionalMethod),
                     handle,
-                    getMethodType(method, dynamicBind));
+                    getMethodType(method, functionalMethod, dynamicBind));
         } catch (Throwable e) {
             throw new RuntimeException("Error while creating lambda expression!", e);
         }
@@ -269,6 +269,29 @@ public class LambdaUtils {
     //        });
     //    }
 
+    private static Class<?>[] argumentTypesBoxing(Class<?>[] clazz, Class<?>[] targetMethod) {
+        int length = Math.min(targetMethod.length, clazz.length);
+
+        Class<?>[] result = new Class<?>[length];
+        for (int i = 0; i < length; i++) {
+            String cls1 = clazz[i].getName();
+            String cls2 = targetMethod[i].getName();
+            if (ReflectUtils.isPrimitiveType(cls1)) {
+                if (!ReflectUtils.isPrimitiveType(cls2)) {
+                    result[i] = ReflectUtils.getBoxedClass(cls1);
+                    continue;
+                }
+            }
+            if (ReflectUtils.isPrimitiveType(cls2)) {
+                if (!ReflectUtils.isPrimitiveType(cls1)) {
+                    result[i] = ReflectUtils.getUnboxedClass(cls1);
+                    continue;
+                }
+            }
+            result[i] = clazz[i];
+        }
+        return result;
+    }
     /**
      * Creates a MethodType for the specified method.
      * This utility method creates a MethodType that matches the method's signature.
@@ -280,6 +303,12 @@ public class LambdaUtils {
         return MethodType.methodType(method.getReturnType(), method.getParameterTypes());
     }
 
+    public static MethodType getMethodType(Method method, Method functionalMethod) {
+        return MethodType.methodType(
+                method.getReturnType(),
+                argumentTypesBoxing(method.getParameterTypes(), functionalMethod.getParameterTypes()));
+    }
+
     /**
      * Creates a MethodType for the specified method with an additional 'self' parameter.
      * This method adds the declaring class as the first parameter type, which is useful
@@ -288,11 +317,12 @@ public class LambdaUtils {
      * @param method The method to create a MethodType for
      * @return A MethodType with the declaring class as the first parameter
      */
-    public static MethodType getMethodTypeWithSelf(Method method) {
+    public static MethodType getMethodTypeWithSelf(Method method, Method functionalMethod) {
         Class[] param = method.getParameterTypes();
         Class[] newParam = new Class[param.length + 1];
         System.arraycopy(param, 0, newParam, 1, param.length);
         newParam[0] = method.getDeclaringClass();
+        newParam = argumentTypesBoxing(newParam, functionalMethod.getParameterTypes());
         return MethodType.methodType(method.getReturnType(), newParam);
     }
 
@@ -305,7 +335,7 @@ public class LambdaUtils {
      * @param dynamic If true, includes the declaring class as the first parameter
      * @return A MethodType representing the method's signature
      */
-    public static MethodType getMethodType(Method method, boolean dynamic) {
-        return dynamic ? getMethodTypeWithSelf(method) : getMethodType(method);
+    public static MethodType getMethodType(Method method, Method functionalMethod, boolean dynamic) {
+        return dynamic ? getMethodTypeWithSelf(method, functionalMethod) : getMethodType(method, functionalMethod);
     }
 }

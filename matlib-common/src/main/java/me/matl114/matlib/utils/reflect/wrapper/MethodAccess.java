@@ -9,11 +9,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.Getter;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeProvider;
 import me.matl114.matlib.common.functions.reflect.MethodInvoker;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 
+@Deprecated(forRemoval = true)
 @SuppressWarnings("unchecked")
 public class MethodAccess<T extends Object> {
     private boolean printError = false;
@@ -68,12 +68,13 @@ public class MethodAccess<T extends Object> {
         return new MethodAccess((obj) -> field);
     }
 
-    private static final MethodAccess FAIL = new InitializeProvider<>(() -> {
-                var access = new MethodAccess<>(null);
-                access.failInitialization = true;
-                return access;
-            })
-            .v();
+    private static final MethodAccess FAIL;
+
+    static {
+        var access = new MethodAccess<>(null);
+        access.failInitialization = true;
+        FAIL = access;
+    }
 
     public static MethodAccess ofFailure() {
         return FAIL;

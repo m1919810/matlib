@@ -138,4 +138,129 @@ public class StringUtils {
         }
         return builder.toString();
     }
+
+    public static boolean isDigit(String str) {
+        return isDigit(str, 10);
+    }
+
+    public static boolean isDigit(String s, int radix) {
+        int i = 0, len = s.length();
+
+        if (len > 0) {
+            char firstChar = s.charAt(0);
+            if (firstChar < '0') { // Possible leading "+" or "-"
+                if (firstChar != '-' && firstChar != '+') {
+                    return false;
+                }
+                if (len == 1) { // Cannot have lone "+" or "-"
+                    return false;
+                }
+                i++;
+            }
+
+            while (i < len) {
+                // Accumulating negatively avoids surprises near MAX_VALUE
+                int digit = Character.digit(s.charAt(i++), radix);
+                if (digit < 0) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static final String INFINITY_REP = "Infinity";
+    private static final int INFINITY_LENGTH = INFINITY_REP.length();
+    private static final String NAN_REP = "NaN";
+    private static final int NAN_LENGTH = NAN_REP.length();
+
+    public static boolean isDouble(String in) {
+        // 常量定义
+        try {
+            in = in.trim();
+            int len = in.length();
+            if (len == 0) {
+                return false;
+            }
+            int i = 0;
+
+            // 检查可选的正负号
+            if (in.charAt(i) == '-' || in.charAt(i) == '+') {
+                i++;
+            }
+
+            // 检查NaN
+            if (i < len && Character.toUpperCase(in.charAt(i)) == 'N') {
+                return in.substring(i).equalsIgnoreCase(NAN_REP);
+            }
+
+            // 检查Infinity
+            if (i < len && Character.toUpperCase(in.charAt(i)) == 'I') {
+                return in.substring(i).equalsIgnoreCase(INFINITY_REP);
+            }
+
+            // 十进制浮点数格式验证
+            boolean digitSeen = false;
+            boolean dotSeen = false;
+            boolean expSeen = false;
+            boolean expDigitSeen = false;
+
+            // 主循环：遍历字符串
+            while (i < len) {
+                char c = in.charAt(i);
+                if (c >= '0' && c <= '9') {
+                    digitSeen = true;
+                    if (expSeen) {
+                        expDigitSeen = true;
+                    }
+                    i++;
+                    continue;
+                }
+
+                if (c == '.') {
+                    if (dotSeen || expSeen) {
+                        return false; // 多个小数点或在指数部分出现小数点
+                    }
+                    dotSeen = true;
+                    i++;
+                    continue;
+                }
+
+                if (c == 'e' || c == 'E') {
+                    if (expSeen) {
+                        return false; // 多个指数符号
+                    }
+                    expSeen = true;
+                    i++;
+
+                    // 检查可选的指数符号
+                    if (i < len && (in.charAt(i) == '+' || in.charAt(i) == '-')) {
+                        i++;
+                    }
+
+                    // 指数部分必须至少有一个数字
+                    if (i >= len) {
+                        return false;
+                    }
+                    continue;
+                }
+                // 检查可选的后缀
+                if ((c == 'f' || c == 'F' || c == 'd' || c == 'D') && i == len - 1) {
+                    i++;
+                    break;
+                }
+                return false; // 无效字符
+            }
+            // 最终验证
+            if (expSeen && !expDigitSeen) {
+                return false; // 有指数符号但没有指数数字
+            }
+
+            return digitSeen; // 至少有一个数字
+        } catch (Throwable e) {
+            return false;
+        }
+    }
 }

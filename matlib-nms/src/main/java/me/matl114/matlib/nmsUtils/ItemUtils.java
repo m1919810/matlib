@@ -1,8 +1,5 @@
 package me.matl114.matlib.nmsUtils;
 
-import static me.matl114.matlib.nmsMirror.impl.NMSCore.*;
-import static me.matl114.matlib.nmsMirror.impl.NMSItem.*;
-
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.List;
@@ -72,43 +69,65 @@ public class ItemUtils {
         NMSItem.ITEMSTACK.getPersistentDataCompoundView(handle, false).writeBack(newComp);
     }
 
+    @Nonnull
     public static ItemStack asCraftMirror(Object val) {
         return CraftBukkit.ITEMSTACK.asCraftMirror(val);
     }
 
+    @Nullable public static ItemStack asCraftMirrorOrNull(Object val) {
+        ItemStack stack = CraftBukkit.ITEMSTACK.asCraftMirror(val);
+        return stack == null ? null : (stack.getType().isAir() ? null : stack);
+    }
+
+    @Nonnull
     public static ItemStack asBukkitCopy(Object val) {
         return CraftBukkit.ITEMSTACK.asBukkitCopy(val);
     }
 
+    @Nullable public static ItemStack asBukkitCopyOrNull(Object val) {
+        ItemStack stack = asBukkitCopy(val);
+        return stack == null ? null : (stack.getType().isAir() ? null : stack);
+    }
+
+    @Nonnull
     public static Object asNMSCopy(ItemStack val) {
         return CraftBukkit.ITEMSTACK.asNMSCopy(val);
     }
 
+    @Nonnull
     public static ItemStack newStack(Material material) {
         return CraftBukkit.ITEMSTACK.createCraftItemStack(material, 1);
     }
 
+    @Nonnull
     public static ItemStack newStack(Material material, int amount) {
         return CraftBukkit.ITEMSTACK.createCraftItemStack(material, amount);
     }
 
+    @Nonnull
     public static ItemStack newStack(Material material, int amount, ItemMeta meta) {
         return CraftBukkit.ITEMSTACK.createCraftItemStack(material, amount, meta);
     }
 
-    public static ItemStack cleanStack(@Nullable ItemStack whatever) {
+    @Nullable public static ItemStack cleanStack(@Nullable ItemStack whatever) {
         return whatever == null ? null : CraftBukkit.ITEMSTACK.getCraftStack(whatever);
     }
 
-    public static ItemStack copyStack(@javax.annotation.Nullable ItemStack whatever) {
+    @Nullable public static ItemStack copyStack(@Nullable ItemStack whatever) {
         return whatever == null ? null : CraftBukkit.ITEMSTACK.asCraftCopy(whatever);
     }
 
+    @Nonnull
     public static Object unwrapHandle(@Nonnull ItemStack it) {
         return CraftBukkit.ITEMSTACK.unwrapToNMS(it);
     }
 
-    public static Object getHandle(@Nonnull ItemStack cis) {
+    @Nonnull
+    public static Object unwrapNullable(@Nullable ItemStack whatever) {
+        return whatever == null ? EmptyEnum.EMPTY_ITEMSTACK : unwrapHandle(whatever);
+    }
+
+    @Nullable public static Object getHandle(@Nonnull ItemStack cis) {
         return CraftBukkit.ITEMSTACK.handleGetter(cis);
     }
 

@@ -15,6 +15,7 @@
         <module>matlib-slimefun</module>
         <module>matlib-nms</module>
         <module>matlib-asm</module>
+        <module>matlib-implement</module>
     </modules>
 
     <properties>

@@ -3,7 +3,6 @@ package me.matl114.matlib.implement.custom.inventory;
 import com.mojang.serialization.Codec;
 import me.matl114.matlib.utils.serialization.Codecs;
 
-
 public enum SlotType {
     BACKGROUND,
     COMMON_BUTTON,

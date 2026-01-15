@@ -12,21 +12,21 @@ public class DemoBase {
         Debug.logger("end demo");
     }
 
-    public DemoBase superMethodA(int a, double b, DemoBase c){
+    public DemoBase superMethodA(int a, double b, DemoBase c) {
         Debug.logger("Super method A called", a, b);
         return this;
     }
 
-    public void overrideMethodA(DemoBase c){
+    public void overrideMethodA(DemoBase c) {
         Debug.logger("Override method A super part called");
         this.superMethodA(1, 2, c);
     }
 
-    public DemoBase(){
+    public DemoBase() {
         Debug.logger("DemoBase constructor called");
     }
 
-    public DemoBase(DemoBase c){
+    public DemoBase(DemoBase c) {
         Preconditions.checkArgument(c == null);
         Debug.logger("DemoBase constructor called with argument");
     }

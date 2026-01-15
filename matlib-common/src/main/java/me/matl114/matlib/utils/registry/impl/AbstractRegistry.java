@@ -91,6 +91,14 @@ public abstract class AbstractRegistry<T> implements Registry<T> {
         return registryValues.getOrDefault(value, defaultValue).getKey();
     }
 
+    public @Nullable Content<T> getContentByKey(NamespacedKey key) {
+        return byNsk.get(key);
+    }
+
+    public @Nullable Content<T> getContentById(String key) {
+        return byIds.get(key);
+    }
+
     @Override
     public @Nullable Content<T> getContent(T value) {
         return registryValues.get(value);

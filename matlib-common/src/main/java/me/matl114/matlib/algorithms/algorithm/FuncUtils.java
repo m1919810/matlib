@@ -1,6 +1,7 @@
 package me.matl114.matlib.algorithms.algorithm;
 
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 public class FuncUtils {
@@ -28,5 +29,9 @@ public class FuncUtils {
 
     public static <W> Supplier<W> value(W val) {
         return () -> val;
+    }
+
+    public static <W> Function<Integer, W> box(IntFunction<W> func) {
+        return func::apply;
     }
 }

@@ -1,0 +1,605 @@
+[
+	{
+		"data": {
+			"server": {
+				"name": "Test Server",
+				"port": 25565,
+				"online_mode": true,
+				"max_players": 100,
+				"motd": "Welcome to Test Server!"
+			},
+			"features": {
+				"enable_pvp": true,
+				"enable_mob_spawning": true,
+				"difficulty": "HARD",
+				"game_mode": "SURVIVAL"
+			},
+			"mysql": {
+				"enabled": false,
+				"host": "localhost",
+				"port": 3306,
+				"database": "minecraft",
+				"username": "root",
+				"password": ""
+			},
+			"backup": {
+				"enabled": true,
+				"interval_minutes": 30,
+				"max_backups": 10,
+				"backup_folder": "./backups"
+			}
+		},
+		"tests": [
+			{
+				"input": "server.name",
+				"output": "Test Server"
+			},
+			{
+				"input": "server.port",
+				"output": 25565
+			},
+			{
+				"input": "server.online_mode",
+				"output": true
+			},
+			{
+				"input": "features.difficulty",
+				"output": "HARD"
+			},
+			{
+				"input": "mysql.enabled",
+				"output": false
+			},
+			{
+				"input": "backup.interval_minutes",
+				"output": 30
+			},
+			{
+				"input": "backup.backup_folder",
+				"output": "./backups"
+			},
+			{
+				"input": "features",
+				"output": {
+					"enable_pvp": true,
+					"enable_mob_spawning": true,
+					"difficulty": "HARD",
+					"game_mode": "SURVIVAL"
+				}
+			}
+		]
+	},
+	{
+		"custom_items": {
+			"excalibur": {
+				"material": "DIAMOND_SWORD",
+				"name": "§6Excalibur",
+				"lore": [
+					"§7The legendary sword",
+					"§7of King Arthur"
+				],
+				"enchants": {
+					"DAMAGE_ALL": 10,
+					"FIRE_ASPECT": 3,
+					"UNBREAKING": 5
+				},
+				"custom_model_data": 1001,
+				"unbreakable": true
+			},
+			"philosopher_stone": {
+				"material": "NETHER_STAR",
+				"name": "§dPhilosopher's Stone",
+				"lore": [
+					"§7Can transmute items",
+					"§7and grant eternal life"
+				],
+				"attributes": [
+					{
+						"type": "GENERIC_MAX_HEALTH",
+						"amount": 20,
+						"slot": "MAINHAND"
+					},
+					{
+						"type": "GENERIC_ATTACK_DAMAGE",
+						"amount": 5,
+						"slot": "ANY"
+					}
+				]
+			}
+		},
+		"crafting_recipes": {
+			"custom_sword": {
+				"shape": ["D D", " S ", " S "],
+				"ingredients": {
+					"D": "DIAMOND_BLOCK",
+					"S": "STICK"
+				},
+				"result": "custom_items.excalibur",
+				"permission": "craft.excalibur"
+			}
+		},
+		"tests": [
+			{
+				"input": "custom_items.excalibur.material",
+				"output": "DIAMOND_SWORD"
+			},
+			{
+				"input": "custom_items.excalibur.lore",
+				"output": ["§7The legendary sword", "§7of King Arthur"]
+			},
+			{
+				"input": "custom_items.excalibur.enchants.DAMAGE_ALL",
+				"output": 10
+			},
+			{
+				"input": "custom_items.philosopher_stone.attributes.0.type",
+				"output": "GENERIC_MAX_HEALTH"
+			},
+			{
+				"input": "crafting_recipes.custom_sword.shape",
+				"output": ["D D", " S ", " S "]
+			},
+			{
+				"input": "crafting_recipes.custom_sword.ingredients.D",
+				"output": "DIAMOND_BLOCK"
+			},
+			{
+				"input": "crafting_recipes.custom_sword.permission",
+				"output": "craft.excalibur"
+			}
+		]
+	},
+	{
+		"worlds": {
+			"world": {
+				"generator": {
+					"type": "normal",
+					"settings": {
+						"caves": true,
+						"strongholds": true,
+						"structures": {
+							"villages": {
+								"enabled": true,
+								"size": 32,
+								"distance": 32,
+								"spawn_attempts": 50
+							},
+							"temples": {
+								"desert_temple": true,
+								"jungle_temple": true
+							}
+						},
+						"biomes": {
+							"desert": {
+								"size": 4,
+								"rainfall": 0.0,
+								"temperature": 2.0
+							},
+							"forest": {
+								"size": 4,
+								"rainfall": 0.8,
+								"temperature": 0.7
+							}
+						}
+					}
+				},
+				"rules": {
+					"do_daylight_cycle": true,
+					"do_weather_cycle": true,
+					"keep_inventory": false,
+					"announce_advancements": true
+				}
+			},
+			"world_nether": {
+				"environment": "NETHER",
+				"generator": "nether"
+			}
+		},
+		"tests": [
+			{
+				"input": "worlds.world.generator.settings.caves",
+				"output": true
+			},
+			{
+				"input": "worlds.world.generator.settings.structures.villages.size",
+				"output": 32
+			},
+			{
+				"input": "worlds.world.generator.settings.biomes.desert.temperature",
+				"output": 2.0
+			},
+			{
+				"input": "worlds.world.rules.keep_inventory",
+				"output": false
+			},
+			{
+				"input": "worlds.world_nether.environment",
+				"output": "NETHER"
+			},
+			{
+				"input": "worlds.world.generator.settings.structures.temples",
+				"output": {
+					"desert_temple": true,
+					"jungle_temple": true
+				}
+			},
+			{
+				"input": "worlds.world.rules",
+				"output": {
+					"do_daylight_cycle": true,
+					"do_weather_cycle": true,
+					"keep_inventory": false,
+					"announce_advancements": true
+				}
+			}
+		]
+	},
+	{
+		"warps": {
+			"spawn": {
+				"world": "world",
+				"x": 100.5,
+				"y": 64.0,
+				"z": -200.5,
+				"yaw": 90.0,
+				"pitch": 0.0,
+				"permission": "warp.spawn"
+			},
+			"shop": {
+				"world": "world",
+				"x": 300.0,
+				"y": 70.0,
+				"z": 400.0,
+				"yaw": 180.0,
+				"pitch": -10.0
+			}
+		},
+		"reserved_slots": [10, 11, 12, 13, 14],
+		"banned_blocks": [
+			"TNT",
+			"BEDROCK",
+			"BARRIER",
+			"COMMAND_BLOCK"
+		],
+		"messages": {
+			"welcome": [
+				"&aWelcome to the server!",
+				"&7Type &e/help &7for help",
+				"&7Visit our website: &bexample.com"
+			],
+			"rules": [
+				"1. No griefing",
+				"2. Be respectful",
+				"3. No cheating",
+				"4. Have fun!"
+			],
+			"commands": {
+				"help": "&7Displays this help message",
+				"warp": "&7Teleport to a warp point",
+				"spawn": "&7Teleport to spawn"
+			}
+		},
+		"teleport_cooldowns": {
+			"normal": 3000,
+			"vip": 1000,
+			"admin": 0
+		},
+		"tests": [
+			{
+				"input": "warps.spawn.x",
+				"output": 100.5
+			},
+			{
+				"input": "warps.shop.pitch",
+				"output": -10.0
+			},
+			{
+				"input": "reserved_slots",
+				"output": [10, 11, 12, 13, 14]
+			},
+			{
+				"input": "banned_blocks.2",
+				"output": "BARRIER"
+			},
+			{
+				"input": "messages.welcome.1",
+				"output": "&7Type &e/help &7for help"
+			},
+			{
+				"input": "messages.commands.help",
+				"output": "&7Displays this help message"
+			},
+			{
+				"input": "teleport_cooldowns.vip",
+				"output": 1000
+			},
+			{
+				"input": "warps.spawn",
+				"output": {
+					"world": "world",
+					"x": 100.5,
+					"y": 64.0,
+					"z": -200.5,
+					"yaw": 90.0,
+					"pitch": 0.0,
+					"permission": "warp.spawn"
+				}
+			}
+		]
+	},
+	{
+		"quest_system": {
+			"enabled": true,
+			"daily_quest_limit": 5,
+			"quests": {
+				"beginner": {
+					"id": "beginner_collection",
+					"name": "§aBeginner Collection",
+					"description": "Collect basic resources",
+					"objectives": [
+						{
+							"type": "COLLECT",
+							"item": "COBBLESTONE",
+							"amount": 64,
+							"data": 0
+						},
+						{
+							"type": "COLLECT",
+							"item": "WOOD",
+							"amount": 32,
+							"data": 0
+						}
+					],
+					"rewards": {
+						"items": [
+							{
+								"type": "IRON_PICKAXE",
+								"amount": 1,
+								"enchants": {
+									"EFFICIENCY": 1
+								}
+							}
+						],
+						"experience": 100,
+						"money": 50.0
+					},
+					"prerequisites": [],
+					"repeatable": true,
+					"cooldown_hours": 24
+				},
+				"advanced": {
+					"id": "dragon_slayer",
+					"name": "§cDragon Slayer",
+					"description": "Defeat the Ender Dragon",
+					"objectives": [
+						{
+							"type": "KILL",
+							"entity": "ENDER_DRAGON",
+							"amount": 1
+						}
+					],
+					"rewards": {
+						"items": [
+							{
+								"type": "DRAGON_EGG",
+								"amount": 1
+							}
+						],
+						"experience": 10000,
+						"money": 1000.0,
+						"permissions": ["fly.dragon"]
+					},
+					"prerequisites": ["beginner"],
+					"repeatable": false
+				}
+			}
+		},
+		"economy": {
+			"currency_symbol": "$",
+			"starting_balance": 100.0,
+			"max_balance": 1000000.0,
+			"transactions": {
+				"tax_rate": 0.05,
+				"min_transaction": 0.01,
+				"max_transaction": 10000.0
+			},
+			"shops": [
+				{
+					"name": "General Store",
+					"location": "spawn",
+					"items": [
+						{
+							"item": "DIAMOND",
+							"buy_price": 100.0,
+							"sell_price": 80.0,
+							"stock": 64
+						},
+						{
+							"item": "IRON_INGOT",
+							"buy_price": 10.0,
+							"sell_price": 8.0,
+							"stock": 256
+						}
+					]
+				}
+			]
+		},
+		"tests": [
+			{
+				"input": "quest_system.daily_quest_limit",
+				"output": 5
+			},
+			{
+				"input": "quest_system.quests.beginner.objectives.1.amount",
+				"output": 32
+			},
+			{
+				"input": "quest_system.quests.advanced.rewards.money",
+				"output": 1000.0
+			},
+			{
+				"input": "quest_system.quests.advanced.prerequisites.0",
+				"output": "beginner"
+			},
+			{
+				"input": "economy.transactions.tax_rate",
+				"output": 0.05
+			},
+			{
+				"input": "economy.shops.0.items.1.sell_price",
+				"output": 8.0
+			},
+			{
+				"input": "economy",
+				"output": {
+					"currency_symbol": "$",
+					"starting_balance": 100.0,
+					"max_balance": 1000000.0,
+					"transactions": {
+						"tax_rate": 0.05,
+						"min_transaction": 0.01,
+						"max_transaction": 10000.0
+					},
+					"shops": [
+						{
+							"name": "General Store",
+							"location": "spawn",
+							"items": [
+								{
+									"item": "DIAMOND",
+									"buy_price": 100.0,
+									"sell_price": 80.0,
+									"stock": 64
+								},
+								{
+									"item": "IRON_INGOT",
+									"buy_price": 10.0,
+									"sell_price": 8.0,
+									"stock": 256
+								}
+							]
+						}
+					]
+				}
+			}
+		]
+	},
+	{
+		"empty_values": {
+			"null_value": null,
+			"empty_string": "",
+			"empty_list": [],
+			"empty_object": {},
+			"zero_number": 0,
+			"false_boolean": false
+		},
+		"special_characters": {
+			"path.with.dots": "value with dots",
+			"path-with-dashes": "value with dashes",
+			"path_with_underscores": "value with underscores",
+			"unicode": "测试 Unicode 字符",
+			"special": "Line1\nLine2\tTab",
+			"emojis": "🎮 Minecraft! 🏰"
+		},
+		"nested_access": {
+			"level1": {
+				"level2": {
+					"level3": {
+						"level4": {
+							"level5": "deep value"
+						}
+					}
+				}
+			},
+			"array_nesting": [
+				[
+					["nested array value"]
+				]
+			],
+			"mixed": {
+				"list_in_object": [1, 2, {"nested": "value"}],
+				"object_in_list": [
+					{"key1": "value1"},
+					{"key2": "value2"}
+				]
+			}
+		},
+		"data_types": {
+			"integers": [0, 1, -1, 2147483647, -2147483648],
+			"decimals": [0.0, 3.14159, -99.99, 1.0e10],
+			"booleans": [true, false],
+			"strings": ["hello", "world", "123", "true"],
+			"arrays": [[1, 2, 3], ["a", "b", "c"], [true, false]],
+			"objects": [{"a": 1}, {"b": 2}]
+		},
+		"tests": [
+			{
+				"input": "empty_values.null_value",
+				"output": null
+			},
+			{
+				"input": "empty_values.empty_string",
+				"output": ""
+			},
+			{
+				"input": "empty_values.empty_list",
+				"output": []
+			},
+			{
+				"input": "empty_values.zero_number",
+				"output": 0
+			},
+			{
+				"input": "special_characters.path.with.dots",
+				"output": "value with dots"
+			},
+			{
+				"input": "special_characters.unicode",
+				"output": "测试 Unicode 字符"
+			},
+			{
+				"input": "special_characters.special",
+				"output": "Line1\nLine2\tTab"
+			},
+			{
+				"input": "nested_access.level1.level2.level3.level4.level5",
+				"output": "deep value"
+			},
+			{
+				"input": "nested_access.array_nesting.0.0.0",
+				"output": "nested array value"
+			},
+			{
+				"input": "nested_access.mixed.list_in_object.2.nested",
+				"output": "value"
+			},
+			{
+				"input": "data_types.integers.3",
+				"output": 2147483647
+			},
+			{
+				"input": "data_types.decimals.1",
+				"output": 3.14159
+			},
+			{
+				"input": "data_types.booleans.0",
+				"output": true
+			},
+			{
+				"input": "data_types.objects.1.b",
+				"output": 2
+			},
+			{
+				"input": "special_characters",
+				"output": {
+					"path.with.dots": "value with dots",
+					"path-with-dashes": "value with dashes",
+					"path_with_underscores": "value with underscores",
+					"unicode": "测试 Unicode 字符",
+					"special": "Line1\nLine2\tTab",
+					"emojis": "🎮 Minecraft! 🏰"
+				}
+			}
+		]
+	}
+]

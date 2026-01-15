@@ -5,17 +5,22 @@ import com.google.common.base.Supplier;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
+import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
+import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.command.interruption.*;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
+import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract base class for main commands that can contain multiple sub-commands.
@@ -39,7 +44,7 @@ import org.bukkit.plugin.Plugin;
  * <p>To use this class, extend it and implement the abstract methods.
  * The main command should be defined as a field named "mainCommand" in the subclass.</p>
  */
-public abstract class AbstractMainCommand implements ComplexCommandExecutor, InterruptionHandler {
+public abstract class AbstractMainCommand implements SubCommandDispatcher, InterruptionHandler {
 
     /** Collection of registered sub-commands, maintaining insertion order */
     @Getter
@@ -191,6 +196,16 @@ public abstract class AbstractMainCommand implements ComplexCommandExecutor, Int
         return getMainInternal().getName();
     }
 
+    public String getName() {
+        return getMainName();
+    }
+
+    @NotNull
+    @Override
+    public Pair<SimpleCommandInputStream, String[]> parseInput(String[] args) {
+        return getMainCommand().parseInput(args);
+    }
+
     /**
      * Handles command execution for the main command.
      * This method routes commands to appropriate sub-commands based on the first argument.
@@ -213,30 +228,24 @@ public abstract class AbstractMainCommand implements ComplexCommandExecutor, Int
      * @return true if the command was executed successfully, false otherwise
      */
     public boolean onCommand(CommandSender var1, Command var2, String var3, String[] var4) {
-        if (permissionRequired() == null || var1.hasPermission(permissionRequired())) {
-            if (var4.length >= 1) {
-                SubCommand command = getSubCommand(var4[0]);
-                if (command != null) {
-                    // add permission check
-                    if (command.hasPermission(var1)) {
-                        String[] elseArg = Arrays.copyOfRange(var4, 1, var4.length);
-                        try {
-                            return command.getExecutor().onCommand(var1, var2, var3, elseArg);
-                        } catch (ArgumentException e) {
-                            e.handleAbort(var1, this);
-                            return false;
-                        }
-                    } else {
-                        noPermission(var1);
-                        return false;
-                    }
+        if (hasPermission(var1)) {
+            try{
+                if (var4.length >= 1) {
+                    return SubCommandDispatcher.super.onCommand(var1, var2, var3, var4);
                 }
+            } catch (ArgumentException e){
+                e.handleAbort(var1, this);
             }
-            showHelpCommand(var1);
         } else {
             noPermission(var1);
         }
         return false;
+    }
+
+    @Note("the \"async\" means that it can be called either on main or off main")
+    public boolean onCommandAsync(
+        @NotNull CommandSender var1, @NotNull Command var2, @NotNull String var3, @NotNull String[] var4) {
+        return onCommand(var1, var2, var3, var4);
     }
 
     /**
@@ -324,6 +333,11 @@ public abstract class AbstractMainCommand implements ComplexCommandExecutor, Int
         }
     }
 
+    @Override
+    public void handleWrongArgumentFormat(CommandSender sender, String command, String[] arguments) {
+        showHelpCommand(sender, command);
+    }
+
     /**
      * Handles logical errors during command execution.
      * Displays a user-friendly error message in Chinese.
@@ -340,18 +354,13 @@ public abstract class AbstractMainCommand implements ComplexCommandExecutor, Int
      *
      * @param var1 The command sender to send the message to
      */
-    public void noPermission(CommandSender var1) {
+    protected void noPermission(CommandSender var1) {
         sendMessage(var1, "&c你没有权限使用该指令!");
     }
 
-    /**
-     * Returns the permission required to use this main command.
-     * Override this method to specify the required permission.
-     * Return null for no permission requirement.
-     *
-     * @return The permission string, or null if no permission is required
-     */
-    public abstract String permissionRequired();
+    public Stream<String> getHelp(String prefix){
+        return Stream.concat(Stream.of("/%s 全部指令".formatted(prefix + getName())), SubCommandDispatcher.super.getHelp(prefix));
+    }
 
     /**
      * Shows the help command with all visible sub-commands.
@@ -359,13 +368,14 @@ public abstract class AbstractMainCommand implements ComplexCommandExecutor, Int
      *
      * @param sender The command sender to show help to
      */
-    public void showHelpCommand(CommandSender sender) {
+    //todo: rewrite
+    protected void showHelpCommand(CommandSender sender, String command) {
+        String commandlower = command.toLowerCase();
         sendMessage(sender, "&a/%s 全部指令大全".formatted(getMainName()));
-        for (SubCommand cmd : subCommands) {
-            for (String help : cmd.getHelp()) {
-                sendMessage(sender, "&a" + help);
-            }
-        }
+        getHelp("")
+            .filter(s -> s.toLowerCase(Locale.ROOT).startsWith(commandlower))
+            .forEach(s -> sendMessage(sender, "&a" + s));
+
     }
 
     /**

@@ -11,6 +11,7 @@ import me.matl114.matlib.utils.Debug;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+@Deprecated(forRemoval = true)
 public class YamlConfig extends Config {
     File file;
     private static Yaml yaml;

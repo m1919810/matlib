@@ -3,7 +3,6 @@ package me.matl114.matlib.nmsUtils.inventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import java.util.function.BiFunction;
-
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import org.bukkit.inventory.ItemStack;
 

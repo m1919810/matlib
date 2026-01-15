@@ -16,7 +16,6 @@ import me.matl114.matlib.nmsMirror.impl.Env;
 import me.matl114.matlib.nmsMirror.impl.NMSChat;
 import me.matl114.matlib.nmsMirror.impl.NMSCore;
 import me.matl114.matlib.nmsMirror.nbt.TagEnum;
-
 import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
@@ -50,10 +49,10 @@ public interface ItemStackHelperDefault extends TargetDescriptor, ItemStackHelpe
         }
     }
 
-    default Map<String, ?> saveNbtAsHashMap(Object itemStack) {
+    default Map<String, ?> saveNbtAsMap(Object itemStack) {
         Object nbt = getCustomTag(itemStack);
         if (nbt == null) {
-            return new HashMap<>();
+            return new LinkedHashMap<>();
         } else {
             return (Map<String, ?>) Env.NBT_OP.convertTo(TypeOps.I, nbt);
         }

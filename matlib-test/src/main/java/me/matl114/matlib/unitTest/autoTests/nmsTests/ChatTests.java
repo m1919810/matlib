@@ -99,7 +99,8 @@ public class ChatTests implements TestCase {
 
         Debug.logger(NMSItem.ITEMSTACK.getLoreView(nms, false));
         ListMapView<?, Iterable<?>> lorelist = NMSItem.ITEMSTACK.getLoreView(nms, false);
-        lorelist.add(NMSChat.CHATCOMPONENT.append(NMSChat.CHATCOMPONENT.empty(), NMSChat.CHATCOMPONENT.literal("这是第四行lore,惊不惊喜意不意外")));
+        lorelist.add(NMSChat.CHATCOMPONENT.append(
+                NMSChat.CHATCOMPONENT.empty(), NMSChat.CHATCOMPONENT.literal("这是第四行lore,惊不惊喜意不意外")));
         lorelist.batchWriteback();
         Debug.logger(stack);
         Assert(stack.getItemMeta().getLore().size() == 4);

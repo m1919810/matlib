@@ -46,6 +46,22 @@ public interface TestResources {
         }
     }
 
+    default JsonElement getData(JsonElement json) {
+        try {
+            return ((JsonObject) json).get("data");
+        } catch (ClassCastException e) {
+            throw new RuntimeException("Test json file format error!" + json);
+        }
+    }
+
+    default Iterable<IndexEntry<JsonElement>> getTests(JsonElement json) {
+        try {
+            return IterUtils.fastEnumerate((JsonArray) ((JsonObject) json).get("tests"));
+        } catch (ClassCastException e) {
+            throw new RuntimeException("Test json file format error!" + json);
+        }
+    }
+
     default JsonElement getArg(JsonElement json, String arg) {
         try {
             return ((JsonObject) json).get(arg);

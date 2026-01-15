@@ -5,7 +5,7 @@ import me.matl114.matlib.unitTest.autoTests.dependTests.LanguageDependsTests;
 import me.matl114.matlib.unitTest.autoTests.dependTests.SlimefunTests;
 
 public class DependsTestset extends TestSet {
-    {
+    public void init() {
         addTest(new SlimefunTests());
         // addTest(new SlimefunItemMatchTests());
         addTest(new LanguageDependsTests());

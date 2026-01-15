@@ -6,14 +6,12 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import me.matl114.matlib.utils.serialization.datafix.DataHelper;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-
+import me.matl114.matlib.utils.serialization.datafix.DataHelper;
 
 public class Codecs {
     public static <S extends Enum<?>> Codec<S> enumLowerCase(Class<S> enumClass) {

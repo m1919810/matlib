@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import me.matl114.matlib.nmsMirror.impl.CraftBukkit;
 import me.matl114.matlib.nmsMirror.impl.NMSEntity;
 import me.matl114.matlib.nmsMirror.impl.NMSLevel;

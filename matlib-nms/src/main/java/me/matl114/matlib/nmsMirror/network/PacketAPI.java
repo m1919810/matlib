@@ -147,4 +147,17 @@ public interface PacketAPI extends TargetDescriptor {
     @RedirectName("language")
     @IgnoreFailure(thresholdInclude = Version.v1_20_R3, below = true)
     String clientInformation$information(Object value);
+
+    @Internal
+    @MethodTarget
+    @RedirectClass(ServerboundInteractEntityPacket)
+    @RedirectName("getTarget")
+    Object serverboundInteractPacket$getTarget(Object packet, @RedirectType(ServerLevel)Object level);
+
+//    @Internal
+//    @MethodTarget
+//    @RedirectClass(ServerboundInteractEntityPacket)
+//    @RedirectName("getType")
+//    Enum serverboundInteractPacket$getType(Object packet, @RedirectType(ServerLevel)Object level);
+
 }

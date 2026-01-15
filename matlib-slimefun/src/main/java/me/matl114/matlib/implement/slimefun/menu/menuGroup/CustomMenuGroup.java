@@ -2,6 +2,8 @@ package me.matl114.matlib.implement.slimefun.menu.menuGroup;
 
 import com.google.common.base.Preconditions;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -14,7 +16,7 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class CustomMenuGroup {
+public class CustomMenuGroup implements IMenuGroup {
     public interface CustomMenuClickHandler {
         static CustomMenuClickHandler of(ChestMenu.MenuClickHandler handler) {
             return (cm) -> handler;
@@ -56,10 +58,10 @@ public class CustomMenuGroup {
     private boolean placePresets = false;
     // private boolean placeBackHandlers=false;
     @Getter
-    private final HashSet<Integer> prev = new HashSet<>();
+    private final IntSet prev = new IntArraySet();
 
     @Getter
-    private final HashSet<Integer> next = new HashSet<>();
+    private final IntSet next = new IntArraySet();
     //    @Getter
     //    private HashSet<Integer> back=new HashSet<>();
     private boolean enablePageChangeSlot;
@@ -274,6 +276,16 @@ public class CustomMenuGroup {
             }
             return cmenu;
         };
+    }
+
+    @Override
+    public int[] getContentSlots() {
+        return new int[0];
+    }
+
+    @Override
+    public ChestMenu buildMenuPage(int page) {
+        return buildPage(page).getMenu();
     }
 
     public CustomMenu buildPage(int page) {

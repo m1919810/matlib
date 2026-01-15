@@ -12,20 +12,21 @@ import io.github.thebusybiscuit.slimefun4.core.guide.SlimefunGuideMode;
 import io.github.thebusybiscuit.slimefun4.core.multiblocks.MultiBlockMachine;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.chat.ChatInput;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.ItemUtils;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
 import me.matl114.matlib.implement.slimefun.menu.MenuUtils;
 import me.matl114.matlib.implement.slimefun.menu.menuClickHandler.GuideClickHandler;
-import me.matl114.matlib.implement.slimefun.menu.menuGroup.CustomMenuGroup;
+import me.matl114.matlib.implement.slimefun.menu.menuGroup.IMenuGroup;
 import me.matl114.matlib.utils.TextUtils;
-import me.matl114.matlib.utils.reflect.wrapper.FieldAccess;
-import me.matl114.matlib.utils.reflect.wrapper.MethodAccess;
+import me.matl114.matlib.utils.inventory.itemStacks.CleanItemStack;
+import me.matl114.matlib.utils.reflect.ReflectUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -34,9 +35,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class CustomItemGroup extends FlexItemGroup {
-    protected static final ItemStack INVOKE_ERROR = new CustomItemStack(Material.BARRIER, "&c", "", "&c获取物品组物品展示失败");
+    protected static final ItemStack INVOKE_ERROR = new CleanItemStack(Material.BARRIER, "&c", "", "&c获取物品组物品展示失败");
     protected boolean isVisible;
-    protected CustomMenuGroup group;
+    protected IMenuGroup group;
     protected Supplier<Map<Integer, ItemGroup>> subGroups;
     protected Supplier<Map<Integer, SlimefunItem>> items;
     boolean loaded = false;
@@ -58,26 +59,25 @@ public class CustomItemGroup extends FlexItemGroup {
     }
 
     public CustomItemGroup setLoader(
-            CustomMenuGroup group, Map<Integer, ItemGroup> subGroup, Map<Integer, SlimefunItem> researches) {
+            IMenuGroup group, Map<Integer, ItemGroup> subGroup, Map<Integer, SlimefunItem> researches) {
         return setLoader(group, subGroup, () -> researches);
     }
 
     public CustomItemGroup setLoader(
-            CustomMenuGroup group, Map<Integer, ItemGroup> subGroup, Supplier<Map<Integer, SlimefunItem>> researches) {
+            IMenuGroup group, Map<Integer, ItemGroup> subGroup, Supplier<Map<Integer, SlimefunItem>> researches) {
         return setLoader(group, () -> subGroup, researches);
     }
 
     public CustomItemGroup setLoader(
-            CustomMenuGroup group, Supplier<Map<Integer, ItemGroup>> subGroup, Map<Integer, SlimefunItem> researches) {
+            IMenuGroup group, Supplier<Map<Integer, ItemGroup>> subGroup, Map<Integer, SlimefunItem> researches) {
         return setLoader(group, subGroup, () -> researches);
     }
 
     public CustomItemGroup setLoader(
-            CustomMenuGroup group,
+            IMenuGroup group,
             Supplier<Map<Integer, ItemGroup>> subGroup,
             Supplier<Map<Integer, SlimefunItem>> researches) {
         this.group = group;
-        assert group.isPlaceItems();
         this.subGroups = subGroup;
         this.items = researches;
         this.loaded = true;
@@ -130,24 +130,26 @@ public class CustomItemGroup extends FlexItemGroup {
     @Getter
     private HashSet<Integer> backButton = new HashSet<>();
 
-    private static FieldAccess iconAccess = FieldAccess.ofName(ItemGroup.class, "item");
+    private static final Field iconAccess = ReflectUtils.getFieldPrivate(ItemGroup.class, "item");
 
     public static ItemStack getItemGroupIcon(ItemGroup group) {
-        return (ItemStack) iconAccess
-                .ofAccess(group)
-                .getRawOrDefault(() -> TextUtils.renameItem(INVOKE_ERROR, group.getUnlocalizedName()));
-        //        try{
-        //            Class clazz= Class.forName("io.github.thebusybiscuit.slimefun4.api.items.ItemGroup");
-        //            Field _hasType=clazz.getDeclaredField("item");
-        //            _hasType.setAccessible(true);
-        //            return (ItemStack)_hasType.get((ItemGroup)group);
-        //        }catch (Throwable e){
-        //            return AddUtils.renameItem(INVOKE_ERROR,group.getUnlocalizedName());
-        //        }
+        if (iconAccess != null) {
+            try {
+                return (ItemStack) iconAccess.get(group);
+            } catch (Throwable e) {
+
+            }
+        }
+        return TextUtils.renameItem(INVOKE_ERROR, group.getUnlocalizedName());
     }
 
     public static boolean setItemGroupIcon(ItemGroup group, ItemStack stack) {
-        return iconAccess.ofAccess(group).set(stack);
+        try {
+            iconAccess.set(group, stack);
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
         //        try{
         //            Class clazz= Class.forName("io.github.thebusybiscuit.slimefun4.api.items.ItemGroup");
         //            Field _hasType=clazz.getDeclaredField("item");
@@ -164,7 +166,7 @@ public class CustomItemGroup extends FlexItemGroup {
         int pages = group.getPages();
         assert page >= 1 && page <= pages;
         var2.getGuideHistory().add(this, page);
-        ChestMenu menu = this.group.buildPage(page).getMenu();
+        ChestMenu menu = this.group.buildMenuPage(page);
         // transfer this to GuideClick
         for (int i = 0; i < this.group.getSizePerPage(); ++i) {
             if (menu.getMenuClickHandler(i) instanceof GuideClickHandler handler) {
@@ -211,7 +213,7 @@ public class CustomItemGroup extends FlexItemGroup {
                 return false;
             }));
         }
-        int[] contents = this.group.getContents();
+        int[] contents = this.group.getContentSlots();
         int contentPerPage = contents.length;
         int startIndex = Math.max(0, contentPerPage * (page - 1));
         int endIndex = Math.min(contentPerPage * page, contentPerPage * pages);
@@ -233,7 +235,13 @@ public class CustomItemGroup extends FlexItemGroup {
             int index = entry.getKey();
             if (index >= startIndex && index < endIndex) {
                 int realIndex = contents[(index - startIndex) % contentPerPage];
-                displaySlimefunItem(menu, this, var1, var2, entry.getValue(), var3, page, realIndex);
+                // leave blank if disabled
+                if (entry.getValue().isDisabledIn(var1.getWorld())) {
+                    menu.replaceExistingItem(realIndex, null);
+                    menu.addMenuClickHandler(realIndex, ChestMenuUtils.getEmptyClickHandler());
+                } else {
+                    displaySlimefunItem(menu, this, var1, var2, entry.getValue(), var3, page, realIndex);
+                }
             }
         }
         menu.open(var1);
@@ -253,7 +261,7 @@ public class CustomItemGroup extends FlexItemGroup {
                 && !Slimefun.getPermissionsService().hasPermission(p, sfitem)) {
             List<String> message = Slimefun.getPermissionsService().getLore(sfitem);
             menu.addItem(
-                    index, new CustomItemStack(ChestMenuUtils.getNoPermissionItem(), sfitem.getItemName(), (String[])
+                    index, new CleanItemStack(ChestMenuUtils.getNoPermissionItem(), sfitem.getItemName(), (String[])
                             message.toArray(new String[0])));
             menu.addMenuClickHandler(index, ChestMenuUtils.getEmptyClickHandler());
         } else if (SlimefunGuideMode.CHEAT_MODE != mode && research != null && !profile.hasUnlocked(research)) {
@@ -267,7 +275,7 @@ public class CustomItemGroup extends FlexItemGroup {
 
             menu.addItem(
                     index,
-                    new CustomItemStack(new CustomItemStack(
+                    new CleanItemStack(
                             ChestMenuUtils.getNoPermissionItem(),
                             "&f" + ItemUtils.getItemName(sfitem.getItem()),
                             new String[] {
@@ -278,7 +286,7 @@ public class CustomItemGroup extends FlexItemGroup {
                                 "",
                                 "&7需要 &b",
                                 lore
-                            })));
+                            }));
             menu.addMenuClickHandler(index, (pl, slot, item, action) -> {
                 research.unlockFromGuide(
                         Slimefun.getRegistry().getSlimefunGuide(mode), p, profile, sfitem, itemGroup, page);
@@ -318,33 +326,36 @@ public class CustomItemGroup extends FlexItemGroup {
         }
     }
 
-    private final MethodAccess lastEntryAccess = MethodAccess.ofName(GuideHistory.class, "getLastEntry", boolean.class);
-    private final MethodAccess getIndexedObjectAccess = MethodAccess.ofName("getIndexedObject");
-    private final MethodAccess getPageAcess = MethodAccess.ofName("getPage");
+    private final Method lastEntryAccess =
+            ReflectUtils.getMethodPrivate(GuideHistory.class, "getLastEntry", boolean.class);
+    private final Method getIndexedObjectAccess = Holder.of("io.github.thebusybiscuit.slimefun4.core.guide.GuideEntry")
+            .thenApplyCaught(Class::forName)
+            .thenApplyCaught(Class::getDeclaredMethod, "getIndexedObject")
+            .thenPeek(Method::setAccessible, true)
+            .valException(null)
+            .get();
+    private final Method getPageAccess = Holder.of("io.github.thebusybiscuit.slimefun4.core.guide.GuideEntry")
+            .thenApplyCaught(Class::forName)
+            .thenApplyCaught(Class::getDeclaredMethod, "getPage")
+            .thenPeek(Method::setAccessible, true)
+            .valException(null)
+            .get();
     // modified from guizhan Infinity Expansion 2
     private int getLastPage(Player var1, PlayerProfile var2, SlimefunGuideMode var3) {
-        AtomicInteger result = new AtomicInteger(1);
-        lastEntryAccess.invokeCallback(
-                (entry) -> {
-                    if (entry != null) {
-                        getIndexedObjectAccess.invokeCallback(
-                                (obj) -> {
-                                    if (obj instanceof CustomItemGroup) {
-                                        getPageAcess.invokeCallback(
-                                                (res) -> {
-                                                    result.set((Integer) res);
-                                                },
-                                                () -> {},
-                                                entry);
-                                    }
-                                },
-                                () -> {},
-                                entry);
+        if (lastEntryAccess != null && getIndexedObjectAccess != null && getPageAccess != null) {
+            try {
+                Object entry = lastEntryAccess.invoke(var2.getGuideHistory(), false);
+                if (entry != null) {
+                    Object indexed = getIndexedObjectAccess.invoke(entry);
+                    if (indexed instanceof CustomItemGroup group) {
+                        int page = (int) getPageAccess.invoke(entry);
+                        return page;
                     }
-                },
-                () -> {},
-                var2.getGuideHistory(),
-                false);
-        return result.get();
+                }
+            } catch (Throwable e) {
+
+            }
+        }
+        return 1;
     }
 }

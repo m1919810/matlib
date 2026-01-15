@@ -23,7 +23,7 @@ public class BukkitTranslationTests implements TestCase {
         Debug.logger(TranslateKeyUtils.getMaterialTranslateDefault(Material.CHERRY_BOAT));
         Debug.logger(TranslateKeyUtils.getMaterialTranslateDefault(Material.PLAYER_HEAD));
         Debug.logger(TranslateKeyUtils.getMaterialTranslateDefault(Material.CALIBRATED_SCULK_SENSOR));
-        Debug.logger(
-                TranslateKeyUtils.getAttributeTranslationDefault(VersionedRegistry.getInstance().getAttribute("armor")));
+        Debug.logger(TranslateKeyUtils.getAttributeTranslationDefault(
+                VersionedRegistry.getInstance().getAttribute("armor")));
     }
 }

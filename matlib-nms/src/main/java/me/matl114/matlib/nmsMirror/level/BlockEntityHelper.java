@@ -4,7 +4,6 @@ import static me.matl114.matlib.nmsMirror.Import.*;
 
 import me.matl114.matlib.algorithms.dataStructures.frames.mmap.COWView;
 import me.matl114.matlib.common.lang.annotations.ForceOnMainThread;
-import me.matl114.matlib.common.lang.annotations.NeedTest;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.nmsMirror.impl.CraftBukkit;
 import me.matl114.matlib.nmsMirror.impl.NMSCore;
@@ -48,7 +47,6 @@ public interface BlockEntityHelper extends TargetDescriptor, PdcCompoundHolder {
         });
     }
 
-    @NeedTest
     default void setPersistentDataCompoundCopy(Object itemStack, Object compound) {
         persistentDataContainerSetter(
                 itemStack,

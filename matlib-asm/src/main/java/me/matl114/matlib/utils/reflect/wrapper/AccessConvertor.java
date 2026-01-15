@@ -33,7 +33,8 @@ public class AccessConvertor {
         }
     }
 
-    public static FieldAccessor createASMAccessor(AsmArgument<me.matl114.matlib.utils.reflect.reflectasm.FieldAccess> asm) {
+    public static FieldAccessor createASMAccessor(
+            AsmArgument<me.matl114.matlib.utils.reflect.reflectasm.FieldAccess> asm) {
         final int a = asm.index;
         me.matl114.matlib.utils.reflect.reflectasm.FieldAccess access = asm.access;
         return new FieldAccessor() {
@@ -54,7 +55,8 @@ public class AccessConvertor {
         access.init(null);
         Preconditions.checkArgument(access.publicField, "Unable to create asm methodAccess for non-public field");
         try {
-            me.matl114.matlib.utils.reflect.reflectasm.FieldAccess fastInternalAccess = me.matl114.matlib.utils.reflect.reflectasm.FieldAccess.get(access.field.getDeclaringClass());
+            me.matl114.matlib.utils.reflect.reflectasm.FieldAccess fastInternalAccess =
+                    me.matl114.matlib.utils.reflect.reflectasm.FieldAccess.get(access.field.getDeclaringClass());
             int fastAccessIndex = fastInternalAccess.getIndex(access.field);
             if (convertInvoker) {
                 access.setter = (a, b) -> fastInternalAccess.set(a, fastAccessIndex, b);
@@ -66,7 +68,8 @@ public class AccessConvertor {
         }
     }
 
-    public static <T> MethodInvoker<T> createASMInvoker(AsmArgument<me.matl114.matlib.utils.reflect.reflectasm.MethodAccess> asm) {
+    public static <T> MethodInvoker<T> createASMInvoker(
+            AsmArgument<me.matl114.matlib.utils.reflect.reflectasm.MethodAccess> asm) {
         me.matl114.matlib.utils.reflect.reflectasm.MethodAccess a = asm.access;
         int b = asm.index;
         return new MethodInvoker<>() {

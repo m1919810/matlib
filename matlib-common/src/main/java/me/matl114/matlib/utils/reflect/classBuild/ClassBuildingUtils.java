@@ -3,7 +3,7 @@ package me.matl114.matlib.utils.reflect.classBuild;
 import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.List;
-
+import javax.annotation.Nullable;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.Debug;
@@ -15,8 +15,6 @@ import me.matl114.matlib.utils.reflect.classBuild.internel.MethodNotCompleteErro
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.DescriptorBuildException;
 import me.matl114.matlib.utils.reflect.internal.SimpleObfManager;
 import me.matl114.matlib.utils.version.Version;
-
-import javax.annotation.Nullable;
 
 public class ClassBuildingUtils {
     public static boolean processFailure(Method method, Class<?> main) {
@@ -77,10 +75,10 @@ public class ClassBuildingUtils {
     }
 
     public static List<Method> matchMethods(
-        Method methodAccess,
-        List<Method> methods,
-        boolean static1,
-        @Note("this determines whether to consider the first param as 'this'") boolean selfAsParam) {
+            Method methodAccess,
+            List<Method> methods,
+            boolean static1,
+            @Note("this determines whether to consider the first param as 'this'") boolean selfAsParam) {
         String targetName;
         var redirect1 = methodAccess.getAnnotation(RedirectName.class);
         if (redirect1 != null) {
@@ -103,7 +101,7 @@ public class ClassBuildingUtils {
         //                returnType = ByteCodeUtils.toJvmType( methodAccess.getReturnType() );
         //            }
         var arguCount =
-            static1 ? methodAccess.getParameterCount() : methodAccess.getParameterCount() - (selfAsParam ? 1 : 0);
+                static1 ? methodAccess.getParameterCount() : methodAccess.getParameterCount() - (selfAsParam ? 1 : 0);
         var startArgument = static1 ? 0 : 1;
         Method tar = null;
         String[] paramI = new String[arguCount];
@@ -121,36 +119,38 @@ public class ClassBuildingUtils {
         //            Debug.logger("matching methodAccess",methodAccess, methods);
         //        }
         return methods.stream()
-            .filter(m -> Modifier.isStatic(m.getModifiers()) == static1)
-            .filter(m -> m.getParameterCount() == arguCount)
-            .filter(test -> {
-                //                if(Debug.isDebugMod() &&
-                // ObfManager.getManager().deobfMethod(test).equals(targetName))
-                //
-                // Debug.logger(test,ObfManager.getManager().deobfMethod(test),"matches",targetName);
-                return SimpleObfManager.getManager().deobfMethod(test).equals(targetName);
-            })
-            .filter(test -> {
-                // match every type after deobf
-                var paramTypes = test.getParameterTypes();
-                for (int i = 0; i < arguCount; ++i) {
-                    //                    if(Debug.isDebugMod()){
-                    //                        Debug.logger("match param
-                    // ",ObfManager.getManager().deobfToJvm(paramTypes[i]),paramI[i]);
+                .filter(m -> Modifier.isStatic(m.getModifiers()) == static1)
+                .filter(m -> m.getParameterCount() == arguCount)
+                .filter(test -> {
+                    //                if(Debug.isDebugMod() &&
+                    // ObfManager.getManager().deobfMethod(test).equals(targetName))
                     //
-                    //                    }
-                    if (!SimpleObfManager.getManager().deobfToJvm(paramTypes[i]).equals(paramI[i])) {
-                        return false;
+                    // Debug.logger(test,ObfManager.getManager().deobfMethod(test),"matches",targetName);
+                    return SimpleObfManager.getManager().deobfMethod(test).equals(targetName);
+                })
+                .filter(test -> {
+                    // match every type after deobf
+                    var paramTypes = test.getParameterTypes();
+                    for (int i = 0; i < arguCount; ++i) {
+                        //                    if(Debug.isDebugMod()){
+                        //                        Debug.logger("match param
+                        // ",ObfManager.getManager().deobfToJvm(paramTypes[i]),paramI[i]);
+                        //
+                        //                    }
+                        if (!SimpleObfManager.getManager()
+                                .deobfToJvm(paramTypes[i])
+                                .equals(paramI[i])) {
+                            return false;
+                        }
                     }
-                }
-                return true;
-            })
-            .peek(c -> c.setAccessible(true))
-            .toList();
+                    return true;
+                })
+                .peek(c -> c.setAccessible(true))
+                .toList();
     }
 
     public static List<Constructor<?>> matchConstructors(
-        Method constructorAccess, Constructor<?>[] targetConstructors) {
+            Method constructorAccess, Constructor<?>[] targetConstructors) {
         var arguCount = constructorAccess.getParameterCount();
         Method tar = null;
         String[] paramI = new String[arguCount];
@@ -165,18 +165,20 @@ public class ClassBuildingUtils {
             }
         }
         return Arrays.stream(targetConstructors)
-            .filter(c -> c.getParameterCount() == arguCount)
-            .filter(c -> {
-                var paramsTypes = c.getParameterTypes();
-                for (int i = 0; i < arguCount; ++i) {
-                    if (!SimpleObfManager.getManager().deobfToJvm(paramsTypes[i]).equals(paramI[i])) {
-                        return false;
+                .filter(c -> c.getParameterCount() == arguCount)
+                .filter(c -> {
+                    var paramsTypes = c.getParameterTypes();
+                    for (int i = 0; i < arguCount; ++i) {
+                        if (!SimpleObfManager.getManager()
+                                .deobfToJvm(paramsTypes[i])
+                                .equals(paramI[i])) {
+                            return false;
+                        }
                     }
-                }
-                return true;
-            })
-            .peek(c -> c.setAccessible(true))
-            .toList();
+                    return true;
+                })
+                .peek(c -> c.setAccessible(true))
+                .toList();
     }
 
     public static Pair<Field, Boolean> matchFields(Method fieldAccess, List<Field> fields, boolean static1) {
@@ -195,7 +197,7 @@ public class ClassBuildingUtils {
             isGetter = false;
         } else {
             throw new DescriptorBuildException(
-                "Illegal field target name " + name1 + ", can not resolve Getter or Setter");
+                    "Illegal field target name " + name1 + ", can not resolve Getter or Setter");
         }
         targetName = name1.substring(0, name1.length() - "Netter".length());
         var type = fieldAccess.getAnnotation(RedirectType.class);
@@ -204,7 +206,7 @@ public class ClassBuildingUtils {
     }
 
     public static Field matchFields(
-        String targetName, @Nullable RedirectType type, List<Field> fields, boolean static1) {
+            String targetName, @Nullable RedirectType type, List<Field> fields, boolean static1) {
         Field tar = null;
         for (Field test : fields) {
             // filter type not match
@@ -231,5 +233,4 @@ public class ClassBuildingUtils {
             return tar;
         } else return null;
     }
-
 }

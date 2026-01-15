@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import me.matl114.matlib.utils.Debug;
-
-
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -159,12 +157,12 @@ public class ASMUtils {
             // 向基类转
             if (!ReflectUtils.isBoxedPrimitive(originType)) {
                 // 原 不是基类包装类
-                String boxedType = ReflectUtils.getBoxedClass(targetType);
+                String boxedType = ReflectUtils.getBoxedClassName(targetType);
                 castType(mv, originType, boxedType);
                 castToPrimitiveType(mv, targetType);
             } else {
                 // 考虑 基类是否可以转
-                String unboxed = ReflectUtils.getUnboxedClass(originType);
+                String unboxed = ReflectUtils.getUnboxedClassName(originType);
                 castToPrimitiveType(mv, unboxed);
                 castInPrimitive(mv, unboxed, targetType);
             }
@@ -172,12 +170,12 @@ public class ASMUtils {
 
             if (ReflectUtils.isBoxedPrimitive(targetType)) {
 
-                String unbox = ReflectUtils.getUnboxedClass(targetType);
+                String unbox = ReflectUtils.getUnboxedClassName(targetType);
                 castInPrimitive(mv, originType, unbox);
                 castFromPrimitiveType(mv, unbox);
             } else {
 
-                String boxedClass = ReflectUtils.getBoxedClass(originType);
+                String boxedClass = ReflectUtils.getBoxedClassName(originType);
                 castFromPrimitiveType(mv, originType);
                 if (!Objects.equals(targetType, boxedClass)) {
                     // not boxClass belike cast to Object or sth
@@ -236,7 +234,7 @@ public class ASMUtils {
     }
 
     public static void castFromPrimitiveType(MethodVisitor mv, String primitive) {
-        String boxed = ReflectUtils.getBoxedClass(primitive);
+        String boxed = ReflectUtils.getBoxedClassName(primitive);
         Preconditions.checkArgument(!Objects.equals(primitive, "void"), "can not cast " + primitive + " to " + boxed);
         mv.visitMethodInsn(
                 Opcodes.INVOKESTATIC,

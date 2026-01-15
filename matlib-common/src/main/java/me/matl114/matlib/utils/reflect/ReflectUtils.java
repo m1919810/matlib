@@ -6,7 +6,8 @@ import java.lang.invoke.VarHandle;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
+import javax.annotation.Nullable;
+import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.lang.annotations.NotRecommended;
 import me.matl114.matlib.common.lang.annotations.Note;
@@ -353,7 +354,7 @@ public class ReflectUtils {
      * @return The unboxed primitive type name
      * @throws IllegalArgumentException if the class name is not a boxed primitive type
      */
-    public static String getUnboxedClass(String boxedClassName) {
+    public static String getUnboxedClassName(String boxedClassName) {
         return switch (boxedClassName) {
             case "java/lang/Integer" -> "int";
             case "java/lang/Boolean" -> "boolean";
@@ -367,6 +368,28 @@ public class ReflectUtils {
             default -> throw new IllegalArgumentException("Not a boxed primitive class: " + boxedClassName);
         };
     }
+
+    /**
+     * Converts a boxed primitive class name to its unboxed primitive type name.
+     *
+     * @param boxedClassName The boxed primitive class name (in internal format)
+     * @return The unboxed primitive type name
+     * @throws IllegalArgumentException if the class name is not a boxed primitive type
+     */
+    public static Class<?> getUnboxedClass(String boxedClassName) {
+        return switch (boxedClassName) {
+            case "java/lang/Integer" -> int.class;
+            case "java/lang/Boolean" -> boolean.class;
+            case "java/lang/Long" -> long.class;
+            case "java/lang/Double" -> double.class;
+            case "java/lang/Float" -> float.class;
+            case "java/lang/Short" -> short.class;
+            case "java/lang/Byte" -> byte.class;
+            case "java/lang/Character" -> char.class;
+            case "java/lang/Void" -> void.class;
+            default -> throw new IllegalArgumentException("Not a boxed primitive class: " + boxedClassName);
+        };
+    }
     /**
      * Converts a primitive type name to its boxed class name.
      *
@@ -374,7 +397,7 @@ public class ReflectUtils {
      * @return The boxed class name (in internal format)
      * @throws IllegalArgumentException if the primitive type is not supported
      */
-    public static String getBoxedClass(String primitive) {
+    public static String getBoxedClassName(String primitive) {
         switch (primitive) {
             case "int":
                 return "java/lang/Integer";
@@ -394,6 +417,38 @@ public class ReflectUtils {
                 return "java/lang/Character";
             case "void":
                 return "java/lang/Void"; // 注意：void 也有对应的包装类 Void
+            default:
+                throw new IllegalArgumentException("Unsupported primitive type: " + primitive);
+        }
+    }
+
+    /**
+     * Converts a primitive type name to its boxed class name.
+     *
+     * @param primitive The primitive type name
+     * @return The boxed class name (in internal format)
+     * @throws IllegalArgumentException if the primitive type is not supported
+     */
+    public static Class<?> getBoxedClass(String primitive) {
+        switch (primitive) {
+            case "int":
+                return Integer.class;
+            case "boolean":
+                return Boolean.class;
+            case "long":
+                return Long.class;
+            case "double":
+                return Double.class;
+            case "float":
+                return Float.class;
+            case "short":
+                return Short.class;
+            case "byte":
+                return Byte.class;
+            case "char":
+                return Character.class;
+            case "void":
+                return Void.class; // 注意：void 也有对应的包装类 Void
             default:
                 throw new IllegalArgumentException("Unsupported primitive type: " + primitive);
         }
@@ -714,6 +769,24 @@ public class ReflectUtils {
         }
     }
 
+    @Nullable public static Field getField(Class<?> clazz, String name) {
+        try {
+            return clazz.getField(name);
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    @Nullable public static Field getFieldPrivate(Class<?> clazz, String name) {
+        try {
+            Field field = clazz.getDeclaredField(name);
+            field.setAccessible(true);
+            return field;
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
     /**
      * Gets a public method from a class.
      *
@@ -739,7 +812,9 @@ public class ReflectUtils {
      */
     public static Method getMethodPrivate(Class<?> clazz, String name, Class<?>... clazzes) {
         try {
-            return clazz.getDeclaredMethod(name, clazzes);
+            Method method = clazz.getDeclaredMethod(name, clazzes);
+            method.setAccessible(true);
+            return method;
         } catch (Throwable e) {
             return null;
         }
@@ -795,6 +870,16 @@ public class ReflectUtils {
         }
     }
 
+    public static VarHandle getVarHandle(Field field) {
+        field.setAccessible(true);
+        try {
+            return MethodHandles.privateLookupIn(field.getDeclaringClass(), MethodHandles.lookup())
+                    .unreflectVarHandle(field);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Gets a VarHandle for a declared field (including private fields).
      *
@@ -842,12 +927,14 @@ public class ReflectUtils {
         public void init(Unsafe unsafe, T newInstance);
     }
 
-    private static final Unsafe theUnsafe = new InitializeSafeProvider<>(() -> {
-                Field field = Unsafe.class.getDeclaredField("theUnsafe");
+    private static final Unsafe theUnsafe = Holder.of(Unsafe.class)
+            .thenApplyCaught((cls) -> {
+                Field field = cls.getDeclaredField("theUnsafe");
                 field.setAccessible(true);
                 return (Unsafe) field.get(null);
             })
-            .v();
+            .valException(null)
+            .get();
 
     /**
      * Gets the Unsafe instance.

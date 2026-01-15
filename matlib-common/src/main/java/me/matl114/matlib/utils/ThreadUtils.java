@@ -10,7 +10,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import me.matl114.matlib.algorithms.algorithm.ExecutorUtils;
-import me.matl114.matlibAdaptor.common.lang.enums.TaskRequest;
 import me.matl114.matlib.common.lang.exceptions.NotImplementedYet;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -202,7 +201,7 @@ public class ThreadUtils {
      */
     public static void executeSyncSched(Runnable runnable) {
         if (Bukkit.isPrimaryThread()) {
-            CompletableFuture.runAsync(runnable, MAIN_THREAD_EXECUTOR);
+            Bukkit.getScheduler().runTask(MOCK_PLUGIN, runnable);
         } else {
             runSyncNMS(runnable);
         }
@@ -346,8 +345,13 @@ public class ThreadUtils {
      *
      * @param runnable The task to execute on the main thread
      */
-    private static void runSyncNMS(Runnable runnable) {
+    public static void runSyncNMS(Runnable runnable) {
         MAIN_THREAD_EXECUTOR.execute(runnable);
+    }
+
+
+    public static Executor getMainThreadExecutor(){
+        return MAIN_THREAD_EXECUTOR;
     }
 
     /**
@@ -359,8 +363,6 @@ public class ThreadUtils {
     public static Plugin getMockPlugin() {
         return MOCK_PLUGIN;
     }
-
-
 
     static {
         try {

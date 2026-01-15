@@ -1,11 +1,10 @@
 package me.matl114.matlib.core;
 
 import lombok.Getter;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
+import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
 import me.matl114.matlib.common.lang.annotations.Note;
-import me.matl114.matlib.implement.slimefun.core.CustomRegistries;
-import me.matl114.matlib.implement.slimefun.manager.BlockDataCache;
-import me.matl114.matlib.slimefunUtils.SlimefunSetup;
+import me.matl114.matlib.core.slimefun.core.CustomRegistries;
+import me.matl114.matlib.core.slimefun.manager.BlockDataCache;
 import me.matl114.matlib.utils.Debug;
 import org.bukkit.plugin.Plugin;
 
@@ -18,14 +17,12 @@ public class AddonInitialization extends PluginInitialization {
     private CustomRegistries registries = null;
 
     @Getter
-    private final boolean hasSlimefun = new InitializeSafeProvider<>(Boolean.class, () -> {
-                try {
-                    return io.github.thebusybiscuit.slimefun4.implementation.Slimefun.instance() != null;
-                } catch (Throwable e) {
-                    return false;
-                }
+    private final boolean hasSlimefun = Holder.of(null)
+            .thenApplyCaught((v) -> {
+                return io.github.thebusybiscuit.slimefun4.implementation.Slimefun.instance() != null;
             })
-            .v();
+            .valException(false)
+            .get();
 
     private boolean hasGuizhanLib = true;
     /**
@@ -42,14 +39,15 @@ public class AddonInitialization extends PluginInitialization {
         if (plugin != null) {
             if (hasSlimefun) {
                 // inject hooks
-                SlimefunSetup.init();
+
+                // TODO: add back
+                //                SlimefunSetup.init();
                 // core
                 this.registries = new CustomRegistries().init(plugin);
                 // datas
                 this.dataManager = new BlockDataCache().init(plugin);
             } else {
-                throw new UnsupportedOperationException(
-                        "Slimefun addon must be enabled after Slimefun plugin is enabled!");
+                Debug.warn("Slimefun not detected,It seems that you are running in testing environment");
             }
             this.hasGuizhanLib = this.plugin.getServer().getPluginManager().isPluginEnabled("GuizhanLibPlugin");
             if (this.hasGuizhanLib) {

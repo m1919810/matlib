@@ -5,9 +5,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.util.Objects;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
+import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
 import me.matl114.matlib.utils.CraftUtils;
-import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -86,11 +85,17 @@ public abstract class VersionedMeta {
         }
         // BlockState
         if (metaOne instanceof BlockStateMeta instanceOne && metaTwo instanceof BlockStateMeta instanceTwo) {
-            if (instanceOne.hasBlockState() != instanceTwo.hasBlockState()) {
+            if (instanceOne.hasBlockState() || instanceTwo.hasBlockState()) {
                 return true;
             }
 
             if (!CraftUtils.matchBlockStateMetaField(instanceOne, instanceTwo)) {
+                return true;
+            }
+        }
+        if (metaOne instanceof BundleMeta bundle1 && metaTwo instanceof BundleMeta bundle2) {
+            // if anyone has item, then mark as different
+            if (bundle1.hasItems() || bundle2.hasItems()) {
                 return true;
             }
         }
@@ -262,8 +267,8 @@ public abstract class VersionedMeta {
     protected abstract boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2);
 
     static class Default extends VersionedMeta {
-        private static final VarHandle handle = new InitializeSafeProvider<>(() -> {
-                    ItemMeta meta = new ItemStack(Material.SPAWNER).getItemMeta();
+        private static final VarHandle handle = Holder.of(new ItemStack(Material.SPAWNER).getItemMeta())
+                .thenApplyUnsafe((meta) -> {
                     BlockStateMeta blockState = (BlockStateMeta) meta;
                     var result = ReflectUtils.getFieldsRecursively(blockState.getClass(), "blockEntityTag");
                     Preconditions.checkArgument(result != null, "Field Absent!");
@@ -271,9 +276,7 @@ public abstract class VersionedMeta {
                     return MethodHandles.privateLookupIn(field.getDeclaringClass(), MethodHandles.lookup())
                             .unreflectVarHandle(field);
                 })
-                .runNonnullAndNoError(
-                        () -> Debug.logger("Successfully initialize CraftMetaBlockState.blockEntityTag VarHandle"))
-                .v();
+                .get();
 
         protected boolean matchBlockStateMeta0(BlockStateMeta meta1, BlockStateMeta meta2) {
             return Objects.equals(handle.get(meta1), handle.get(meta2));
@@ -281,17 +284,15 @@ public abstract class VersionedMeta {
     }
 
     static class v1_20_R4 extends Default {
-        private static final VarHandle componentsHandle = new InitializeSafeProvider<>(() -> {
-                    ItemMeta meta = new ItemStack(Material.SPAWNER).getItemMeta();
+        private static final VarHandle componentsHandle = Holder.of(new ItemStack(Material.SPAWNER).getItemMeta())
+                .thenApplyUnsafe((meta) -> {
                     BlockStateMeta blockState = (BlockStateMeta) meta;
                     Field targetField = ReflectUtils.getFieldsRecursively(blockState.getClass(), "components")
                             .getA();
                     return MethodHandles.privateLookupIn(targetField.getDeclaringClass(), MethodHandles.lookup())
                             .unreflectVarHandle(targetField);
                 })
-                .runNonnullAndNoError(
-                        () -> Debug.logger("Successfully initialize CraftMetaBlockState.components VarHandle"))
-                .v();
+                .get();
 
         public boolean comparePotionType(PotionMeta instanceOne, PotionMeta instanceTwo) {
             return instanceOne.getBasePotionType() == instanceTwo.getBasePotionType();
@@ -365,14 +366,14 @@ public abstract class VersionedMeta {
     }
 
     static class v1_21_R1 extends v1_20_R4 {
-        private static final boolean hasShieldMetaInterface = new InitializeSafeProvider<>(
-                        () -> {
-                            Class<?> testClass = ShieldMeta.class;
-                            Preconditions.checkArgument(testClass.isInterface());
-                            return true;
-                        },
-                        false)
-                .v();
+        private static final boolean hasShieldMetaInterface = Holder.of(null)
+                .thenApplyCaught((v) -> {
+                    Class<?> testClass = ShieldMeta.class;
+                    Preconditions.checkArgument(testClass.isInterface());
+                    return true;
+                })
+                .valException(false)
+                .get();
 
         @Override
         public boolean differentSpecialMeta(ItemMeta metaOne, ItemMeta metaTwo) {

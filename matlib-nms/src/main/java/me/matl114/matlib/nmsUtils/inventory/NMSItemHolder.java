@@ -1,7 +1,5 @@
 package me.matl114.matlib.nmsUtils.inventory;
 
-
-
 import me.matl114.matlib.nmsMirror.impl.NMSItem;
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import org.bukkit.inventory.ItemStack;

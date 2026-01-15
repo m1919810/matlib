@@ -8,7 +8,6 @@ import me.matl114.matlib.nmsMirror.inventory.ItemStackHelperDefault;
 import me.matl114.matlib.nmsMirror.nbt.TagEnum;
 import me.matl114.matlib.utils.serialization.TypeOps;
 
-
 class ItemDataValueReadRemoveImpl implements ItemDataValue {
     final String[] path;
 

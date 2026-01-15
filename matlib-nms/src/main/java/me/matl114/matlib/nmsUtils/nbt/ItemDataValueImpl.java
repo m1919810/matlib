@@ -6,7 +6,6 @@ import me.matl114.matlib.nmsMirror.impl.Env;
 import me.matl114.matlib.nmsMirror.impl.NMSCore;
 import me.matl114.matlib.utils.serialization.TypeOps;
 
-
 class ItemDataValueImpl extends ItemDataValueReadRemoveImpl {
 
     final Object nbtTag;
@@ -40,7 +39,8 @@ class ItemDataValueImpl extends ItemDataValueReadRemoveImpl {
 
     @Override
     public void applyToStack(Object itemStack) {
-        if (this.nbtTag == null || (NMSCore.TAGS.isCompound(this.nbtTag) && NMSCore.COMPOUND_TAG.isEmpty(this.nbtTag))) {
+        if (this.nbtTag == null
+                || (NMSCore.TAGS.isCompound(this.nbtTag) && NMSCore.COMPOUND_TAG.isEmpty(this.nbtTag))) {
             // remove mode;
             removeFromStack(itemStack);
         } else {

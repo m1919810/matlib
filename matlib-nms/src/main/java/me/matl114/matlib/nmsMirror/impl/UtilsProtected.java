@@ -6,7 +6,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
 import me.matl114.matlib.nmsMirror.Utils;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;

@@ -41,14 +41,17 @@ public final class RegistryContent<T> implements Content<T> {
     @Setter
     Set<Group<T>> tags = Set.of();
 
+    @Note("create via registering in the Registry, the namespace should be the owner.namespace()")
     RegistryContent(Registry<T> owner, NamespacedKey key, T value) {
-        this.owner = owner;
-        this.fullId = key.toString();
-        this.namespace = key.getNamespace();
         this.keyId = key.getKey();
-        this.nsKey = key;
         this.valueRefenrece = new WeakReference<>(value);
-        this.onRegister = true;
+        registerToOwner(owner);
+    }
+
+    @Note("create via outer access or Registry#createRegistryContent")
+    public RegistryContent(String name, T value) {
+        this.keyId = name;
+        this.valueRefenrece = new WeakReference<>(value);
     }
 
     void registerToOwner(Registry<? super T> owner) {
@@ -71,12 +74,6 @@ public final class RegistryContent<T> implements Content<T> {
         this.nsKey = null;
         this.fullId = null;
         this.value = null;
-    }
-
-    @Note("create via outer access")
-    public RegistryContent(String name, T value) {
-        this.keyId = name;
-        this.valueRefenrece = new WeakReference<>(value);
     }
 
     @NotNull @Override

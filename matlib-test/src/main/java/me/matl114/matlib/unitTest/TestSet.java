@@ -6,6 +6,8 @@ import java.util.List;
 public class TestSet implements TestCase {
     List<TestCase> tests = new ArrayList<>();
 
+    public void init() {}
+
     public List<TestCase> getTests() {
         return tests;
     }

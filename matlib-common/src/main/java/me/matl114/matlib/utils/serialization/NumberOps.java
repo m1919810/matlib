@@ -3,10 +3,8 @@ package me.matl114.matlib.utils.serialization;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import me.matl114.matlib.utils.serialization.datafix.DataHelper;
-
 import java.util.stream.Stream;
-
+import me.matl114.matlib.utils.serialization.datafix.DataHelper;
 
 public class NumberOps implements DynamicOps<Number> {
     public static final NumberOps I = new NumberOps();

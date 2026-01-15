@@ -25,7 +25,7 @@ public interface InventoryBuilder<T> {
      * @param stack
      * @param handler
      */
-    void visitSlot(int index, @Nullable ItemStack stack, @Nullable InteractHandler handler);
+    void visitSlot(int index, @Nullable ItemStack stack, @Nullable InteractHandler handler, SlotType type);
 
     /**
      * end of any

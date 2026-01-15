@@ -78,9 +78,4 @@ public class CraftBukkitUtilTests implements TestCase {
         b = System.nanoTime();
         Debug.logger("using meta", b - a);
     }
-
-    @OnlineTest(name = "stop watchdog test")
-    public void test_stopWatchDog() throws Throwable {
-        Class.forName("org.spigotmc.WatchdogThread").getMethod("doStop").invoke(null);
-    }
 }

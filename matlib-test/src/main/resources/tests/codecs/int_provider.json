@@ -1,0 +1,54 @@
+[
+	1,
+	{
+		"type": "const",
+		"value": 2
+	},
+	{
+		"type": "uniform",
+		"min": 114,
+		"max": 514
+	},
+	{
+		"type": "choice",
+		"min": 336,
+		"max": 666,
+		"p" : 33
+	},
+	{
+		"type": "combine",
+		"providers": [
+			{
+				"type": "combine",
+				"providers": [
+					{
+						"type": "combine",
+						"providers": [
+							{
+								"type": "combine",
+								"providers": [
+									{
+										"type": "combine",
+										"providers": [
+											1
+										]
+									},
+									2
+								]
+							},
+							3
+						]
+					},
+					4
+				]
+			},
+			{
+				"type": "choice",
+				"min": 336,
+				"max": 666,
+				"p" : 33
+			},
+			3
+		]
+	}
+]

@@ -23,7 +23,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class NMSPlayerTest implements TestCase {
-    @OnlineTest(name = "special test", automatic = false)
+    @OnlineTest(name = "special item give test", automatic = false)
     public void test_test(CommandSender sender) throws Throwable {
         Player p = (Player) sender;
         PlayerInventory playerInventory = p.getInventory();

@@ -10,13 +10,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.Getter;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeProvider;
 import me.matl114.matlib.common.functions.reflect.FieldGetter;
 import me.matl114.matlib.common.functions.reflect.FieldSetter;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import sun.misc.Unsafe;
 
+@Deprecated(forRemoval = true)
 public class FieldAccess {
     private boolean printError = Debug.isDebugMod();
 
@@ -70,12 +70,13 @@ public class FieldAccess {
         });
     }
 
-    private static final FieldAccess FAIL = new InitializeProvider<>(() -> {
-                FieldAccess access = new FieldAccess(null);
-                access.failInitialization = true;
-                return access;
-            })
-            .v();
+    private static final FieldAccess FAIL;
+
+    static {
+        FieldAccess access = new FieldAccess(null);
+        access.failInitialization = true;
+        FAIL = access;
+    }
 
     public static FieldAccess ofFailure() {
         return FAIL;

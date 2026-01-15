@@ -3,8 +3,6 @@ package me.matl114.matlib.utils.reflect.internal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.ServiceLoader;
-
 import me.matl114.matlib.algorithms.dataStructures.struct.LazyInitValue;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
@@ -15,12 +13,12 @@ public interface SimpleObfManager {
     }
 
     static LazyInitValue<SimpleObfManager> manager = LazyInitValue.ofLazy(() -> {
-        try{
-            //use ObfManager if preset
-            Class<?> clazz = Class.forName( SimpleObfManager.class.getPackageName() + ".ObfManager");
+        try {
+            // use ObfManager if preset
+            Class<?> clazz = Class.forName(SimpleObfManager.class.getPackageName() + ".ObfManager");
             Method m = clazz.getDeclaredMethod("getManager");
             return (SimpleObfManager) m.invoke(null);
-        }catch (Throwable e0){
+        } catch (Throwable e0) {
             try {
                 return new SimpleObfManagerImpl();
             } catch (Throwable e) {
@@ -30,7 +28,6 @@ public interface SimpleObfManager {
                 return new DefaultImpl();
             }
         }
-
     });
     /**
      * this method should return the deobf class name of a optional-obf class, you should check whether the class is in the mapping
@@ -96,13 +93,9 @@ public interface SimpleObfManager {
         return Objects.equals(deobfMethodInClass(reobfClassName, targetDescriptor), methodName);
     }
 
-
-
-
     default String deobfField(Field field0) {
         return field0.getName();
     }
-
 
     static class DefaultImpl implements SimpleObfManager {
 
@@ -120,7 +113,6 @@ public interface SimpleObfManager {
         public String deobfMethodInClass(String reobfClassName, String methodDescriptor) {
             return ByteCodeUtils.parseMethodNameFromDescriptor(methodDescriptor);
         }
-
 
         public String deobfFieldInClass(String mojangClassName, String obfMethodDescriptor) {
             return ByteCodeUtils.parseFieldNameFromDescriptor(obfMethodDescriptor);

@@ -9,18 +9,20 @@ import lombok.Getter;
 import me.matl114.matlib.algorithms.algorithm.ExecutorUtils;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.core.Manager;
-import me.matl114.matlib.implement.bukkit.schedule.ScheduleManager;
+import me.matl114.matlib.core.bukkit.schedule.ScheduleManager;
 import me.matl114.matlib.utils.AddUtils;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.TextUtils;
 import me.matl114.matlib.utils.command.commandGroup.AbstractMainCommand;
 import me.matl114.matlib.utils.command.commandGroup.SubCommand;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
+import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 public class TestRunner extends AbstractMainCommand implements Manager {
     private Plugin plugin;
@@ -70,6 +72,11 @@ public class TestRunner extends AbstractMainCommand implements Manager {
 
     public TestRunner registerTestCase(TestCase testCase) {
         if (testCase instanceof TestSet set) {
+            try {
+                set.init();
+            } catch (Throwable e) {
+                Debug.logger(e, "Exception occurred while testset init");
+            }
             set.getTests().forEach(this::registerTestCase);
         }
         var methods = ReflectUtils.getAllMethodsRecursively(testCase.getClass());
@@ -193,6 +200,7 @@ public class TestRunner extends AbstractMainCommand implements Manager {
     public String permissionRequired() {
         return "matlib.test.op";
     }
+
 
     private final SubCommand mainCommand = genMainCommand("matlib");
 

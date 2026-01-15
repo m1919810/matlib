@@ -114,6 +114,7 @@ public interface Import {
     String TagVisitor = "Lnet/minecraft/nbt/TagVisitor;";
     String StringTagVisitor = "Lnet/minecraft/nbt/StringTagVisitor;";
     String TextComponentTagVisitor = "Lnet/minecraft/nbt/TextComponentTagVisitor;";
+    String TagParser = "Lnet/minecraft/nbt/TagParser;";
     String ItemContainerContents = "Lnet/minecraft/world/item/component/ItemContainerContents;";
     String TooltipDisplay = "Lnet/minecraft/world/item/component/TooltipDisplay;";
     String FontDescription = "Lnet/minecraft/network/chat/FontDescription;";

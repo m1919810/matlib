@@ -617,6 +617,26 @@ public class TextUtils {
         return item2;
     }
     /**
+     * Adds lore lines to an ItemStack.
+     *
+     * <p>This method modifies the origin ItemStack. The lore lines are processed through
+     * {@link #resolveColor(String)} to handle color codes.
+     *
+     * @param item The ItemStack to add lore to
+     * @param lores The lore lines to add (varargs)
+     * @return A new ItemStack with the added lore
+     */
+    public static ItemStack appendLore(ItemStack item, String... lores) {
+        ItemMeta meta = item.getItemMeta();
+        List<String> finallist = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+        for (String l : lores) {
+            finallist.add(resolveColor(l));
+        }
+        meta.setLore(finallist);
+        item.setItemMeta(meta);
+        return item;
+    }
+    /**
      * Renames an ItemStack by setting its display name.
      *
      * <p>This method creates a copy of the provided ItemStack and sets its display

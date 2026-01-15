@@ -29,6 +29,8 @@ public class LevelUtils {
         var world = CraftBukkit.BLOCK.getHandle(block);
         int x = block.getX(), z = block.getZ();
         var chunk = NMSLevel.LEVEL.getChunkCustomAt(world, x, z, forceLoadChunk);
-        return chunk == null ? null : NMSLevel.LEVEL_CHUNK.getBlockEntity(chunk, NMSCore.BLOCKPOS.ofVec(x, block.getY(), z));
+        return chunk == null
+                ? null
+                : NMSLevel.LEVEL_CHUNK.getBlockEntity(chunk, NMSCore.BLOCKPOS.ofVec(x, block.getY(), z));
     }
 }

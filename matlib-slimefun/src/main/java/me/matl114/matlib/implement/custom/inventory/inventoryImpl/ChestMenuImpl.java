@@ -24,7 +24,7 @@ public class ChestMenuImpl implements InventoryBuilder<ChestMenu> {
     }
 
     @Override
-    public void visitSlot(int index, ItemStack stack, InteractHandler handler) {
+    public void visitSlot(int index, ItemStack stack, InteractHandler handler, SlotType type) {
         Preconditions.checkNotNull(menu, "You should visitPage before visitSlot");
         menu.replaceExistingItem(index, stack);
         menu.addMenuClickHandler(index, wrap(handler));

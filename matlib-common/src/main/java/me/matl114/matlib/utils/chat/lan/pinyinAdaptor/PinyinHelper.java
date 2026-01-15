@@ -2,6 +2,7 @@ package me.matl114.matlib.utils.chat.lan.pinyinAdaptor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import me.matl114.matlib.common.lang.annotations.EnumVal;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.FailHard;
@@ -13,7 +14,6 @@ import me.matl114.matlib.utils.reflect.descriptor.DescriptorProxyBuilder;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
-import me.matl114.matlib.utils.service.CustomServiceLoader;
 import me.matl114.matlib.utils.version.Version;
 
 @FailHard(thresholdInclude = Version.v1_20_R1, below = false)
@@ -116,9 +116,8 @@ public interface PinyinHelper extends TargetDescriptor {
     }
 
     public static final class A {
-        public static final PinyinHelper I = DescriptorBuilder.createASMMultiHelper(PinyinHelper.class);
-
-
+        public static final PinyinHelper I =
+                Objects.requireNonNullElseGet(DescriptorBuilder.createASMMultiHelper(PinyinHelper.class), () -> P.I);
     }
 
     public static final class P {

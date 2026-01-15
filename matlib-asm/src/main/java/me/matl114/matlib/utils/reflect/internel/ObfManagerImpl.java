@@ -6,11 +6,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import me.matl114.matlib.utils.Debug;
-
 import me.matl114.matlib.utils.reflect.ASMUtils;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
-
 import me.matl114.matlib.utils.reflect.asm.CustomClassLoader;
 import me.matl114.matlib.utils.reflect.internal.SimpleObfManagerImpl;
 import me.matl114.matlib.utils.version.Version;
@@ -25,7 +23,7 @@ public class ObfManagerImpl extends SimpleObfManagerImpl implements ObfManager {
 
     protected ObfManagerImpl() {
         super();
-        if(this.classMapperHelper != null){
+        if (this.classMapperHelper != null) {
             try {
                 // higher version with no obf
                 Class<?> clazz = this.classMapperHelper.getClass();
@@ -37,11 +35,11 @@ public class ObfManagerImpl extends SimpleObfManagerImpl implements ObfManager {
                 try {
                     Set val = a();
                     this.mappingsFieldByObf = (Map<String, ?>) val.stream()
-                        .collect(Collectors.toUnmodifiableMap(classMapperHelper::obfNameGetter, map -> map));
+                            .collect(Collectors.toUnmodifiableMap(classMapperHelper::obfNameGetter, map -> map));
                     this.mappingsFieldByMojang = (Map<String, ?>) val.stream()
-                        .collect(Collectors.toUnmodifiableMap(classMapperHelper::mojangNameGetter, map -> map));
+                            .collect(Collectors.toUnmodifiableMap(classMapperHelper::mojangNameGetter, map -> map));
                 } catch (Throwable e) {
-                    if(!Version.getVersionInstance().isAtLeast(Version.v1_21_R1)){
+                    if (!Version.getVersionInstance().isAtLeast(Version.v1_21_R1)) {
                         Debug.logger(e, "Error while reading field reobf data, disabling field reobf:");
                     }
                     this.mappingsFieldByObf = null;

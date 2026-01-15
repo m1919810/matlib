@@ -1,11 +1,15 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.params.CommandArgumentMap;
@@ -54,6 +58,12 @@ public class SubCommand implements CustomTabExecutor {
         }
     }
 
+    @Nullable
+    @Override
+    public String permissionRequired() {
+        return permission;
+    }
+
     /**
      * Interface for registering sub-commands with a parent command.
      * Implemented by classes that can contain and manage sub-commands.
@@ -65,10 +75,16 @@ public class SubCommand implements CustomTabExecutor {
          * @param command The sub-command to register
          */
         public void registerSub(SubCommand command);
+
+        public SubCommand getSubCommand(String name);
+
+
+        public Collection<SubCommand> getSubCommands();
+        //todo: add help interface
     }
 
     /** Help text lines for this sub-command */
-    @Getter
+    /** Should be like an array of string: <name> <argument> <argument> function, function, function**/
     String[] help;
 
     /** Argument template defining the expected parameters */
@@ -80,22 +96,16 @@ public class SubCommand implements CustomTabExecutor {
 
     /** Executor responsible for handling command execution */
     @Getter
+    @Nonnull
     TabExecutor executor = this;
+
+    @Setter
+    String permission;
 
     /** Whether this sub-command should be hidden from help displays */
     boolean hide = false;
 
-    /**
-     * Checks if the sender has permission to use this sub-command.
-     * By default, returns true (no permission required).
-     * Override this method to implement custom permission logic.
-     *
-     * @param sender The command sender to check
-     * @return true if the sender has permission, false otherwise
-     */
-    public boolean hasPermission(CommandSender sender) {
-        return true;
-    }
+
 
     /**
      * Handles command execution for this sub-command.
@@ -109,6 +119,9 @@ public class SubCommand implements CustomTabExecutor {
      * @return true if the command was executed successfully, false otherwise
      */
     public boolean onCommand(CommandSender var1, Command var2, String var3, String[] var4) {
+        if(this.executor != this){
+            return this.executor.onCommand(var1, var2, var3, var4);
+        }
         return true;
     }
 
@@ -176,6 +189,11 @@ public class SubCommand implements CustomTabExecutor {
     @Nonnull
     public Pair<SimpleCommandInputStream, String[]> parseInput(String[] args) {
         return template.parseInputStream(args);
+    }
+
+    @Override
+    public Stream<String> getHelp(String prefix) {
+        return Arrays.stream(help).map(s -> prefix + s);
     }
 
     /**
@@ -316,7 +334,7 @@ public class SubCommand implements CustomTabExecutor {
      * @param executor The TabExecutor to use for this sub-command
      * @return This SubCommand instance for method chaining
      */
-    public SubCommand setCommandExecutor(TabExecutor executor) {
+    public SubCommand setCommandExecutor(@Nonnull TabExecutor executor) {
         this.executor = executor;
         return this;
     }

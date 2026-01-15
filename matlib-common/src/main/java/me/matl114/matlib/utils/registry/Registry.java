@@ -44,6 +44,10 @@ public interface Registry<T> extends IdHolder, Namespaced, IdMap<T>, Iterable<T>
      */
     @Nullable NamespacedKey getKey(T value);
 
+    @Nullable Content<T> getContentByKey(NamespacedKey key);
+
+    @Nullable Content<T> getContentById(String key);
+
     /**
      * Gets the Content object associated with the specified value.
      *

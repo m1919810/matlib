@@ -1,6 +1,5 @@
 package me.matl114.matlib.nmsUtils.nbt;
 
-import static me.matl114.matlib.nmsMirror.impl.CraftBukkit.ADVENTURE;
 import static me.matl114.matlib.nmsMirror.impl.NMSCore.*;
 
 import com.google.common.collect.LinkedHashMultimap;

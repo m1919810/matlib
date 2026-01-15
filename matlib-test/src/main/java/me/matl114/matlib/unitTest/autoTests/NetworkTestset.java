@@ -4,7 +4,7 @@ import me.matl114.matlib.unitTest.TestSet;
 import me.matl114.matlib.unitTest.autoTests.networkTests.NettyBasicTest;
 
 public class NetworkTestset extends TestSet {
-    {
+    public void init() {
         addTest(new NettyBasicTest());
     }
 }

@@ -159,7 +159,6 @@ public interface InputManager {
             return false;
         }
 
-
         default BiFunction<Player, AtomicReference<String>, Integer> toBiFunction() {
             return (p, str) -> {
                 return onChat(p, str, null, false).ordinal();

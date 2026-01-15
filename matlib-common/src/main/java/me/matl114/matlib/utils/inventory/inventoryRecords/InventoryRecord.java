@@ -67,6 +67,8 @@ public interface InventoryRecord {
      */
     public boolean stillValid();
 
+    default void ensureChunkLoad() {}
+
     @ForceOnMainThread
     @Note("call only when isVanillaInv = true,")
     public void setChange();

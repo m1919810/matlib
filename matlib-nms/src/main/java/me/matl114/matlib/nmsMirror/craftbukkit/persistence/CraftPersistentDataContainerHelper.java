@@ -5,7 +5,6 @@ import static me.matl114.matlib.nmsMirror.Import.*;
 import com.google.common.base.Preconditions;
 import java.util.Map;
 import me.matl114.matlib.common.lang.annotations.Internal;
-import me.matl114.matlib.common.lang.annotations.NeedTest;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.nmsMirror.impl.NMSCore;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
@@ -21,7 +20,6 @@ import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-@NeedTest
 @MultiDescriptive(targetDefault = "org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer")
 public interface CraftPersistentDataContainerHelper extends TargetDescriptor {
     //    @MethodTarget

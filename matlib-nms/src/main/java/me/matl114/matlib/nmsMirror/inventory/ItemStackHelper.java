@@ -99,7 +99,7 @@ public interface ItemStackHelper extends PdcCompoundHolder, CustomNbtHolder {
 
     Object saveNbtAsTag(Object itemStack);
 
-    Map<String, ?> saveNbtAsHashMap(Object itemStack);
+    Map<String, ?> saveNbtAsMap(Object itemStack);
 
     Object saveElementInPath(Object itemStack, String path);
 

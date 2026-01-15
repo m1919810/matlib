@@ -30,6 +30,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>me.matl114</groupId>
+            <artifactId>matlib-implement</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>net.guizhanss</groupId>
             <artifactId>GuizhanLibPlugin</artifactId>
             <version>1.7.6</version>

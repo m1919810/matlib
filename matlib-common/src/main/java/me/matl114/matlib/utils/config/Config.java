@@ -14,6 +14,7 @@ import lombok.Setter;
 import me.matl114.matlib.utils.Debug;
 
 @SuppressWarnings("all")
+@Deprecated(forRemoval = true)
 public abstract class Config {
     // for load when startup
 

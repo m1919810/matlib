@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.*;
 import java.util.Map;
 import java.util.SequencedSet;
 import java.util.Set;
-
 import me.matl114.matlib.nmsMirror.impl.versioned.Env1_20_R4;
 import me.matl114.matlib.nmsMirror.inventory.v1_20_R4.DataComponentEnum;
 import org.bukkit.inventory.ItemFlag;
@@ -81,7 +80,8 @@ class ItemMetaViewImpl_1_21_R4 extends ItemMetaViewImpl_1_20_R4 {
                 HELPER.setDataComponentValue(
                         itemStack,
                         DataComponentEnum.TOOLTIP_DISPLAY,
-                        Env1_20_R4.DATA_TYPES.tooltipsDisplay$newComponent(false, new ReferenceLinkedOpenHashSet<>(hides)));
+                        Env1_20_R4.DATA_TYPES.tooltipsDisplay$newComponent(
+                                false, new ReferenceLinkedOpenHashSet<>(hides)));
             }
         }
     }
@@ -111,7 +111,9 @@ class ItemMetaViewImpl_1_21_R4 extends ItemMetaViewImpl_1_20_R4 {
             SequencedSet<?> set = Env1_20_R4.DATA_TYPES.tooltipsDisplay$hiddenComponents(tooltips);
             if (!set.isEmpty() || b) {
                 HELPER.setDataComponentValue(
-                        itemStack, DataComponentEnum.TOOLTIP_DISPLAY, Env1_20_R4.DATA_TYPES.tooltipsDisplay$newComponent(b, set));
+                        itemStack,
+                        DataComponentEnum.TOOLTIP_DISPLAY,
+                        Env1_20_R4.DATA_TYPES.tooltipsDisplay$newComponent(b, set));
             } else {
                 // empty and hideTooltips = false, remove
                 HELPER.removeFromPatch(itemStack, DataComponentEnum.TOOLTIP_DISPLAY);

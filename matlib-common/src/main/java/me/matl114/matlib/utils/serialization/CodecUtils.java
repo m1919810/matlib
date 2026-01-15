@@ -5,12 +5,9 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.JsonOps;
 import me.matl114.matlib.common.lang.exceptions.DecodeException;
 import me.matl114.matlib.common.lang.exceptions.EncodeException;
-
 import me.matl114.matlib.utils.serialization.datafix.DataHelper;
-import me.matl114.matlib.utils.version.Version;
 
 public class CodecUtils {
 
@@ -37,7 +34,4 @@ public class CodecUtils {
             throw new EncodeException(e);
         });
     }
-
-
-
 }

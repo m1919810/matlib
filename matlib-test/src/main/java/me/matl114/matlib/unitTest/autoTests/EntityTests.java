@@ -1,7 +1,7 @@
 package me.matl114.matlib.unitTest.autoTests;
 
 import me.matl114.matlib.algorithms.algorithm.ExecutorUtils;
-import me.matl114.matlib.implement.bukkit.schedule.ScheduleManager;
+import me.matl114.matlib.core.bukkit.schedule.ScheduleManager;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
 import me.matl114.matlib.utils.Debug;

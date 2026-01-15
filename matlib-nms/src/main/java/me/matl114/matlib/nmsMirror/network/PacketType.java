@@ -28,4 +28,7 @@ public interface PacketType {
 
     String ServerboundClientInformationPacket =
             "Lnet/minecraft.network/protocol/common/ServerboundClientInformationPacket;";
+    String ServerboundInteractEntityPacket =
+        "Lnet/minecraft/network/protocol/game/ServerboundInteractPacket;";
+
 }

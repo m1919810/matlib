@@ -20,7 +20,6 @@ import me.matl114.matlib.algorithms.algorithm.CollectionUtils;
 import me.matl114.matlib.algorithms.dataStructures.frames.collection.PairList;
 import me.matl114.matlib.algorithms.dataStructures.frames.collection.SimpleLinkList;
 import me.matl114.matlib.algorithms.dataStructures.frames.collection.Stack;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeProvider;
 import me.matl114.matlib.common.lang.exceptions.CompileError;
 
 public class ComponentFormatParser {
@@ -580,36 +579,40 @@ public class ComponentFormatParser {
     private static final int inputTokenAmount =
             (int) Arrays.stream(Token.values()).filter(Token::isTerminal).count();
     private static final int unTerminalTokenAmount = Token.values().length - inputTokenAmount;
-    private static final int[] inputTokenOrdinal = (int[]) new InitializeProvider(() -> {
-                int a = tokens.length;
-                int[] raw = new int[a];
-                int count = 0;
-                for (int i = 0; i < a; i++) {
-                    if (tokens[i].isTerminal()) {
-                        raw[i] = count;
-                        count++;
-                    } else {
-                        raw[i] = -1;
-                    }
-                }
-                return raw;
-            })
-            .v();
-    private static final int[] unTerminalTokenOrdinal = (int[]) new InitializeProvider(() -> {
-                int a = tokens.length;
-                int[] raw = new int[a];
-                int count = 0;
-                for (int i = 0; i < a; i++) {
-                    if (!tokens[i].isTerminal()) {
-                        raw[i] = count;
-                        count++;
-                    } else {
-                        raw[i] = -1;
-                    }
-                }
-                return raw;
-            })
-            .v();
+    private static final int[] inputTokenOrdinal;
+
+    static {
+        int a = tokens.length;
+        int[] raw = new int[a];
+        int count = 0;
+        for (int i = 0; i < a; i++) {
+            if (tokens[i].isTerminal()) {
+                raw[i] = count;
+                count++;
+            } else {
+                raw[i] = -1;
+            }
+        }
+        inputTokenOrdinal = raw;
+    }
+
+    private static final int[] unTerminalTokenOrdinal;
+
+    static {
+        int a = tokens.length;
+        int[] raw = new int[a];
+        int count = 0;
+        for (int i = 0; i < a; i++) {
+            if (!tokens[i].isTerminal()) {
+                raw[i] = count;
+                count++;
+            } else {
+                raw[i] = -1;
+            }
+        }
+        unTerminalTokenOrdinal = raw;
+    }
+
     private static final Syntax[] allSyntax = new Syntax[] {
         S11, S20, S21, S22, S23, S24, S32, S42, S43, S51, S61, S63, S64, S65, S66, S67, S81, S82, S83, S91, S92, S93,
         S94, S95, S96, S97

@@ -45,7 +45,9 @@ public class RegistryUtils {
     }
 
     public static <B extends Keyed, M> Object byKeyBukkitToMinecraft(B bukkit, Object nmsRegistry) {
-        return NMSCore.REGISTRIES.getOptional(nmsRegistry, fromBukkit(bukkit.getKey())).orElseThrow();
+        return NMSCore.REGISTRIES
+                .getOptional(nmsRegistry, fromBukkit(bukkit.getKey()))
+                .orElseThrow();
     }
 
     public static Object validateAsHolder(Object nms, Object nmsRegistry) {

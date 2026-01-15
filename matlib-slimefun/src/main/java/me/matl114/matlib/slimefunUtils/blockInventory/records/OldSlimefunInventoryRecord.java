@@ -47,6 +47,8 @@ public record OldSlimefunInventoryRecord(@Nonnull Inventory inventory, @Nonnull 
         return optionalHolder != null && optionalHolder.canOpen(optionalHolder.getBlock(), p);
     }
 
+    public void ensureChunkLoad() {}
+
     public static InventoryRecord getInventoryRecord(Location loc, boolean checkVanilla) {
         BlockMenu inv = BlockStorage.getInventory(loc);
         if (inv != null) {

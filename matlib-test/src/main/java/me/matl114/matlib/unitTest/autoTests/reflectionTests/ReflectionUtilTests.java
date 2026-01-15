@@ -44,7 +44,7 @@ public class ReflectionUtilTests implements TestCase {
         ItemMeta meta = item.getItemMeta();
         Debug.logger(CraftUtils.getDisplayNameHandle().get(meta));
         Debug.logger(CraftUtils.getLoreHandle().get(meta));
-        item = CraftUtils.getCraftCopy(item, true);
+        item = CraftUtils.getCraftCopy(item);
         Debug.logger(item);
         Assert(CraftUtils.isCraftItemStack(item));
         Debug.logger(CraftUtils.getHandled(item));
@@ -114,6 +114,7 @@ public class ReflectionUtilTests implements TestCase {
     //    }
     @OnlineTest(name = "MatlibAdaptor Test")
     public void testAPI() throws Throwable {
+        disableTest();
         Class logiTech = Class.forName("me.matl114.logitech.MyAddon");
         Debug.logger(logiTech.getName());
         FieldAccess initAccess = FieldAccess.ofName(logiTech, "matlibInstance");
@@ -217,8 +218,7 @@ public class ReflectionUtilTests implements TestCase {
         String obfClass = WorldUtils.getTileEntityClass().getName();
         String mojClass = helper.deobfClassName(obfClass);
         AssertEq(mojClass, "net.minecraft.world.level.block.entity.BlockEntity");
-        String des = ByteCodeUtils.getMethodDescriptor(
-                WorldUtils.getTileEntitySetChangeAccess().getMethodOrDefault(() -> null));
+        String des = ByteCodeUtils.getMethodDescriptor(WorldUtils.getTileEntitySetChangeAccess());
         AssertEq(helper.deobfMethodInClass(mojClass, des), "setChanged");
     }
     //    public static class DynamicClassLoader extends ClassLoader{

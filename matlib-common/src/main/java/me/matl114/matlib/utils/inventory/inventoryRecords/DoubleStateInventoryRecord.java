@@ -65,6 +65,15 @@ public record DoubleStateInventoryRecord(DoubleChestInventory inventory, TileSta
         return stillValid();
     }
 
+    public void ensureChunkLoad() {
+        if (left != null) {
+            left.getChunk();
+        }
+        if (right != null) {
+            right.getChunk();
+        }
+    }
+
     @Override
     public Inventory getInventorySync() {
         if (inventory != null) {

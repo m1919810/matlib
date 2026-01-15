@@ -20,7 +20,7 @@ public class DynamicOpUtils {
             NBT_OP_1_20_R4_CACHE = NMSCore.REGISTRIES.provideRegistryForDynamicOp(Env.REGISTRY_FROZEN, Env.NBT_OP);
             PRIMITIVE_OP_1_20_R4_CACHE = NMSCore.REGISTRIES.provideRegistryForDynamicOp(Env.REGISTRY_FROZEN, TypeOps.I);
             JSON_OP_1_20_R4_CACHE =
-                NMSCore.REGISTRIES.provideRegistryForDynamicOp(Env.REGISTRY_FROZEN, JsonOps.INSTANCE);
+                    NMSCore.REGISTRIES.provideRegistryForDynamicOp(Env.REGISTRY_FROZEN, JsonOps.INSTANCE);
         } else {
             NBT_OP_1_20_R4_CACHE = Env.NBT_OP;
             PRIMITIVE_OP_1_20_R4_CACHE = TypeOps.I;

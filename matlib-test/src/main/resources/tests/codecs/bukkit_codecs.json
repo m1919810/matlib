@@ -1,0 +1,115 @@
+[
+	{
+		"data": "NAMESPACED_KEY",
+		"tests": [
+			{
+				"input": "minecraft:diamond",
+				"output": "minecraft:diamond"
+			},
+			{
+				"input": "myplugin:custom_item",
+				"output": "myplugin:custom_item"
+			},
+			{
+				"input": "test:invalid_key",
+				"output": "test:invalid_key"
+			},
+			{
+				"input": "",
+				"output": "null"
+			},
+			{
+				"input": "only_namespace",
+				"output": "minecraft:only_namespace"
+			}
+		]
+	},
+	{
+		"data": "WORLD",
+		"tests": [
+			{
+				"input": "world",
+				"output": "CraftWorld{name=world}"
+			},
+			{
+				"input": "world_nether",
+				"output": "CraftWorld{name=world_nether}"
+			},
+			{
+				"input": "world_the_end",
+				"output": "CraftWorld{name=world_the_end}"
+			},
+			{
+				"input": "non_existent_world",
+				"output": "null"
+			},
+			{
+				"input": "",
+				"output": "null"
+			}
+		]
+	},
+	{
+		"data": "LOCATION",
+		"tests": [
+			{
+				"input": "world,100.5,64.0,-200.5",
+				"output": "Location{world=CraftWorld{name=world},x=100.5,y=64.0,z=-200.5,pitch=0.0,yaw=0.0}"
+			},
+			{
+				"input": "world_nether,0.0,70.0,0.0",
+				"output": "Location{world=CraftWorld{name=world_nether},x=0.0,y=70.0,z=0.0,pitch=0.0,yaw=0.0}"
+			},
+			{
+				"input": "null",
+				"output": "null"
+			},
+			{
+				"input": "world,invalid,64.0,-200.5",
+				"output": "throw"
+			},
+			{
+				"input": "null",
+				"output": "null"
+			},
+			{
+				"input": "world,100.5,64.0",
+				"output": "throw"
+			},
+			{
+				"input": "",
+				"output": "throw"
+			}
+		]
+	},
+	{
+		"data": "BLOCK_LOCATION",
+		"tests": [
+			{
+				"input": "world,100,64,-200",
+				"output": "world,100,64,-200"
+			},
+			{
+				"input": "world_nether,0,70,0",
+				"output": "world_nether,0,70,0"
+			},
+			{
+				"input": "null",
+				"output": "null"
+			},
+			{
+				"input": "world,invalid,64,-200",
+				"output": "throw"
+			},
+			{
+				"input": "world,100.5,64,-200",
+				"output": "throw"
+			},
+			{
+				"input": "",
+				"output": "throw"
+			}
+		]
+	}
+	
+]

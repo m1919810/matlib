@@ -15,7 +15,6 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-
 import me.matl114.matlib.utils.reflect.ASMUtils;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 import me.matl114.matlib.utils.reflect.asm.CustomClassLoader;
@@ -26,7 +25,6 @@ import org.objectweb.asm.*;
 
 @SuppressWarnings("all")
 public class ClassBuilder {
-
 
     /**
      * flag, whether to set up try-catch block in MethodHandle invocation

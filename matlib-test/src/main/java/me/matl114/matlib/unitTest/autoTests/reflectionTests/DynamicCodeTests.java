@@ -2,11 +2,12 @@ package me.matl114.matlib.unitTest.autoTests.reflectionTests;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
+import me.matl114.matlib.common.functions.core.TriConsumer;
 import me.matl114.matlib.nmsUtils.ItemUtils;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;
@@ -19,11 +20,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class DynamicCodeTests implements TestCase {
-    MethodHandle methodHandle = new InitializeSafeProvider<>(() -> {
-                return MethodHandles.privateLookupIn(DemoFinal.class, MethodHandles.lookup())
-                        .unreflect(DemoFinal.class.getDeclaredMethod("getBoolean"));
-            })
-            .v();
+    MethodHandle methodHandle =
+            Objects.requireNonNull(ReflectUtils.getMethodHandlePrivate(DemoFinal.class, "getBoolean"));
 
     @OnlineTest(name = "lambda factory tests")
     public void test_lambdafactory() throws Throwable {
@@ -89,8 +87,21 @@ public class DynamicCodeTests implements TestCase {
         Assert(!nextId.getAsBoolean());
         Debug.logger("check code");
 
+        Debug.logger("test lambda boxing and unboxing");
         // need test: lambda build for fields
         // make lambda factory util
         //        Debug.logger(new String(new ClassReader()));
+        TriConsumer<Object, Integer, Object> unboxingLambda = DynamicCodeTests::test_unboxing_method;
+        Itf boxingLambda = DynamicCodeTests::test_boxing_method;
+    }
+
+    private Integer a;
+
+    public static void test_unboxing_method(Object a, int b, Object c) {}
+
+    public static void test_boxing_method(Object a, Integer b, Object c) {}
+
+    public static interface Itf {
+        void f(Object a, int b, Object c);
     }
 }

@@ -4,12 +4,10 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeProvider;
 import me.matl114.matlib.algorithms.dataStructures.struct.LazyInitValue;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 import me.matl114.matlib.utils.reflect.internal.SimpleObfManager;
-import me.matl114.matlib.utils.reflect.internal.SimpleObfManagerImpl;
 
 @SuppressWarnings("all")
 public interface ObfManager extends SimpleObfManager {
@@ -20,7 +18,7 @@ public interface ObfManager extends SimpleObfManager {
     static LazyInitValue<ObfManager> manager = LazyInitValue.ofLazy(() -> {
         try {
             ObfManager manager1 = new ObfManagerImpl();
-            //inject into SimpleObfManager
+            // inject into SimpleObfManager
             SimpleObfManager.manager.set(manager1);
             return manager1;
         } catch (Throwable e) {
@@ -31,18 +29,17 @@ public interface ObfManager extends SimpleObfManager {
         }
     });
 
-
-//    ObfManager manager = new InitializeProvider<>(() -> {
-//                try {
-//                    return new ObfManagerImpl();
-//                } catch (Throwable e) {
-//                    var e1 = e.getCause();
-//                    Debug.logger(e1 != null ? e1 : e, "Error while creating ObfManagerImpl:");
-//                    Debug.logger("Using Default Impl");
-//                    return new DefaultImpl();
-//                }
-//            })
-//            .v();
+    //    ObfManager manager = new InitializeProvider<>(() -> {
+    //                try {
+    //                    return new ObfManagerImpl();
+    //                } catch (Throwable e) {
+    //                    var e1 = e.getCause();
+    //                    Debug.logger(e1 != null ? e1 : e, "Error while creating ObfManagerImpl:");
+    //                    Debug.logger("Using Default Impl");
+    //                    return new DefaultImpl();
+    //                }
+    //            })
+    //            .v();
 
     public String deobfFieldInClass(String mojangClassName, String obfFieldDescriptor);
 

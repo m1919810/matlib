@@ -53,7 +53,6 @@ public final class Pair<A extends Object, B extends Object> implements Cloneable
         return result;
     }
 
-
     @Nonnull
     public String toString() {
         return "Pair(a=" + this.a + ", b=" + this.b + ")";

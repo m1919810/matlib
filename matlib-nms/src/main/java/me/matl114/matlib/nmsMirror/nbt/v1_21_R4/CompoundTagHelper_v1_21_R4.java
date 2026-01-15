@@ -88,4 +88,5 @@ public interface CompoundTagHelper_v1_21_R4 extends CompoundTagHelper {
         Object val = get(nbt, key);
         return val == null ? newComp() : (TAGS.getId(val) == TagEnum.TAG_COMPOUND ? val : newComp());
     }
+    //todo: support newer UUID method and UID STRING CODEC
 }

@@ -1,7 +1,5 @@
 package me.matl114.matlib.slimefunUtils;
 
-import static me.matl114.matlib.utils.AddUtils.getCopy;
-
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;

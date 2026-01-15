@@ -139,7 +139,8 @@ public class TagCompoundView implements PersistentDataContainer {
             if (tags0 != null) {
                 Object customDataTags = view.compoundTagViews.getWritable();
                 if (b) {
-                    NMSCore.COMPOUND_TAG.tagsGetter(customDataTags).putAll((Map) NMSCore.COMPOUND_TAG.tagsGetter(tags0));
+                    NMSCore.COMPOUND_TAG.tagsGetter(customDataTags).putAll((Map)
+                            NMSCore.COMPOUND_TAG.tagsGetter(tags0));
                 } else {
                     Map map = NMSCore.COMPOUND_TAG.tagsGetter(customDataTags);
                     NMSCore.COMPOUND_TAG.tagsGetter(tags0).forEach((k, v) -> map.putIfAbsent(k, v));

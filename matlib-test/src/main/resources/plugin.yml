@@ -21,9 +21,8 @@ api-version: '1.20'
 
 ## 指定 Slimefun 作为依赖项，必须
 
-depend:
-  - Slimefun
 softdepend:
+  - Slimefun
   - GuizhanLibPlugin
 
 

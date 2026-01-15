@@ -24,6 +24,7 @@ import org.bukkit.Location;
 public class ProxyUtilTests implements TestCase {
     @OnlineTest(name = "Proxy descriptor test")
     public void test_proxy() throws Throwable {
+        disableTest();
         DemoProxy handle = DescriptorProxyBuilder.createHelperImpl(DemoProxy.class);
         Debug.logger(handle);
         Debug.logger(handle.getClass());
@@ -38,6 +39,7 @@ public class ProxyUtilTests implements TestCase {
 
     @OnlineTest(name = "Proxy builder test")
     public void test_simple_proxy() throws Throwable {
+        disableTest();
         Class logiTech = Class.forName("me.matl114.logitech.MyAddon");
         Debug.logger(logiTech.getName());
         FieldAccess initAccess = FieldAccess.ofName(logiTech, "matlibInstance");

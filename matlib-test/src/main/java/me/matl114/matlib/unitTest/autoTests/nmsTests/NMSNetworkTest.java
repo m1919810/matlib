@@ -2,10 +2,10 @@ package me.matl114.matlib.unitTest.autoTests.nmsTests;
 
 import java.util.concurrent.FutureTask;
 import me.matl114.matlib.algorithms.algorithm.ExecutorUtils;
-import me.matl114.matlib.implement.nms.network.PacketEvent;
-import me.matl114.matlib.implement.nms.network.PacketEventManager;
-import me.matl114.matlib.implement.nms.network.PacketHandler;
-import me.matl114.matlib.implement.nms.network.PacketListener;
+import me.matl114.matlib.core.nms.network.PacketEvent;
+import me.matl114.matlib.core.nms.network.PacketEventManager;
+import me.matl114.matlib.core.nms.network.PacketHandler;
+import me.matl114.matlib.core.nms.network.PacketListener;
 import me.matl114.matlib.nmsUtils.network.GamePacket;
 import me.matl114.matlib.unitTest.OnlineTest;
 import me.matl114.matlib.unitTest.TestCase;

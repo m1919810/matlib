@@ -1,6 +1,6 @@
 package me.matl114.matlib.utils;
 
-import me.matl114.matlib.algorithms.dataStructures.frames.initBuidler.InitializeSafeProvider;
+import me.matl114.matlib.algorithms.dataStructures.struct.Holder;
 import me.matl114.matlib.common.lang.annotations.ForceOnMainThread;
 import me.matl114.matlib.common.lang.annotations.Note;
 import org.bukkit.block.Container;
@@ -12,8 +12,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 public class InventoryUtils {
-    private static final InventoryType PAPER_DECORATED_POT_TYPE =
-            new InitializeSafeProvider<>(() -> InventoryType.valueOf("DECORATED_POT"), null).v();
+    private static final InventoryType PAPER_DECORATED_POT_TYPE = Holder.of("DECORATED_POT")
+            .thenApplyCaught(InventoryType::valueOf)
+            .valException(null)
+            .get();
 
     /**
      * Checks if an inventory type is common and safe enough for setItem and getItem operations.

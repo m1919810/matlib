@@ -1,7 +1,6 @@
 package me.matl114.matlib.nmsUtils.chat.v1_21_R7;
 
 import javax.annotation.Nullable;
-
 import me.matl114.matlib.nmsMirror.Import;
 import me.matl114.matlib.nmsMirror.chat.FormatHelper;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectClass;
@@ -24,7 +23,9 @@ public interface FormatHelper_v1_21_R7 extends FormatHelper {
 
     @ConstructorTarget
     @RedirectClass(Import.FontAtlasSprite)
-    Object newAtlas(@RedirectType(Import.ResourceLocation) Object atlasId, @RedirectType(Import.ResourceLocation) Object spriteId);
+    Object newAtlas(
+            @RedirectType(Import.ResourceLocation) Object atlasId,
+            @RedirectType(Import.ResourceLocation) Object spriteId);
 
     @ConstructorTarget
     @RedirectClass(Import.FontResource)
