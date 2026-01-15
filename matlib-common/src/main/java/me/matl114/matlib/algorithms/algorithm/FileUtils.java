@@ -13,6 +13,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Map;
+
+import org.bukkit.plugin.Plugin;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -121,6 +123,19 @@ public class FileUtils {
         File toFile = new File(to);
         ensureParentDir(toFile);
         Files.copy(clazz.getResourceAsStream("/" + resource), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public static File ensureConfigExists(String pathName, Plugin plugin){
+        try{
+            String filePath = "plugins/" + plugin.getName().replace(" ", "_") + "/" + pathName;
+            File file = new File(filePath);
+            if(!file.exists() || !file.isFile()){
+                FileUtils.copyFile(plugin.getClass(), pathName, filePath);
+            }
+            return file;
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     /**

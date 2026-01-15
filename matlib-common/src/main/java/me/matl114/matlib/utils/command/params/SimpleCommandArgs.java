@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 
 public class SimpleCommandArgs {
@@ -40,12 +41,40 @@ public class SimpleCommandArgs {
             return tabCompletor.get();
         }
     }
+    @Accessors(fluent = true, chain = true)
+    @Getter
+    @Setter
+    public static class ArgumentBuilder {
+        String name;
+        String defaultValue;
+        Supplier<List<String>> tabCompletor = List::of;
+
+        Set<String> alias = new HashSet<>();
+
+        public ArgumentBuilder alias(String alias) {
+            this.alias.add(alias);
+            return this;
+        }
+
+        public Argument build(){
+            var arg = new Argument(name);
+            arg.setDefaultValue(defaultValue);
+            arg.tabCompletor = tabCompletor;
+            arg.argsAlias.addAll(alias);
+            return arg;
+        }
+    }
+
 
     @Getter
     Argument[] args;
 
     public SimpleCommandArgs(String... args) {
         this.args = Arrays.stream(args).map(Argument::new).toArray(Argument[]::new);
+    }
+
+    public SimpleCommandArgs(Argument... args) {
+        this.args = args;
     }
 
     public void setDefault(String arg, String defaultValue) {

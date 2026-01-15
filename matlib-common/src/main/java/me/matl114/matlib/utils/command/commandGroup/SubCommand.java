@@ -1,9 +1,8 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -11,11 +10,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
+import me.matl114.matlib.algorithms.dataStructures.struct.Triplet;
+import me.matl114.matlib.common.functions.core.TriFunction;
 import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.params.CommandArgumentMap;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
@@ -32,6 +34,95 @@ import org.bukkit.command.TabExecutor;
  * The class implements TabExecutor to provide tab completion functionality.</p>
  */
 public class SubCommand implements CustomTabExecutor {
+    public static class Builder<T extends SubCommand>{
+        List<SimpleCommandArgs.Argument> argsMap = new ArrayList<>();
+        String name;
+        List<String> helpers = new ArrayList<>();
+        String permission;
+        TabExecutor tabExecutor;
+        TriFunction<String, SimpleCommandArgs, String[],T> builder;
+        public Builder(TriFunction<String, SimpleCommandArgs, String[], T> builder){
+            this.builder = builder;
+        }
+        public Builder(Builder<T> builder){
+            this.argsMap.addAll(builder.argsMap);
+            this.helpers.addAll(builder.helpers);
+            this.permission = builder.permission;
+            this.tabExecutor = builder.tabExecutor;
+            this.builder = builder.builder;
+            this.name = builder.name;
+        }
+        public Builder<T> name(String name){
+            this.name = name;
+            return this;
+        }
+        public Builder<T> helpers(List<String> helpers){
+            this.helpers.addAll(helpers);
+            return this;
+        }
+        public Builder<T> helper(String helper){
+            this.helpers.add(helper);
+            return this;
+        }
+
+        public Builder<T> permission(String permission){
+            this.permission = permission;
+            return this;
+        }
+
+        public Builder<T> delegate(TabExecutor tabExecutor){
+            this.tabExecutor = tabExecutor;
+            return this;
+        }
+
+
+
+        private void postBuild(SubCommand command){
+            if(permission != null){
+                command.setPermission(permission);
+            }
+            if(tabExecutor != null){
+                command.setCommandExecutor(tabExecutor);
+            }
+        }
+
+
+        public Builder<T> arg(SimpleCommandArgs.Argument arg){
+            argsMap.add(arg);
+            return this;
+        }
+
+        public Builder<T> args(UnaryOperator<SimpleCommandArgs.ArgumentBuilder> arg){
+            var builder = new SimpleCommandArgs.ArgumentBuilder();
+            arg.apply(builder);
+            argsMap.add(builder.build());
+            return this;
+        }
+        public T build(){
+            T command = this.builder.apply(name, new SimpleCommandArgs(this.argsMap.toArray(SimpleCommandArgs.Argument[]::new)), helpers.toArray(String[]::new));
+            postBuild(command);
+            return command;
+        }
+
+        public <W extends SubCommand> W build(TriFunction<String, SimpleCommandArgs, String[],W> builder){
+            W command = builder.apply(name, new SimpleCommandArgs(this.argsMap.toArray(SimpleCommandArgs.Argument[]::new)), helpers.toArray(String[]::new));
+            postBuild(command);
+            return command;
+        }
+    }
+
+
+    public static Builder<SubCommand> emptyBuilder(){
+        return new Builder<>(SubCommand::new);
+    }
+
+    public static Builder<TaskSubCommand> taskBuilder(){
+        return new Builder<>(TaskSubCommand::new);
+    }
+
+    public static Builder<TreeSubCommand> treeBuilder(){
+        return new Builder<>((a, b, c)-> new TreeSubCommand(a, c));
+    }
 
     /**
      * Handles tab completion for this sub-command.
@@ -137,6 +228,7 @@ public class SubCommand implements CustomTabExecutor {
         this.template = argsTemplate;
         this.help = help;
     }
+
 
     /**
      * Creates a new SubCommand with the specified name, argument template, and help text.
