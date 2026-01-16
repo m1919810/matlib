@@ -15,6 +15,7 @@ import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.TextUtils;
 import me.matl114.matlib.utils.command.commandGroup.AbstractMainCommand;
 import me.matl114.matlib.utils.command.commandGroup.SubCommand;
+import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
@@ -201,51 +202,72 @@ public class TestRunner extends AbstractMainCommand implements Manager {
         return "matlib.test.op";
     }
 
-
-    private final SubCommand mainCommand = genMainCommand("matlib");
-
-    private final SubCommand runMainTest = new SubCommand("runmain", new SimpleCommandArgs("test"), "...") {
-        @Override
-        public boolean onCommand(CommandSender var1, Command var2, String var3, String[] var4) {
-
-            String val = var4[0];
-            var re = testCases.get(val);
-            if (re == null) {
-                TextUtils.sendMessage(var1, "&cTest case not found, run all");
-                ScheduleManager.getManager().launchScheduled(TestRunner.this::runAutomaticTests, 10, false, 0);
-            } else {
-                ScheduleManager.getManager().launchScheduled(() -> runAutomaticTests(List.of(re.getA())), 10, false, 0);
-            }
-
-            return true;
+    {
+        mainBuilder()
+            .name("matlib")
+            .build()
+            .subBuilder(
+                SubCommand.taskBuilder()
+                    .name("runmain")
+            )
+                .args(
+                    b -> b.name("test")
+                        .defaultValue("null")
+                        .tabSupplier(()-> this.testCases.keySet().stream())
+                )
+                .helper("执行自动测试项")
+                .post(run -> run.executor(this::executeMain))
+            .complete()
+            .subBuilder(
+                SubCommand.taskBuilder()
+                    .name("exetest")
+            )
+                .args(
+                    b -> b.name("testcase")
+                        .defaultValue("null")
+                        .tabSupplier(()-> this.manuallyExecutedCase.keySet().stream())
+                )
+                .helper("执行手动测试项")
+                .post(run -> run.executor(this::executeManual))
+            .complete()
+        ;
+    }
+    private boolean executeMain(CommandSender sender, SimpleCommandInputStream args, ArgumentReader reader){
+        String val = args.nextArg();
+        var re = testCases.get(val);
+        if (re == null) {
+            TextUtils.sendMessage(sender, "&cTest case not found, run all");
+            ScheduleManager.getManager().launchScheduled(TestRunner.this::runAutomaticTests, 10, false, 0);
+        } else {
+            ScheduleManager.getManager().launchScheduled(() -> runAutomaticTests(List.of(re.getA())), 10, false, 0);
         }
-    }.setTabCompletor("test", () -> this.testCases.keySet().stream().toList()).register(this);
-
-    private final SubCommand runManuallyOne = new SubCommand("exetest", new SimpleCommandArgs("testcase"), "...") {
-        public boolean onCommand(CommandSender var1, Command var2, String var3, String[] var4) {
-            var result = parseInput(var4);
-            String testcase = result.getA().nextArg();
-            var re = TestRunner.this.manuallyExecutedCase.get(testcase);
-            if (re != null) {
-                ScheduleManager.getManager().execute(() -> runManualTests(var1, List.of(re.getA()), result.getB()));
+        return true;
+    }
+    private boolean executeManual(CommandSender sender, SimpleCommandInputStream args, ArgumentReader reader){
+        String testcase = args.nextArg();
+        var re = TestRunner.this.manuallyExecutedCase.get(testcase);
+        if (re != null) {
+            ScheduleManager.getManager().execute(() -> runManualTests(sender, List.of(re.getA()), reader.getRemainingArgs()));
+        } else {
+            if ("all".equals(testcase)) {
+                ScheduleManager.getManager()
+                    .execute(() -> runManualTests(
+                        sender,
+                        manuallyExecutedCase.values().stream()
+                            .map(Pair::getA)
+                            .toList(),
+                        reader.getRemainingArgs()));
             } else {
-                if ("all".equals(testcase)) {
-                    ScheduleManager.getManager()
-                            .execute(() -> runManualTests(
-                                    var1,
-                                    manuallyExecutedCase.values().stream()
-                                            .map(Pair::getA)
-                                            .toList(),
-                                    result.getB()));
-                } else {
-                    AddUtils.sendMessage(var1, "&cTest case not found");
-                }
+                AddUtils.sendMessage(sender, "&cTest case not found");
             }
-            return true;
         }
-    }.setTabCompletor("testcase", () -> this.manuallyExecutedCase.keySet().stream()
-                    .toList())
-            .register(this);
+        return true;
+    }
+
+
+
+
+
 
     public interface TestRunnable extends Runnable {
         default void execute() {

@@ -1,6 +1,7 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
@@ -10,7 +11,9 @@ import lombok.Getter;
 import lombok.Setter;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.functions.core.TriFunction;
+import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.utils.command.CommandUtils;
+import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.CommandArgumentMap;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
@@ -30,13 +33,14 @@ import org.bukkit.command.TabExecutor;
  * <p>Each SubCommand has a name, help text, argument template, and optional executor.
  * The class implements TabExecutor to provide tab completion functionality.</p>
  */
-public class SubCommand implements CustomTabExecutor {
+public abstract class SubCommand implements CustomTabExecutor {
     public static class Builder<T extends SubCommand>{
         List<SimpleCommandArgs.Argument> argsMap = new ArrayList<>();
         String name;
         List<String> helpers = new ArrayList<>();
         String permission;
         TabExecutor tabExecutor;
+        List<Consumer<T>> posts = new ArrayList<>();
         TriFunction<String, SimpleCommandArgs, String[],T> builder;
         public Builder(TriFunction<String, SimpleCommandArgs, String[], T> builder){
             this.builder = builder;
@@ -57,6 +61,11 @@ public class SubCommand implements CustomTabExecutor {
             this.helpers.addAll(helpers);
             return this;
         }
+
+        public Builder<T> helpers(String... helpers){
+            this.helpers.addAll(Arrays.asList(helpers));
+            return this;
+        }
         public Builder<T> helper(String helper){
             this.helpers.add(helper);
             return this;
@@ -67,20 +76,16 @@ public class SubCommand implements CustomTabExecutor {
             return this;
         }
 
-        public Builder<T> delegate(TabExecutor tabExecutor){
-            this.tabExecutor = tabExecutor;
-            return this;
-        }
-
-
-
-        private void postBuild(SubCommand command){
+        private void postBuild(T command){
             if(permission != null){
                 command.setPermission(permission);
             }
-            if(tabExecutor != null){
-                command.setCommandExecutor(tabExecutor);
-            }
+            posts.forEach(s -> s.accept(command));
+        }
+
+        public Builder<T> post(Consumer<T> postTask){
+            posts.add(postTask);
+            return this;
         }
 
 
@@ -103,14 +108,14 @@ public class SubCommand implements CustomTabExecutor {
 
         public <W extends SubCommand> W build(TriFunction<String, SimpleCommandArgs, String[],W> builder){
             W command = builder.apply(name, new SimpleCommandArgs(this.argsMap.toArray(SimpleCommandArgs.Argument[]::new)), helpers.toArray(String[]::new));
-            postBuild(command);
+            postBuild((T) command);
             return command;
         }
     }
 
 
     public static Builder<SubCommand> emptyBuilder(){
-        return new Builder<>(SubCommand::new);
+        return new Builder<>(TaskSubCommand::new);
     }
 
     public static Builder<TaskSubCommand> taskBuilder(){
@@ -121,30 +126,10 @@ public class SubCommand implements CustomTabExecutor {
         return new Builder<>((a, b, c)-> new TreeSubCommand(a, c));
     }
 
-    /**
-     * Handles tab completion for this sub-command.
-     * If a custom executor is set, delegates to that executor. Otherwise,
-     * uses the argument template to provide tab completion suggestions.
-     *
-     * @param commandSender The sender requesting tab completion
-     * @param command The command being executed
-     * @param s The command alias
-     * @param elseArg The arguments provided so far
-     * @return A list of tab completion suggestions, or empty list if none available
-     */
-    @Nullable @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] elseArg) {
-        if (executor != this) {
-            return executor.onTabComplete(commandSender, command, s, elseArg);
-        } else {
-            var tab = this.parseInput(elseArg).getA();
-            if (tab != null) {
-                return tab.getTabComplete();
-            } else {
-                return List.of();
-            }
-        }
+    public static <W extends SubCommand> Builder<W> factoryBuilder(TriFunction<String, SimpleCommandArgs, String[], W> factory){
+        return new Builder<>(factory);
     }
+
 
     @Nullable
     @Override
@@ -177,6 +162,9 @@ public class SubCommand implements CustomTabExecutor {
 
 
     }
+
+
+
     public static class SubBuilder<R extends SubCommandCaller ,W extends SubCommand> extends Builder<W>{
         R treeSubCommand;
         protected SubBuilder(R root, Builder<W> builder) {
@@ -193,6 +181,49 @@ public class SubCommand implements CustomTabExecutor {
         public <S extends SubCommandCaller> SubBuilder<S, W> cast(){
             return (SubBuilder<S, W>) this;
         }
+
+        public SubBuilder<R,W> name(String name){
+            super.name(name);
+            return this;
+        }
+        public SubBuilder<R, W> helpers(List<String> helpers){
+            super.helpers(helpers);
+            return this;
+        }
+        public SubBuilder<R, W> helpers(String... helpers){
+            super.helpers(helpers);
+            return this;
+        }
+        public SubBuilder<R, W> helper(String helper){
+            super.helper(helper);
+            return this;
+        }
+
+        public SubBuilder<R, W> permission(String permission){
+            super.permission(permission);
+            return this;
+        }
+
+        public SubBuilder<R,W> post(Consumer<W> postTask){
+            super.post(postTask);
+            return this;
+        }
+
+
+
+
+
+        public SubBuilder<R, W> arg(SimpleCommandArgs.Argument arg){
+            super.arg(arg);
+            return this;
+        }
+
+        public SubBuilder<R, W> args(UnaryOperator<SimpleCommandArgs.ArgumentBuilder> arg){
+            super.args(arg);
+            return this;
+        }
+
+
     }
 
     /** Help text lines for this sub-command */
@@ -206,10 +237,6 @@ public class SubCommand implements CustomTabExecutor {
     @Getter
     String name;
 
-    /** Executor responsible for handling command execution */
-    @Getter
-    @Nonnull
-    TabExecutor executor = this;
 
     @Setter
     String permission;
@@ -219,23 +246,6 @@ public class SubCommand implements CustomTabExecutor {
 
 
 
-    /**
-     * Handles command execution for this sub-command.
-     * By default, returns true (success). Override this method to implement
-     * custom command logic.
-     *
-     * @param var1 The command sender
-     * @param var2 The command being executed
-     * @param var3 The command alias
-     * @param var4 The command arguments
-     * @return true if the command was executed successfully, false otherwise
-     */
-    public boolean onCommand(CommandSender var1, Command var2, String var3, String[] var4) {
-        if(this.executor != this){
-            return this.executor.onCommand(var1, var2, var3, var4);
-        }
-        return true;
-    }
 
     /**
      * Creates a new SubCommand with the specified name, argument template, and help text.
@@ -300,7 +310,15 @@ public class SubCommand implements CustomTabExecutor {
      * @return A pair containing the parsed input stream and remaining arguments
      */
     @Nonnull
+    @Deprecated(forRemoval = true)
     public Pair<SimpleCommandInputStream, String[]> parseInput(String[] args) {
+        ArgumentReader reader = new ArgumentReader(args);
+        var re = template.parseInputStream(reader);
+        return new Pair<>(re, reader.getRemainingArgs());
+    }
+
+    @Nonnull
+    public SimpleCommandInputStream parseInput(ArgumentReader args) {
         return template.parseInputStream(args);
     }
 
@@ -440,15 +458,5 @@ public class SubCommand implements CustomTabExecutor {
         return this;
     }
 
-    /**
-     * Sets a custom executor for this sub-command.
-     * The executor will handle both command execution and tab completion.
-     *
-     * @param executor The TabExecutor to use for this sub-command
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setCommandExecutor(@Nonnull TabExecutor executor) {
-        this.executor = executor;
-        return this;
-    }
+
 }

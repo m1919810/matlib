@@ -1,5 +1,6 @@
 package me.matl114.matlib.utils.command.interruption;
 
+import me.matl114.matlib.common.lang.exceptions.Abort;
 import me.matl114.matlib.common.lang.exceptions.RuntimeAbort;
 import org.bukkit.command.CommandSender;
 

@@ -1,11 +1,18 @@
 package me.matl114.matlib.utils.command.params;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.google.common.collect.Streams;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import me.matl114.matlib.algorithms.algorithm.FuncUtils;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
+import org.bukkit.command.CommandSender;
 
 public class SimpleCommandArgs {
     //todo: add Argument type,  consume more args
@@ -20,7 +27,7 @@ public class SimpleCommandArgs {
         @Setter
         private String defaultValue = null;
 
-        public Supplier<List<String>> tabCompletor = List::of;
+        public Function<CommandSender, List<String>> tabCompletor = (p)->List.of();
 
         public Argument(String argsName) {
             this.argsName = argsName;
@@ -37,9 +44,10 @@ public class SimpleCommandArgs {
             return argsAlias.contains(arg);
         }
 
-        public List<String> getTab() {
-            return tabCompletor.get();
+        public List<String> getTab(CommandSender sender) {
+            return tabCompletor.apply(sender);
         }
+
     }
     @Accessors(fluent = true, chain = true)
     @Getter
@@ -47,7 +55,17 @@ public class SimpleCommandArgs {
     public static class ArgumentBuilder {
         String name;
         String defaultValue;
-        Supplier<List<String>> tabCompletor = List::of;
+        List<Function<CommandSender, Stream<String>>> tabCompletor = new ArrayList<>();
+
+        public ArgumentBuilder tabSupplier(Supplier<Stream<String>> list){
+            tabCompletor.add((p)-> list.get());
+            return this;
+        }
+
+        public ArgumentBuilder tabCompletor(Function<CommandSender, Stream<String>> list){
+            tabCompletor.add(list);
+            return this;
+        }
 
         Set<String> alias = new HashSet<>();
 
@@ -59,7 +77,13 @@ public class SimpleCommandArgs {
         public Argument build(){
             var arg = new Argument(name);
             arg.setDefaultValue(defaultValue);
-            arg.tabCompletor = tabCompletor;
+            arg.tabCompletor = (cmd)->{
+                List<String> strings = new ArrayList<>();
+                for (var en : tabCompletor){
+                    en.apply(cmd).forEach(strings::add);
+                }
+                return strings;
+            };
             arg.argsAlias.addAll(alias);
             return arg;
         }
@@ -88,17 +112,25 @@ public class SimpleCommandArgs {
     public void setTabCompletor(String arg, Supplier<List<String>> tabCompletor) {
         for (Argument a : args) {
             if (a.argsName.equals(arg)) {
+                a.tabCompletor =  (o)-> tabCompletor.get();
+            }
+        }
+    }
+
+    public void setTabCompletor(String arg, Function<CommandSender, List<String>> tabCompletor) {
+        for (Argument a : args) {
+            if (a.argsName.equals(arg)) {
                 a.tabCompletor = tabCompletor;
             }
         }
     }
 
-    public Pair<SimpleCommandInputStream, String[]> parseInputStream(String[] input) {
-        List<String> commonArgs = new ArrayList<>();
+    public SimpleCommandInputStream parseInputStream(ArgumentReader reader) {
         final HashMap<Argument, String> argsMap = new HashMap<>();
-        Iterator<String> iter = Arrays.stream(input).iterator();
-        while (iter.hasNext()) {
-            String arg = iter.next();
+//        Iterator<String> iter = Arrays.stream(input).iterator();
+        List<Argument> argSet = Arrays.stream(args).collect(Collectors.toCollection(ArrayList::new));
+        while (reader.hasNext() && !argSet.isEmpty()) {
+            String arg = reader.next();
             if (arg.startsWith("-")) {
                 Argument selected = null;
                 String trueName = arg.replaceFirst("^-+", "");
@@ -109,10 +141,11 @@ public class SimpleCommandArgs {
                     }
                 }
                 if (selected != null) {
+                    argSet.remove(selected);
                     if (arg.startsWith("--")) {
                         // --args inputValue
-                        if (iter.hasNext()) {
-                            String arg2 = iter.next();
+                        if (reader.hasNext()) {
+                            String arg2 = reader.next();
 
                             argsMap.put(selected, arg2);
                         }
@@ -122,20 +155,14 @@ public class SimpleCommandArgs {
                     }
 
                 } else {
-                    // 输入了一个无效参数 加入commonArgs
-                    commonArgs.add(arg);
+                    //the argument is broken, expect a argument but no argument is here
+                    break;
                 }
             } else {
-                commonArgs.add(arg);
+                Argument selected = argSet.remove(0);
+                argsMap.put(selected, arg);
             }
         }
-        for (Argument a : args) {
-            if (!argsMap.containsKey(a)) {
-                if (!commonArgs.isEmpty()) {
-                    argsMap.put(a, commonArgs.remove(0));
-                }
-            }
-        }
-        return new Pair<>(new SimpleCommandInputStream(args, argsMap), commonArgs.toArray(String[]::new));
+        return new SimpleCommandInputStream(args, argsMap);
     }
 }

@@ -1,0 +1,67 @@
+package me.matl114.matlib.utils.command.params;
+
+public class ArgumentReader {
+    String[] args;
+    int currentCursor;
+
+    public ArgumentReader(String command, String[] args) {
+        this.args = new String[args.length + 1];
+        System.arraycopy(args, 0, this.args, 1, args.length);
+        //replace the name with our main command name
+        this.args[0] = command;
+        this.currentCursor = 1;
+    }
+
+
+    public String peekPosition(int index){
+        return args[index];
+    }
+
+    public ArgumentReader(String[] args) {
+        this.args = args;
+        this.currentCursor = 0;
+    }
+    public boolean hasNext(){
+        return currentCursor < args.length;
+    }
+    public String next(){
+        String arg = args[currentCursor];
+        currentCursor++;
+        return arg;
+    }
+
+    public String peek(){
+        return args[currentCursor];
+    }
+
+    public ArgumentReader skip(){
+        currentCursor++;
+        return this;
+    }
+
+    public ArgumentReader stepBack(){
+        currentCursor--;
+        return this;
+    }
+
+    public String getRemainingArgStr(){
+        return String.join(" ", getRemainingArgs());
+    }
+
+    public String[] getRemainingArgs(){
+        String[] remainingArgs = new String[args.length-currentCursor];
+        System.arraycopy(args, currentCursor, remainingArgs, 0, remainingArgs.length);
+        return remainingArgs;
+    }
+
+    public String getAlreadyReadArgStr(){
+        return String.join(" ", getAlreadyReadArgs());
+    }
+
+    public String[] getAlreadyReadArgs(){
+        String[] remainingArgs = new String[currentCursor];
+        System.arraycopy(args, 0, remainingArgs, 0, remainingArgs.length);
+        return remainingArgs;
+    }
+
+}

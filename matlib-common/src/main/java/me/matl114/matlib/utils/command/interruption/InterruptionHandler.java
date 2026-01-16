@@ -2,6 +2,8 @@ package me.matl114.matlib.utils.command.interruption;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import me.matl114.matlib.utils.command.params.ArgumentReader;
 import org.bukkit.command.CommandSender;
 
 public interface InterruptionHandler {
@@ -20,9 +22,9 @@ public interface InterruptionHandler {
 
     public void handleExecutorInvalid(CommandSender sender, boolean shouldConsole);
 
-    public void handlePermissionDenied(CommandSender sender, String permission, @Nullable String commandNodeName);
+    public void handlePermissionDenied(CommandSender sender, String permission, ArgumentReader reader);
 
     public void handleLogicalError(CommandSender sender, String fullMessage);
 
-    public void handleWrongArgumentFormat(CommandSender sender, String command, String[] arguments);
+    public void handleUnexpectedArgument(CommandSender sender, ArgumentReader reader);
 }

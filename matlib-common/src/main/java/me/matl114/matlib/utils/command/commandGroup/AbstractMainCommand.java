@@ -2,28 +2,30 @@ package me.matl114.matlib.utils.command.commandGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-import java.lang.reflect.Field;
+
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import lombok.Getter;
-import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.command.interruption.*;
+import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Abstract base class for main commands that can contain multiple sub-commands.
+ * Abstract base class for root commands that can contain multiple sub-commands.
  * This class provides a complete command framework with sub-command management,
  * permission handling, argument parsing, and error handling capabilities.
  *
@@ -34,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>Key features include:</p>
  * <ul>
  *   <li>Sub-command registration and management</li>
- *   <li>Permission checking at both main and sub-command levels</li>
+ *   <li>Permission checking at both root and sub-command levels</li>
  *   <li>Automatic help generation</li>
  *   <li>Tab completion for sub-commands and arguments</li>
  *   <li>Error handling with user-friendly messages</li>
@@ -42,16 +44,19 @@ import org.jetbrains.annotations.NotNull;
  * </ul>
  *
  * <p>To use this class, extend it and implement the abstract methods.
- * The main command should be defined as a field named "mainCommand" in the subclass.</p>
+ * The root command should be defined as a field named "mainCommand" in the subclass.</p>
  */
-public abstract class AbstractMainCommand implements SubCommandDispatcher, InterruptionHandler {
+public abstract class AbstractMainCommand implements TabExecutor, SubCommandDispatcher, InterruptionHandler {
 
-    /** Collection of registered sub-commands, maintaining insertion order */
-    @Getter
-    private LinkedHashSet<SubCommand> subCommands = new LinkedHashSet<>();
+    /** Internal reference to the root command */
+    private TreeSubCommand root;
 
-    /** Internal reference to the main command */
-    private SubCommand mainInternal;
+    protected SubCommand.Builder<TreeSubCommand> mainBuilder(){
+        return SubCommand.factoryBuilder((a, b, c)->{
+            root = new TreeSubCommand(a, c);
+            return root;
+        });
+    }
 
     /** Whether this command has been registered with the plugin */
     private boolean registered = false;
@@ -115,12 +120,12 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
      * @return The sub-command with the specified name, or null if not found
      */
     public SubCommand getSubCommand(String name) {
-        for (SubCommand command : subCommands) {
-            if (command.getName().equalsIgnoreCase(name)) {
-                return command;
-            }
-        }
-        return null;
+        return getMainCommand().getSubCommand(name);
+    }
+
+    @Override
+    public Collection<SubCommand> getSubCommands() {
+        return getMainCommand().getSubCommands();
     }
 
     /**
@@ -130,89 +135,72 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
      * @return A list of visible sub-command names
      */
     public List<String> getDisplayedSubCommand() {
-        return this.subCommands.stream()
+        return this.getSubCommands().stream()
                 .filter(SubCommand::isVisiable)
                 .map(SubCommand::getName)
                 .toList();
     }
 
     /**
-     * Generates a main command with the specified name.
-     * The main command uses a special "_operation" argument for sub-command selection.
+     * Generates a root command with the specified name.
+     * The root command uses a special "_operation" argument for sub-command selection.
      *
-     * @param name The name of the main command
-     * @return A SubCommand instance configured as the main command
+     * @param name The name of the root command
+     * @return A SubCommand instance configured as the root command
      */
+    @Deprecated
     protected SubCommand genMainCommand(String name) {
-        return new SubCommand(name, genArgument("_operation"), "")
-                .setTabCompletor("_operation", this::getDisplayedSubCommand);
+        return new TreeSubCommand(name);
     }
 
     /**
-     * Registers a sub-command with this main command.
+     * Registers a sub-command with this root command.
      *
      * @param command The sub-command to register
      */
     @Override
     public void registerSub(SubCommand command) {
-        this.subCommands.add(command);
+        this.root.registerSub(command);
     }
 
+
     /**
-     * Gets the internal main command reference.
-     * This method uses reflection to find the "mainCommand" field in the subclass.
+     * Gets the root command for this command group.
      *
-     * @return The main command SubCommand instance
+     * @return The root command SubCommand instance
      */
-    private SubCommand getMainInternal() {
-        if (mainInternal == null) {
-            try {
-                Field field = this.getClass().getDeclaredField("mainCommand");
-                field.setAccessible(true);
-                mainInternal = (SubCommand) field.get(this);
-            } catch (Throwable e) {
-                Debug.info("Error in " + this.getClass().getName() + ": main Command Not Found");
-                e.printStackTrace();
-            }
+    public TreeSubCommand getMainCommand() {
+        if (root == null) {
+            throw new IllegalStateException("Access to root delegate before it is built");
         }
-        return mainInternal;
+        return root;
     }
 
     /**
-     * Gets the main command for this command group.
+     * Gets the name of the root command.
      *
-     * @return The main command SubCommand instance
-     */
-    public SubCommand getMainCommand() {
-        return getMainInternal();
-    }
-
-    /**
-     * Gets the name of the main command.
-     *
-     * @return The name of the main command
+     * @return The name of the root command
      */
     public String getMainName() {
-        return getMainInternal().getName();
+        return getMainCommand().getName();
     }
 
     public String getName() {
         return getMainName();
     }
 
-    @NotNull
-    @Override
-    public Pair<SimpleCommandInputStream, String[]> parseInput(String[] args) {
-        return getMainCommand().parseInput(args);
+
+    public SimpleCommandInputStream parseInput(ArgumentReader reader){
+        return (getMainCommand()).parseInput(reader);
     }
 
     /**
-     * Handles command execution for the main command.
+     * Handles command execution for the root command.
      * This method routes commands to appropriate sub-commands based on the first argument.
      *
      * <p>The execution flow:</p>
      * <ol>
-     *   <li>Check main command permission</li>
+     *   <li>Check root command permission</li>
      *   <li>Parse the first argument as sub-command name</li>
      *   <li>Find and validate the sub-command</li>
      *   <li>Check sub-command permission</li>
@@ -228,21 +216,15 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
      * @return true if the command was executed successfully, false otherwise
      */
     public boolean onCommand(CommandSender var1, Command var2, String var3, String[] var4) {
-        if (hasPermission(var1)) {
-            try{
-                if (var4.length >= 1) {
-                    return SubCommandDispatcher.super.onCommand(var1, var2, var3, var4);
-                }
-            } catch (ArgumentException e){
-                e.handleAbort(var1, this);
-            }
-        } else {
-            noPermission(var1);
+        try{
+            return getMainCommand().onCustomCommand(var1, var2, new ArgumentReader(getMainName(), var4));
+        }catch (ArgumentException ex){
+            ex.handleAbort(var1, this);
         }
         return false;
     }
 
-    @Note("the \"async\" means that it can be called either on main or off main")
+    @Note("the \"async\" means that it can be called either on root or off root")
     public boolean onCommandAsync(
         @NotNull CommandSender var1, @NotNull Command var2, @NotNull String var3, @NotNull String[] var4) {
         return onCommand(var1, var2, var3, var4);
@@ -325,18 +307,18 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
         }
     }
 
-    public void handlePermissionDenied(CommandSender sender, String permission, @Nullable String commandNodeName) {
+    public void handlePermissionDenied(CommandSender sender, String permission, @Nullable ArgumentReader commandNodeName) {
         if (commandNodeName == null) {
             noPermission(sender);
         } else {
-            sendMessage(sender, "&c你没有权限使用: " + commandNodeName);
+            sendMessage(sender, "&c你没有权限使用: " + commandNodeName.getAlreadyReadArgStr());
         }
     }
-
     @Override
-    public void handleWrongArgumentFormat(CommandSender sender, String command, String[] arguments) {
-        showHelpCommand(sender, command);
+    public void handleUnexpectedArgument(CommandSender sender, ArgumentReader reader){
+        showHelpCommand(sender, reader.getAlreadyReadArgStr());
     }
+
 
     /**
      * Handles logical errors during command execution.
@@ -364,7 +346,7 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
 
     /**
      * Shows the help command with all visible sub-commands.
-     * Displays the main command usage and help text for each sub-command.
+     * Displays the root command usage and help text for each sub-command.
      *
      * @param sender The command sender to show help to
      */
@@ -379,12 +361,12 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
     }
 
     /**
-     * Handles tab completion for the main command and its sub-commands.
+     * Handles tab completion for the root command and its sub-commands.
      * This method provides intelligent tab completion based on the current input.
      *
      * <p>The tab completion flow:</p>
      * <ol>
-     *   <li>Check main command permission</li>
+     *   <li>Check root command permission</li>
      *   <li>Parse input to determine current context</li>
      *   <li>If no sub-command is selected, show available sub-commands</li>
      *   <li>If a sub-command is selected, delegate to that sub-command</li>
@@ -400,22 +382,12 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
     public List<String> onTabComplete(CommandSender var1, Command var2, String var3, String[] var4) {
         // add permission check
         try {
-            if (permissionRequired() == null || var1.hasPermission(permissionRequired())) {
-                var re = getMainCommand().parseInput(var4);
-                if (re.getB().length == 0) {
-                    List<String> provider = re.getA().getTabComplete();
-                    return provider == null ? new ArrayList<>() : provider;
-                } else {
-                    SubCommand subCommand = getSubCommand(re.getA().nextArg());
-                    if (subCommand != null && subCommand.hasPermission(var1)) {
-                        String[] elseArg = re.getB();
-                        return subCommand.onTabComplete(var1, var2, var3, elseArg);
-                    }
-                }
+            if(hasPermission(var1)){
+                return getMainCommand().onCustomTabComplete(var1, var2, new ArgumentReader(getName(), var4));
             }
         } catch (Throwable e) {
         }
-        return new ArrayList<>();
+        return List.of();
     }
 
     /**
@@ -435,15 +407,15 @@ public abstract class AbstractMainCommand implements SubCommandDispatcher, Inter
         }
     }
 
-    public void permissionDenied(String permission, @Nullable String commandnode) {
-        throw new PermissionDenyError(permission, Optional.ofNullable(commandnode));
+    public void permissionDenied(String permission, @Nullable ArgumentReader argument) {
+        throw new PermissionDenyError(permission, argument);
     }
 
-    public void checkPermission(CommandSender sender, String permission) {
+    public void checkPermission(CommandSender sender, String permission, ArgumentReader argument) {
         if (sender.hasPermission(permission)) {
             return;
         } else {
-            throw new PermissionDenyError(permission, Optional.empty());
+            throw new PermissionDenyError(permission, argument);
         }
     }
 

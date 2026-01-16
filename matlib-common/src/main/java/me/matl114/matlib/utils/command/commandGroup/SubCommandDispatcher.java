@@ -7,53 +7,60 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Streams;
-import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.utils.command.interruption.ArgumentException;
-import me.matl114.matlib.utils.command.interruption.ArgumentFormatError;
+import me.matl114.matlib.utils.command.interruption.ValueUnexpectedError;
 import me.matl114.matlib.utils.command.interruption.PermissionDenyError;
-import me.matl114.matlib.utils.command.interruption.ValueOutOfRangeError;
-import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
+import me.matl114.matlib.utils.command.params.ArgumentReader;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.Opcodes;
+import org.jetbrains.annotations.Nullable;
 
 public interface SubCommandDispatcher extends CustomTabExecutor, SubCommand.SubCommandCaller {
 
-    default List<String> onTabComplete(CommandSender var1, Command var2, String var3, String[] var4) {
-        var re = parseInput(var4);
-        if (re.getB().length == 0) {
-            List<String> provider = re.getA().getTabComplete();
-            return provider == null ? new ArrayList<>() : provider;
-        } else {
-            SubCommand subCommand = getSubCommand(re.getA().nextArg());
-            if (subCommand != null) {
-                String[] elseArg = re.getB();
-                List<String> tab = subCommand.parseInput(elseArg).getA().getTabComplete();
-                if (tab != null) {
-                    return tab;
+
+
+    default List<String> onCustomTabComplete(CommandSender sender, @Nullable Command apiUsage, ArgumentReader arguments){
+        if(hasPermission(sender)){
+            var re = parseInput(arguments);
+            if (!arguments.hasNext()) {
+                List<String> provider = re.getTabComplete(sender);
+                return provider == null ? new ArrayList<>() : provider;
+            } else {
+                SubCommand subCommand = getSubCommand(re.nextArg());
+                if (subCommand != null) {
+                    List<String> tab = subCommand.onCustomTabComplete(sender, apiUsage, arguments);  //parseInput(elseArg).getTabComplete();
+                    if (tab != null) {
+                        return tab;
+                    }
                 }
             }
         }
+
         return new ArrayList<>();
     }
 
-
     @Override
-    default boolean onCommand(@NotNull CommandSender var1, @NotNull Command var2, @NotNull String var3, @NotNull String[] var4) {
-        if(var4.length > 0) {
-            SubCommand command = getSubCommand(var4[0]);
-            if (command != null) {
-                // add permission check
-                if (command.hasPermission(var1)) {
-                    String[] elseArg = Arrays.copyOfRange(var4, 1, var4.length);
-                    return command.getExecutor().onCommand(var1, var2, var3 + " " + command.getName(), elseArg);
-                } else {
-                    throw new PermissionDenyError(permissionRequired(), Optional.of(var4[0]));
+    default boolean onCustomCommand(@NotNull CommandSender var1, @Nullable Command apiUsage, ArgumentReader reader) throws ArgumentException {
+        if(hasPermission(var1)){
+            if(reader.hasNext()) {
+                String next = reader.next();
+                SubCommand command = getSubCommand(next);
+                if (command != null) {
+                    // add permission check
+                    if (command.hasPermission(var1)) {
+                        return command.onCustomCommand(var1, apiUsage, reader);
+                    } else {
+                        throw new PermissionDenyError(permissionRequired(), reader);
+                    }
                 }
             }
+            // not consume
+            throw new ValueUnexpectedError(reader.stepBack());
+        }else{
+            throw new PermissionDenyError(permissionRequired(), reader);
         }
-        throw new ArgumentFormatError(var3, var4);
+
     }
 
     default Stream<String> getHelp(String prefix){

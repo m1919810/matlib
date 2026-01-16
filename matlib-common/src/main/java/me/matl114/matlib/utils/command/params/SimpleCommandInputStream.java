@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.interruption.ValueAbsentError;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
 public class SimpleCommandInputStream {
@@ -100,14 +101,14 @@ public class SimpleCommandInputStream {
         }
     }
 
-    @Nullable public List<String> getTabComplete() {
+    @Nullable public List<String> getTabComplete(CommandSender sender) {
         for (int i = 0; i <= arguments.length; i++) {
             if (i == arguments.length || argsMap.get(arguments[i]) == null) {
                 if (i == 0) {
                     return null;
                 }
                 final int index = i - 1;
-                List<String> tablist = arguments[index].tabCompletor.get();
+                List<String> tablist = arguments[index].tabCompletor.apply(sender);
                 tablist = tablist == null ? List.of() : tablist;
                 return tablist.stream()
                         .filter(s -> s.contains(argsMap.get(arguments[index])))

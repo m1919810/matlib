@@ -11,7 +11,7 @@ public class TreeSubCommand extends SubCommand implements SubCommandDispatcher ,
     public TreeSubCommand(String name, String... helpContent) {
         super(name, new SimpleCommandArgs("dispatch_" + name), helpContent);
         this.subCommands = new LinkedHashMap<String, SubCommand>();
-        setTabCompletor("dispatch_", ()-> subCommands.keySet().stream().toList());
+        setTabCompletor("dispatch_" + name, ()-> subCommands.keySet().stream().toList());
     }
     public Stream<String> getHelp(String prefix){
         //the name should be included in the help

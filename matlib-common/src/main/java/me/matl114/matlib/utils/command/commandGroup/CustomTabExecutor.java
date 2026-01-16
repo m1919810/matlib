@@ -1,17 +1,24 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
+import me.matl114.matlib.common.lang.annotations.DoNotOverride;
+import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.utils.command.CommandUtils;
+import me.matl114.matlib.utils.command.interruption.ArgumentException;
 import me.matl114.matlib.utils.command.interruption.TypeError;
+import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.stream.Stream;
 
-public interface CustomTabExecutor extends TabExecutor {
+public interface CustomTabExecutor  {
     /**
      * Returns the permission required to use this main command.
      * Override this method to specify the required permission.
@@ -43,9 +50,24 @@ public interface CustomTabExecutor extends TabExecutor {
      * @return A pair containing the parsed input stream and remaining arguments
      */
     @Nonnull
-    public Pair<SimpleCommandInputStream, String[]> parseInput(String[] args);
+    public SimpleCommandInputStream parseInput(ArgumentReader args);
 
     public String getName();
+
+    public boolean onCustomCommand(CommandSender sender, Command command, ArgumentReader arguments);
+
+    public List<String> onCustomTabComplete(CommandSender sender, Command command, ArgumentReader arguments);
+
+//    @DoNotOverride
+//    @Override
+//    default boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+//        return onCustomCommand(commandSender, command, new ArgumentReader(s, strings));
+//    }
+//    @Override
+//    @DoNotOverride
+//    default List<String> onTabComplete(@NotNull CommandSender var1, @NotNull Command var2, @NotNull String var3, @NotNull String[] var4) {
+//        return onCustomTabComplete(var1, var2, new ArgumentReader(var3, var4));
+//    }
 
 
     public Stream<String> getHelp(String prefix);
