@@ -9,6 +9,7 @@ import org.bukkit.command.TabExecutor;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class WrapperSubCommand extends SubCommand{
 
@@ -49,5 +50,14 @@ public class WrapperSubCommand extends SubCommand{
 
     public WrapperSubCommand(String name, SimpleCommandArgs argsTemplate, String... help) {
         super(name, argsTemplate, help);
+    }
+
+    @Override
+    public Stream<String> onCustomHelp(CommandSender sender, ArgumentReader arguments) {
+        if(hasPermission(sender)){
+            return getHelp(arguments.getAlreadyReadCmdStr());
+        }else{
+            return Stream.empty();
+        }
     }
 }

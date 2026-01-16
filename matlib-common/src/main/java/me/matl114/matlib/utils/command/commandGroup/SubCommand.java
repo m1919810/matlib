@@ -11,13 +11,9 @@ import lombok.Getter;
 import lombok.Setter;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.functions.core.TriFunction;
-import me.matl114.matlib.common.lang.annotations.Internal;
-import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import me.matl114.matlib.utils.command.params.CommandArgumentMap;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
-import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
-import org.bukkit.command.Command;
+import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
@@ -126,6 +122,10 @@ public abstract class SubCommand implements CustomTabExecutor {
         return new Builder<>((a, b, c)-> new TreeSubCommand(a, c));
     }
 
+    public static Builder<DelegateSubCommand> delegateBuilder(){
+        return new Builder<>(DelegateSubCommand::new);
+    }
+
     public static <W extends SubCommand> Builder<W> factoryBuilder(TriFunction<String, SimpleCommandArgs, String[], W> factory){
         return new Builder<>(factory);
     }
@@ -211,8 +211,6 @@ public abstract class SubCommand implements CustomTabExecutor {
 
 
 
-
-
         public SubBuilder<R, W> arg(SimpleCommandArgs.Argument arg){
             super.arg(arg);
             return this;
@@ -246,6 +244,9 @@ public abstract class SubCommand implements CustomTabExecutor {
 
 
 
+    private SubCommand(){
+
+    }
 
     /**
      * Creates a new SubCommand with the specified name, argument template, and help text.
@@ -311,31 +312,32 @@ public abstract class SubCommand implements CustomTabExecutor {
      */
     @Nonnull
     @Deprecated(forRemoval = true)
-    public Pair<SimpleCommandInputStream, String[]> parseInput(String[] args) {
+    public Pair<ArgumentInputStream, String[]> parseInput(String[] args) {
         ArgumentReader reader = new ArgumentReader(args);
         var re = template.parseInputStream(reader);
         return new Pair<>(re, reader.getRemainingArgs());
     }
 
     @Nonnull
-    public SimpleCommandInputStream parseInput(ArgumentReader args) {
+    public ArgumentInputStream parseInput(ArgumentReader args) {
         return template.parseInputStream(args);
     }
+
 
     @Override
     public Stream<String> getHelp(String prefix) {
         return Arrays.stream(help).map(s -> prefix + s);
     }
 
-    /**
-     * Parses arguments and creates a CommandArgumentMap for easy access to argument values.
-     *
-     * @param args The arguments to parse
-     * @return A CommandArgumentMap containing the parsed arguments
-     */
-    public CommandArgumentMap parseArgument(String[] args) {
-        return new CommandArgumentMap(CommandUtils.parseArguments(args, this.template.getArgs()));
-    }
+//    /**
+//     * Parses arguments and creates a CommandArgumentMap for easy access to argument values.
+//     *
+//     * @param args The arguments to parse
+//     * @return A CommandArgumentMap containing the parsed arguments
+//     */
+//    public CommandArgumentMap parseArgument(String[] args) {
+//        return new CommandArgumentMap(CommandUtils.parseArguments(args, this.template.getArgs()));
+//    }
 
     /**
      * Sets a default value for the specified argument.

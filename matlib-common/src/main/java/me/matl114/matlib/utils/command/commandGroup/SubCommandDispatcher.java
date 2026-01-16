@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.Streams;
 import me.matl114.matlib.utils.command.interruption.ArgumentException;
+import me.matl114.matlib.utils.command.interruption.ValueAbsentError;
 import me.matl114.matlib.utils.command.interruption.ValueUnexpectedError;
 import me.matl114.matlib.utils.command.interruption.PermissionDenyError;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
@@ -17,9 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface SubCommandDispatcher extends CustomTabExecutor, SubCommand.SubCommandCaller {
-
-
-
     default List<String> onCustomTabComplete(CommandSender sender, @Nullable Command apiUsage, ArgumentReader arguments){
         if(hasPermission(sender)){
             var re = parseInput(arguments);
@@ -48,23 +46,41 @@ public interface SubCommandDispatcher extends CustomTabExecutor, SubCommand.SubC
                 SubCommand command = getSubCommand(next);
                 if (command != null) {
                     // add permission check
-                    if (command.hasPermission(var1)) {
-                        return command.onCustomCommand(var1, apiUsage, reader);
-                    } else {
-                        throw new PermissionDenyError(permissionRequired(), reader);
-                    }
+                    return command.onCustomCommand(var1, apiUsage, reader);
                 }
+                //没有对应的
+                throw new ValueUnexpectedError(reader.stepBack());
+            }else{
+                //认为在dispatch的时候值缺失算空串
+                throw new ValueUnexpectedError(reader);
             }
             // not consume
-            throw new ValueUnexpectedError(reader.stepBack());
         }else{
             throw new PermissionDenyError(permissionRequired(), reader);
         }
 
     }
 
+    default Stream<String> onCustomHelp(CommandSender sender, ArgumentReader reader){
+        if(hasPermission(sender)){
+            if(reader.hasNext()) {
+                String next = reader.peek();
+                SubCommand command1 = getSubCommand(next);
+                if (command1 != null) {
+                    reader.next();
+                    return command1.onCustomHelp(sender, reader);
+                } else {
+                    return getHelp(reader.getAlreadyReadCmdStr());
+                }
+            }else{
+                return getHelp(reader.getAlreadyReadCmdStr());
+            }
+        }else{
+            return Stream.empty();
+        }
+    }
+
     default Stream<String> getHelp(String prefix){
-        String prefix2 = prefix + getName() + " ";
-        return Streams.concat(getSubCommands().stream().map(cmd -> cmd.getHelp(prefix2)).toArray(Stream[]::new));
+        return Streams.concat(getSubCommands().stream().map(cmd -> cmd.getHelp(prefix + cmd.getName() + " ")).toArray(Stream[]::new));
     }
 }

@@ -8,12 +8,13 @@ import org.bukkit.command.CommandSender;
 
 public interface InterruptionHandler {
     public void handleTypeError(
-            CommandSender sender, @Nullable String argument, TypeError.BaseArgumentType type, String input);
+            CommandSender sender, @Nullable ArgumentReader reader, @Nullable String argument, TypeError.BaseArgumentType type, String input);
 
-    public void handleValueAbsent(CommandSender sender, @Nonnull String argument);
+    public void handleValueAbsent(CommandSender sender,@Nullable ArgumentReader reader , @Nonnull String argument);
 
     public void handleValueOutOfRange(
             CommandSender sender,
+            @Nullable ArgumentReader reader,
             @Nullable String argument,
             TypeError.BaseArgumentType type,
             String from,

@@ -12,9 +12,25 @@ public class ArgumentReader {
         this.currentCursor = 1;
     }
 
+    public ArgumentReader(ArgumentReader reader) {
+        this.args = new String[reader.args.length];
+        System.arraycopy(reader.args, 0, this.args, 0, reader.args.length);
+        this.currentCursor = reader.currentCursor;
+
+    }
+
 
     public String peekPosition(int index){
         return args[index];
+    }
+
+    public int cursor(){
+        return currentCursor;
+    }
+
+    public ArgumentReader setCursor(int cursor){
+        this.currentCursor = cursor;
+        return this;
     }
 
     public ArgumentReader(String[] args) {
@@ -34,7 +50,7 @@ public class ArgumentReader {
         return args[currentCursor];
     }
 
-    public ArgumentReader skip(){
+    public ArgumentReader step(){
         currentCursor++;
         return this;
     }
@@ -56,6 +72,14 @@ public class ArgumentReader {
 
     public String getAlreadyReadArgStr(){
         return String.join(" ", getAlreadyReadArgs());
+    }
+
+    public String getAlreadyReadCmdStr(){
+        StringBuilder builder = new StringBuilder();
+        for (var str: getAlreadyReadArgs()){
+            builder.append(str).append(" ");
+        }
+        return builder.toString();
     }
 
     public String[] getAlreadyReadArgs(){

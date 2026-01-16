@@ -5,6 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.stream.IntStream;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.Getter;
 import me.matl114.matlib.algorithms.algorithm.ExecutorUtils;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
@@ -14,16 +17,16 @@ import me.matl114.matlib.utils.AddUtils;
 import me.matl114.matlib.utils.Debug;
 import me.matl114.matlib.utils.TextUtils;
 import me.matl114.matlib.utils.command.commandGroup.AbstractMainCommand;
+import me.matl114.matlib.utils.command.commandGroup.CommandContext;
 import me.matl114.matlib.utils.command.commandGroup.SubCommand;
+import me.matl114.matlib.utils.command.commandGroup.TreeSubCommand;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
+import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
-import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 public class TestRunner extends AbstractMainCommand implements Manager {
     private Plugin plugin;
@@ -202,37 +205,68 @@ public class TestRunner extends AbstractMainCommand implements Manager {
         return "matlib.test.op";
     }
 
+    private TreeSubCommand command;
+
     {
-        mainBuilder()
+        command = mainBuilder()
             .name("matlib")
-            .build()
-            .subBuilder(
+            .build();
+
+        command.subBuilder(
                 SubCommand.taskBuilder()
                     .name("runmain")
             )
-                .args(
-                    b -> b.name("test")
-                        .defaultValue("null")
-                        .tabSupplier(()-> this.testCases.keySet().stream())
-                )
-                .helper("执行自动测试项")
-                .post(run -> run.executor(this::executeMain))
-            .complete()
-            .subBuilder(
+            .args(
+                b -> b.name("test")
+                    .defaultValue("null")
+                    .tabSupplier(()-> this.testCases.keySet().stream())
+            )
+            .helper("执行自动测试项")
+            .post(run -> run.executor(this::executeMain))
+            .complete();
+
+        command.subBuilder(
                 SubCommand.taskBuilder()
                     .name("exetest")
             )
-                .args(
-                    b -> b.name("testcase")
-                        .defaultValue("null")
-                        .tabSupplier(()-> this.manuallyExecutedCase.keySet().stream())
-                )
-                .helper("执行手动测试项")
-                .post(run -> run.executor(this::executeManual))
-            .complete()
+            .args(
+                b -> b.name("testcase")
+                    .defaultValue("null")
+                    .tabSupplier(()-> this.manuallyExecutedCase.keySet().stream())
+            )
+            .helper("执行手动测试项")
+            .post(run -> run.executor(this::executeManual))
+            .complete();
+
+        command.subBuilder(
+            SubCommand.taskBuilder()
+                .name("testcommandargs")
+        )
+            .args(
+                b -> b.name("1")
+            )
+            .args(
+                b -> b.name("2")
+                    .intValue()
+            )
+            .args(
+                b -> b.name("3")
+                    .bool()
+            )
+            .args(
+                b -> b.name("4")
+                    .floatValue()
+            )
+            .args(
+                b -> b.name("5")
+                    .intValue(IntArrayList.toList(IntStream.range(0, 10)))
+            )
+            .helper("测试指令参数解析功能")
+            .post(run -> run.executor(CommandContext.run(this::testEveryThingInCommandStream)))
+            .complete();
         ;
     }
-    private boolean executeMain(CommandSender sender, SimpleCommandInputStream args, ArgumentReader reader){
+    private boolean executeMain(CommandSender sender, ArgumentInputStream args, ArgumentReader reader){
         String val = args.nextArg();
         var re = testCases.get(val);
         if (re == null) {
@@ -243,7 +277,8 @@ public class TestRunner extends AbstractMainCommand implements Manager {
         }
         return true;
     }
-    private boolean executeManual(CommandSender sender, SimpleCommandInputStream args, ArgumentReader reader){
+
+    private boolean executeManual(CommandSender sender, ArgumentInputStream args, ArgumentReader reader){
         String testcase = args.nextArg();
         var re = TestRunner.this.manuallyExecutedCase.get(testcase);
         if (re != null) {
@@ -262,6 +297,11 @@ public class TestRunner extends AbstractMainCommand implements Manager {
             }
         }
         return true;
+    }
+
+    private void testEveryThingInCommandStream(ArgumentInputStream arg){
+        Debug.logger(arg.nextNonnull(), arg.nextInt(), arg.nextBoolean(), arg.nextDouble(), arg.nextClampedInt(0, 10));
+
     }
 
 

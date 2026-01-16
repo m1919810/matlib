@@ -5,19 +5,18 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
-import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Setter
 @Getter
 @Accessors(fluent = true, chain = true)
 public class TaskSubCommand extends SubCommand{
-    StreamCommandExecutor executor;
+    CommandContext executor;
     public TaskSubCommand(String name, SimpleCommandArgs argsTemplate, String... help) {
         super(name, argsTemplate, help);
     }
@@ -39,12 +38,14 @@ public class TaskSubCommand extends SubCommand{
         return executor != null && executor.execute(sender, parseInput(arguments), arguments);
     }
 
-    public static interface StreamCommandExecutor {
-        public boolean execute(CommandSender var1, SimpleCommandInputStream streamArgs, ArgumentReader argsReader);
-
-        default List<String> supplyTab(CommandSender var1, SimpleCommandInputStream streamArgs, ArgumentReader argsReader) {
-            return List.of();
+    @Override
+    public Stream<String> onCustomHelp(CommandSender sender, ArgumentReader arguments) {
+        if(hasPermission(sender)){
+            return getHelp(arguments.getAlreadyReadCmdStr());
+        }else{
+            return Stream.empty();
         }
     }
+
 
 }

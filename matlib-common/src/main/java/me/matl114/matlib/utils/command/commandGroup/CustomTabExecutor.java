@@ -1,17 +1,11 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
-import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
-import me.matl114.matlib.common.lang.annotations.DoNotOverride;
-import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.utils.command.CommandUtils;
-import me.matl114.matlib.utils.command.interruption.ArgumentException;
 import me.matl114.matlib.utils.command.interruption.TypeError;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import me.matl114.matlib.utils.command.params.SimpleCommandInputStream;
+import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,13 +44,15 @@ public interface CustomTabExecutor  {
      * @return A pair containing the parsed input stream and remaining arguments
      */
     @Nonnull
-    public SimpleCommandInputStream parseInput(ArgumentReader args);
+    public ArgumentInputStream parseInput(ArgumentReader args);
 
     public String getName();
 
     public boolean onCustomCommand(CommandSender sender, Command command, ArgumentReader arguments);
 
     public List<String> onCustomTabComplete(CommandSender sender, Command command, ArgumentReader arguments);
+
+    public Stream<String> onCustomHelp(CommandSender sender, ArgumentReader arguments);
 
 //    @DoNotOverride
 //    @Override
@@ -69,7 +65,11 @@ public interface CustomTabExecutor  {
 //        return onCustomTabComplete(var1, var2, new ArgumentReader(var3, var4));
 //    }
 
-
+    /**
+     * the prefix WILL contains current command name with a blank
+     * @param prefix
+     * @return
+     */
     public Stream<String> getHelp(String prefix);
 
     static int gint(String val) {

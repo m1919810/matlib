@@ -2,7 +2,11 @@ package me.matl114.matlib.utils.command;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import com.google.common.base.Supplier;
 import me.matl114.matlib.utils.command.interruption.TypeError;
 import me.matl114.matlib.utils.command.interruption.ValueOutOfRangeError;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
@@ -162,14 +166,14 @@ public class CommandUtils {
         if (input >= from && input < to) {
             return;
         }
-        throw new ValueOutOfRangeError(arg, from, to, input);
+        throw new ValueOutOfRangeError(null, arg, from, to, input);
     }
 
     public static void range(String arg, float input, int from, int to) {
         if (input >= from && input < to) {
             return;
         }
-        throw new ValueOutOfRangeError(arg, from, to, input);
+        throw new ValueOutOfRangeError(null, arg, from, to, input);
     }
 
     public static void range(String arg, double input, double from, double to) {
@@ -177,6 +181,37 @@ public class CommandUtils {
             return;
         }
         throw new ValueOutOfRangeError(
-                arg, String.valueOf(from), String.valueOf(to), String.valueOf(input), TypeError.BaseArgumentType.FLOAT);
+               null ,arg, String.valueOf(from), String.valueOf(to), String.valueOf(input), TypeError.BaseArgumentType.FLOAT);
+    }
+
+    /**
+     * Creates a supplier that provides common number values for tab completion.
+     *
+     * @return A supplier that returns a list of common number values
+     */
+    public static Supplier<List<String>> numberSupplier() {
+        return () -> List.of("0", "1", "16", "64", "114514", "2147483647");
+    }
+
+    /**
+     * Creates a supplier that provides common float values for tab completion.
+     *
+     * @return A supplier that returns a list of common float values
+     */
+    public static Supplier<List<String>> floatSupplier() {
+        return () -> List.of("0.0", "1.0", "2.0", "3.0", "3.14159", "1.57079", "6.283185");
+    }
+
+    public static Supplier<Stream<String>> numberStreamSupplier() {
+        return () -> Stream.of("0", "1", "16", "64", "114514", "2147483647");
+    }
+
+    /**
+     * Creates a supplier that provides common float values for tab completion.
+     *
+     * @return A supplier that returns a list of common float values
+     */
+    public static Supplier<Stream<String>> floatStreamSupplier() {
+        return () -> Stream.of("0.0", "1.0", "2.0", "3.0", "3.14159", "1.57079", "6.283185");
     }
 }

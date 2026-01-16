@@ -4,14 +4,18 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Streams;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import me.matl114.matlib.algorithms.algorithm.FuncUtils;
-import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
+import me.matl114.matlib.utils.command.CommandUtils;
+import me.matl114.matlib.utils.serialization.datafix.DataHelper;
 import org.bukkit.command.CommandSender;
 
 public class SimpleCommandArgs {
@@ -53,6 +57,9 @@ public class SimpleCommandArgs {
     @Getter
     @Setter
     public static class ArgumentBuilder {
+        public ArgumentBuilder(){
+
+        }
         String name;
         String defaultValue;
         List<Function<CommandSender, Stream<String>>> tabCompletor = new ArrayList<>();
@@ -71,6 +78,54 @@ public class SimpleCommandArgs {
 
         public ArgumentBuilder alias(String alias) {
             this.alias.add(alias);
+            return this;
+        }
+
+        public ArgumentBuilder intValue(){
+            tabSupplier(CommandUtils.numberStreamSupplier());
+            return this;
+        }
+
+        public ArgumentBuilder intValue(int def){
+            tabSupplier(CommandUtils.numberStreamSupplier()).defaultValue(String.valueOf(def));
+            return this;
+        }
+
+        public ArgumentBuilder intValue(IntList list){
+            tabSupplier(() -> {return list.stream().map(String::valueOf);});
+            return this;
+        }
+
+        public ArgumentBuilder floatValue(float fl){
+            tabSupplier(CommandUtils.floatStreamSupplier()).defaultValue(String.valueOf(fl));
+            return this;
+        }
+
+        public ArgumentBuilder floatValue(){
+            tabSupplier(CommandUtils.floatStreamSupplier());
+            return this;
+        }
+
+        public ArgumentBuilder select(List<String> list){
+            tabSupplier(list::stream);
+            return this;
+        }
+        public ArgumentBuilder select(String... list){
+            tabSupplier(()-> Arrays.stream(list));
+            return this;
+        }
+
+        public ArgumentBuilder select(List<String> list, String def){
+            tabSupplier(list::stream).defaultValue(def);
+            return this;
+        }
+
+        public ArgumentBuilder bool(boolean def){
+            tabSupplier(()-> Stream.of("true", "false")).defaultValue(String.valueOf(def));
+            return this;
+        }
+        public ArgumentBuilder bool(){
+            tabSupplier(()-> Stream.of("true", "false"));
             return this;
         }
 
@@ -125,12 +180,13 @@ public class SimpleCommandArgs {
         }
     }
 
-    public SimpleCommandInputStream parseInputStream(ArgumentReader reader) {
-        final HashMap<Argument, String> argsMap = new HashMap<>();
+    public ArgumentInputStream parseInputStream(ArgumentReader reader) {
+        final HashMap<Argument, ArgumentInputStream.ArgumentReaderResult> argsMap = new HashMap<>();
 //        Iterator<String> iter = Arrays.stream(input).iterator();
         List<Argument> argSet = Arrays.stream(args).collect(Collectors.toCollection(ArrayList::new));
+        Object2IntMap<Argument> argsCursorSet = new Object2IntOpenHashMap<>();
         while (reader.hasNext() && !argSet.isEmpty()) {
-            String arg = reader.next();
+            String arg = reader.peek();
             if (arg.startsWith("-")) {
                 Argument selected = null;
                 String trueName = arg.replaceFirst("^-+", "");
@@ -143,15 +199,20 @@ public class SimpleCommandArgs {
                 if (selected != null) {
                     argSet.remove(selected);
                     if (arg.startsWith("--")) {
+                        reader.step();
                         // --args inputValue
                         if (reader.hasNext()) {
-                            String arg2 = reader.next();
-
-                            argsMap.put(selected, arg2);
+                            String arg2 = reader.peek();
+                            reader.step();
+                            argsMap.put(selected, new ArgumentInputStream.ArgumentReaderResult(selected, arg2, reader, reader.cursor(), false));
+                        }else{
+                            argsMap.put(selected, new ArgumentInputStream.ArgumentReaderResult(selected, "", reader, reader.cursor() - 1, false));
                         }
                     } else {
                         // -f -v means boolean
-                        argsMap.put(selected, "true");
+                        reader.step();
+
+                        argsMap.put(selected, new ArgumentInputStream.ArgumentReaderResult(selected, "true", reader, reader.cursor(), false));
                     }
 
                 } else {
@@ -160,9 +221,10 @@ public class SimpleCommandArgs {
                 }
             } else {
                 Argument selected = argSet.remove(0);
-                argsMap.put(selected, arg);
+                reader.step();
+                argsMap.put(selected, new ArgumentInputStream.ArgumentReaderResult(selected, arg, reader, reader.cursor(), false));
             }
         }
-        return new SimpleCommandInputStream(args, argsMap);
+        return new ArgumentInputStream(reader, args, argsMap);
     }
 }
