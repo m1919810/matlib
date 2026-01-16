@@ -178,6 +178,12 @@ public abstract class SubCommand implements CustomTabExecutor {
             return treeSubCommand;
         }
 
+        public W buildAndRegister(){
+            W sb = build();
+            treeSubCommand.registerSub(sb);
+            return sb;
+        }
+
         public <S extends SubCommandCaller> SubBuilder<S, W> cast(){
             return (SubBuilder<S, W>) this;
         }

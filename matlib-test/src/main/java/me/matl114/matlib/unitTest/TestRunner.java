@@ -265,7 +265,58 @@ public class TestRunner extends AbstractMainCommand implements Manager {
             .post(run -> run.executor(CommandContext.run(this::testEveryThingInCommandStream)))
             .complete();
         ;
+        command.subBuilder(
+            SubCommand.treeBuilder()
+        )
+            .name("testtree")
+            .post(
+                b -> b.subBuilder(
+                    SubCommand.treeBuilder()
+                )
+                .name("node1")
+                .post(
+                    c -> c.subBuilder(
+                            SubCommand.taskBuilder()
+                        )
+                        .name("leaf1")
+                        .helper("leaf1 task")
+                        .post(e -> e.executor( CommandContext.run(()-> Debug.logger("111"))))
+                        .complete()
+                        .subBuilder(
+                            SubCommand.taskBuilder()
+                        )
+                        .name("leaf2")
+                        .helper("leaf2 task")
+                        .post(e -> e.executor(CommandContext.run(()-> Debug.logger("222"))))
+                        .complete()
+
+                )
+                .complete()
+                .subBuilder(
+                    SubCommand.treeBuilder()
+                )
+                .name("node2")
+                .post(
+                    c -> c.subBuilder(
+                            SubCommand.taskBuilder()
+                        )
+                        .name("leaf3")
+                        .helper("leaf3 task")
+                        .post(e -> e.executor(CommandContext.run(()-> Debug.logger("333"))))
+                        .complete()
+                        .subBuilder(
+                            SubCommand.taskBuilder()
+                        )
+                        .name("leaf4")
+                        .helper("leaf4 task")
+                        .post(e -> e.executor(CommandContext.run(()->Debug.logger("444"))))
+                    .complete()
+                )
+                .complete()
+            )
+            .complete();
     }
+
     private boolean executeMain(CommandSender sender, ArgumentInputStream args, ArgumentReader reader){
         String val = args.nextArg();
         var re = testCases.get(val);

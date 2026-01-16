@@ -57,7 +57,7 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
             root.subBuilder(SubCommand.taskBuilder())
                 .name("help")
                 .post(s -> s.executor(((var1, streamArgs, argsReader) -> {
-                    showHelpCommand(var1, new ArgumentReader(getName(), argsReader.getRemainingArgs()).stepBack());
+                    showHelpCommand(var1, new ArgumentReader(getName(), argsReader.getRemainingArgs()));
                     return true;
                 })))
                 .complete();
@@ -343,7 +343,7 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
     }
     @Override
     public void handleUnexpectedArgument(CommandSender sender, ArgumentReader reader){
-        showHelpCommand(sender, new ArgumentReader(reader.getAlreadyReadArgs()));
+        showHelpCommand(sender, reader);
     }
 
 
@@ -427,7 +427,7 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
     protected void showHelpCommand(CommandSender sender, ArgumentReader command){
         String already = command.getAlreadyReadArgStr();
         sender.sendMessage("/%s 全部指令".formatted(already));
-        onCustomHelp(sender, command )
+        onCustomHelp(sender,new ArgumentReader(command.getAlreadyReadArgs()))
             .forEach(s -> sendMessage(sender, "&a" + s));
     }
 
