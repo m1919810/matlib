@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.functions.core.TriFunction;
+import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
@@ -366,7 +367,7 @@ public abstract class SubCommand implements CustomTabExecutor {
      */
     public SubCommand setInt(String arg) {
         setDefault(arg, "0");
-        setTabCompletor(arg, AbstractMainCommand.numberSupplier());
+        setTabCompletor(arg, CommandUtils.numberSupplier());
         return this;
     }
 
@@ -380,7 +381,7 @@ public abstract class SubCommand implements CustomTabExecutor {
      */
     public SubCommand setInt(String arg, int val) {
         setDefault(arg, String.valueOf(val));
-        setTabCompletor(arg, AbstractMainCommand.numberSupplier());
+        setTabCompletor(arg, CommandUtils.numberSupplier());
         return this;
     }
 
@@ -393,7 +394,7 @@ public abstract class SubCommand implements CustomTabExecutor {
      */
     public SubCommand setFloat(String arg) {
         setDefault(arg, "0.0");
-        setTabCompletor(arg, AbstractMainCommand.floatSupplier());
+        setTabCompletor(arg, CommandUtils.floatSupplier());
         return this;
     }
 
@@ -407,7 +408,7 @@ public abstract class SubCommand implements CustomTabExecutor {
      */
     public SubCommand setFloat(String arg, float val) {
         setDefault(arg, String.valueOf(val));
-        setTabCompletor(arg, AbstractMainCommand.floatSupplier());
+        setTabCompletor(arg, CommandUtils.floatSupplier());
         return this;
     }
 

@@ -6,8 +6,18 @@ import me.matl114.matlib.common.lang.annotations.Experimental;
 import me.matl114.matlib.utils.Debug;
 import org.bukkit.Bukkit;
 
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
+
 public enum Version {
     unknown("unknown", Integer.MAX_VALUE),
+    legacy("legacy", 0),
+    v1_18_R1("v1_18_R1", 8),
+    v1_18_R2("v1_18_R2", 9),
+    v1_19_R1("v1_19_R1", 11),
+    v1_19_R2("v1_19_R2", 12),
+    v1_19_R3("v1_19_R3", 13),
+    v1_19_R4("v1_19_R4", 14),
     v1_20_R1("v1_20_R1", 15),
     v1_20_R2("v1_20_R2", 18),
     v1_20_R3("v1_20_R3", 26),
@@ -21,7 +31,10 @@ public enum Version {
     v1_21_R4("v1_21_R4", 71),
     v1_21_R5("v1_21_R5", 80),
     v1_21_R6("v1_21_R6", 81),
-    v1_21_R7("v1_21_R7", 88);
+    v1_21_R7("v1_21_R7", 88),
+    v1_21_R8("v1_21_R8", 94),
+    MODERN("modern", Integer.MAX_VALUE - 1)
+    ;
 
     private Version(String name, int datapackNumber) {
         this.name = name;
@@ -87,15 +100,39 @@ public enum Version {
                 case "1.21.9":
                     Debug.logger("Using version", v1_21_R7.name);
                     return v1_21_R7;
+                case "1.21.10":
+                case "1.21.11":
+                    Debug.logger("Using version", v1_21_R8.name);
+                    return v1_21_R8;
                 default:
+                    if(version.startsWith("1.26")){
+                        Debug.logger("Using version", MODERN.name);
+                        return MODERN;
+                    }
+                    var majorVersionGroup = Version.SEMANTIC_VERSIONS.matcher(version);
+                    if(majorVersionGroup.matches()){
+                        MatchResult result = majorVersionGroup.toMatchResult();
+                        try{
+                            int majorVersion = Integer.parseInt(result.group(1), 10);
+                            if(majorVersion < 18){
+                                Debug.logger("Using version", legacy.name);
+                                return legacy;
+                            }
+                        }catch (Throwable ignored){
+
+                        }
+
+                    }
             }
             throw new RuntimeException("Version not supported for " + version);
         } catch (Throwable e) {
-            Debug.logger(e, "Fail to create version specific feature :", version);
-            Debug.logger("Using default versiond feature ");
+            Debug.logger( "Fail to create version specific feature :", version);
+            Debug.logger("Using default version feature ");
             return unknown;
         }
     }
+
+    private static final Pattern SEMANTIC_VERSIONS = Pattern.compile("v1_(\\d+)_R(\\d+)");
 
     public boolean isAtLeast(Version v2) {
         return versionAtLeast(this, v2);

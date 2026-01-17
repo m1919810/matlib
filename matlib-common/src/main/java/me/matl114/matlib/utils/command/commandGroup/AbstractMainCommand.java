@@ -502,8 +502,8 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      *
      * @return A supplier that returns a list of common number values
      */
-    public static Supplier<List<String>> numberSupplier() {
-        return () -> List.of("0", "1", "16", "64", "114514", "2147483647");
+    public static Supplier<Stream<String>> numberSupplier() {
+        return () -> Stream.of("0", "1", "16", "64", "114514", "2147483647");
     }
 
     /**
@@ -511,8 +511,8 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      *
      * @return A supplier that returns a list of common float values
      */
-    public static Supplier<List<String>> floatSupplier() {
-        return () -> List.of("0.0", "1.0", "2.0", "3.0", "3.14159", "1.57079", "6.283185");
+    public static Supplier<Stream<String>> floatSupplier() {
+        return () -> Stream.of("0.0", "1.0", "2.0", "3.0", "3.14159", "1.57079", "6.283185");
     }
 
     /**
@@ -520,8 +520,8 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      *
      * @return A supplier that returns the list of visible sub-command names
      */
-    public Supplier<List<String>> subCommandsSupplier() {
-        return this::getDisplayedSubCommand;
+    public Supplier<Stream<String>> subCommandsSupplier() {
+        return ()-> this.getSubCommands().stream().map(SubCommand::getName);
     }
 
     /**
@@ -529,8 +529,8 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      *
      * @return A supplier that returns a list of online player names
      */
-    public static Supplier<List<String>> playerNameSupplier() {
-        return () -> Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+    public static Supplier<Stream<String>> playerNameSupplier() {
+        return () -> Bukkit.getOnlinePlayers().stream().map(Player::getName);
     }
 
     public static void checkArgument(boolean argument, String... msg) {
