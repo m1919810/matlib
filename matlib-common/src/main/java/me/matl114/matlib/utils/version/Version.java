@@ -1,13 +1,12 @@
 package me.matl114.matlib.utils.version;
 
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import lombok.Getter;
 import me.matl114.matlib.common.lang.annotations.Experimental;
 import me.matl114.matlib.utils.Debug;
 import org.bukkit.Bukkit;
-
-import java.util.regex.MatchResult;
-import java.util.regex.Pattern;
 
 public enum Version {
     unknown("unknown", Integer.MAX_VALUE),
@@ -25,16 +24,15 @@ public enum Version {
     v1_21_R1("v1_21_R1", 48),
     v1_21_R2("v1_21_R2", 57),
     @Experimental
-    //1.21.4
+    // 1.21.4
     v1_21_R3("v1_21_R3", 61),
-    //1.21.5
+    // 1.21.5
     v1_21_R4("v1_21_R4", 71),
     v1_21_R5("v1_21_R5", 80),
     v1_21_R6("v1_21_R6", 81),
     v1_21_R7("v1_21_R7", 88),
     v1_21_R8("v1_21_R8", 94),
-    MODERN("modern", Integer.MAX_VALUE - 1)
-    ;
+    MODERN("modern", Integer.MAX_VALUE - 1);
 
     private Version(String name, int datapackNumber) {
         this.name = name;
@@ -105,28 +103,27 @@ public enum Version {
                     Debug.logger("Using version", v1_21_R8.name);
                     return v1_21_R8;
                 default:
-                    if(version.startsWith("1.26")){
+                    if (version.startsWith("1.26")) {
                         Debug.logger("Using version", MODERN.name);
                         return MODERN;
                     }
                     var majorVersionGroup = Version.SEMANTIC_VERSIONS.matcher(version);
-                    if(majorVersionGroup.matches()){
+                    if (majorVersionGroup.matches()) {
                         MatchResult result = majorVersionGroup.toMatchResult();
-                        try{
+                        try {
                             int majorVersion = Integer.parseInt(result.group(1), 10);
-                            if(majorVersion < 18){
+                            if (majorVersion < 18) {
                                 Debug.logger("Using version", legacy.name);
                                 return legacy;
                             }
-                        }catch (Throwable ignored){
+                        } catch (Throwable ignored) {
 
                         }
-
                     }
             }
             throw new RuntimeException("Version not supported for " + version);
         } catch (Throwable e) {
-            Debug.logger( "Fail to create version specific feature :", version);
+            Debug.logger("Fail to create version specific feature :", version);
             Debug.logger("Using default version feature ");
             return unknown;
         }

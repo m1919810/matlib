@@ -152,12 +152,12 @@ public interface PacketAPI extends TargetDescriptor {
     @MethodTarget
     @RedirectClass(ServerboundInteractEntityPacket)
     @RedirectName("getTarget")
-    Object serverboundInteractPacket$getTarget(Object packet, @RedirectType(ServerLevel)Object level);
+    Object serverboundInteractPacket$getTarget(Object packet, @RedirectType(ServerLevel) Object level);
 
-//    @Internal
-//    @MethodTarget
-//    @RedirectClass(ServerboundInteractEntityPacket)
-//    @RedirectName("getType")
-//    Enum serverboundInteractPacket$getType(Object packet, @RedirectType(ServerLevel)Object level);
+    //    @Internal
+    //    @MethodTarget
+    //    @RedirectClass(ServerboundInteractEntityPacket)
+    //    @RedirectName("getType")
+    //    Enum serverboundInteractPacket$getType(Object packet, @RedirectType(ServerLevel)Object level);
 
 }

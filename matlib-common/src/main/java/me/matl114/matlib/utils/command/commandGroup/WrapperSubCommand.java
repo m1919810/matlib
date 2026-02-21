@@ -1,5 +1,8 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
+import java.util.List;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import me.matl114.matlib.common.lang.annotations.Internal;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
@@ -7,11 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.stream.Stream;
-
-public class WrapperSubCommand extends SubCommand{
+public class WrapperSubCommand extends SubCommand {
 
     /** Executor responsible for handling command execution */
     @Internal("use for wrapper")
@@ -36,14 +35,16 @@ public class WrapperSubCommand extends SubCommand{
 
     @Override
     public boolean onCustomCommand(CommandSender sender, Command command, ArgumentReader arguments) {
-        return executor != null && executor.onCommand(sender, command, arguments.getAlreadyReadArgStr(), arguments.getRemainingArgs());
+        return executor != null
+                && executor.onCommand(sender, command, arguments.getAlreadyReadArgStr(), arguments.getRemainingArgs());
     }
 
     @Override
     public List<String> onCustomTabComplete(CommandSender sender, Command command, ArgumentReader arguments) {
-        if(executor != null){
-            return executor.onTabComplete(sender, command, arguments.getAlreadyReadArgStr(), arguments.getRemainingArgs());
-        }else {
+        if (executor != null) {
+            return executor.onTabComplete(
+                    sender, command, arguments.getAlreadyReadArgStr(), arguments.getRemainingArgs());
+        } else {
             return List.of();
         }
     }
@@ -54,9 +55,9 @@ public class WrapperSubCommand extends SubCommand{
 
     @Override
     public Stream<String> onCustomHelp(CommandSender sender, ArgumentReader arguments) {
-        if(hasPermission(sender)){
+        if (hasPermission(sender)) {
             return getHelp(arguments.getAlreadyReadCmdStr());
-        }else{
+        } else {
             return Stream.empty();
         }
     }

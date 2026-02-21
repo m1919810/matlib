@@ -349,8 +349,7 @@ public class ThreadUtils {
         MAIN_THREAD_EXECUTOR.execute(runnable);
     }
 
-
-    public static Executor getMainThreadExecutor(){
+    public static Executor getMainThreadExecutor() {
         return MAIN_THREAD_EXECUTOR;
     }
 

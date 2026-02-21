@@ -2,19 +2,17 @@ package me.matl114.matlib.utils.command.commandGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import lombok.Getter;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.command.interruption.*;
+import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
-import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -46,26 +44,24 @@ import org.jetbrains.annotations.NotNull;
  * <p>To use this class, extend it and implement the abstract methods.
  * The root command should be defined as a field named "mainCommand" in the subclass.</p>
  */
-public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, InterruptionHandler {
+public class AbstractMainCommand implements CustomTabExecutor, TabExecutor, InterruptionHandler {
 
     /** Internal reference to the root command */
     private TreeSubCommand root;
 
-    protected SubCommand.Builder<TreeSubCommand> mainBuilder(){
-        return SubCommand.factoryBuilder((a, b, c)->{
+    protected SubCommand.Builder<TreeSubCommand> mainBuilder() {
+        return SubCommand.factoryBuilder((a, b, c) -> {
             root = new TreeSubCommand(a, c);
             root.subBuilder(SubCommand.taskBuilder())
-                .name("help")
-                .post(s -> s.executor(((var1, streamArgs, argsReader) -> {
-                    showHelpCommand(var1, new ArgumentReader(getName(), argsReader.getRemainingArgs()));
-                    return true;
-                })))
-                .complete();
+                    .name("help")
+                    .post(s -> s.executor(((var1, streamArgs, argsReader) -> {
+                        showHelpCommand(var1, new ArgumentReader(getName(), argsReader.getRemainingArgs()));
+                        return true;
+                    })))
+                    .complete();
             return root;
         });
     }
-
-
 
     /** Whether this command has been registered with the plugin */
     private boolean registered = false;
@@ -170,7 +166,6 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
         this.root.registerSub(command);
     }
 
-
     /**
      * Gets the root command for this command group.
      *
@@ -196,14 +191,12 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
         return getMainName();
     }
 
-
-    @org.jetbrains.annotations.Nullable
-    @Override
+    @org.jetbrains.annotations.Nullable @Override
     public String permissionRequired() {
         return getMainCommand().permissionRequired();
     }
 
-    public ArgumentInputStream parseInput(ArgumentReader reader){
+    public ArgumentInputStream parseInput(ArgumentReader reader) {
         return (getMainCommand()).parseInput(reader);
     }
 
@@ -229,10 +222,10 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      * @return true if the command was executed successfully, false otherwise
      */
     public boolean onCommand(CommandSender var1, Command var2, String var3, String[] var4) {
-        try{
-            //return getMainCommand().onCustomCommand(var1, var2, new ArgumentReader(getMainName(), var4));
+        try {
+            // return getMainCommand().onCustomCommand(var1, var2, new ArgumentReader(getMainName(), var4));
             return onCustomCommand(var1, var2, new ArgumentReader(getMainName(), var4).stepBack());
-        }catch (ArgumentException ex){
+        } catch (ArgumentException ex) {
             ex.handleAbort(var1, this);
             return true;
         }
@@ -240,12 +233,12 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
 
     @Note("the \"async\" means that it can be called either on root or off root")
     public boolean onCommandAsync(
-        @NotNull CommandSender var1, @NotNull Command var2, @NotNull String var3, @NotNull String[] var4) {
+            @NotNull CommandSender var1, @NotNull Command var2, @NotNull String var3, @NotNull String[] var4) {
         return onCommand(var1, var2, var3, var4);
     }
 
-    private StringBuilder getArgumentPositionPrefix(ArgumentReader reader){
-        return reader == null? new StringBuilder() : new StringBuilder("&f" + reader.getAlreadyReadCmdStr() + "&c<--");
+    private StringBuilder getArgumentPositionPrefix(ArgumentReader reader) {
+        return reader == null ? new StringBuilder() : new StringBuilder("&f" + reader.getAlreadyReadCmdStr() + "&c<--");
     }
 
     /**
@@ -258,12 +251,24 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      * @param input The invalid input that was provided
      */
     public void handleTypeError(
-            CommandSender sender,@Nullable ArgumentReader reader , @Nullable String argument, TypeError.BaseArgumentType type, String input) {
+            CommandSender sender,
+            @Nullable ArgumentReader reader,
+            @Nullable String argument,
+            TypeError.BaseArgumentType type,
+            String input) {
         StringBuilder builder = getArgumentPositionPrefix(reader);
         if (argument != null) {
-            builder.append("&c类型错误:参数\"").append(argument).append("\"需要输入一个").append(type.getDisplayNameZHCN()).append(",但是输入了:").append(input);
+            builder.append("&c类型错误:参数\"")
+                    .append(argument)
+                    .append("\"需要输入一个")
+                    .append(type.getDisplayNameZHCN())
+                    .append(",但是输入了:")
+                    .append(input);
         } else {
-            builder.append("&c类型错误: 需要输入一个").append(type.getDisplayNameZHCN()).append(",但是输入了:").append(input);
+            builder.append("&c类型错误: 需要输入一个")
+                    .append(type.getDisplayNameZHCN())
+                    .append(",但是输入了:")
+                    .append(input);
         }
         sendMessage(sender, builder.toString());
     }
@@ -275,14 +280,13 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      * @param sender The command sender to send the error to
      * @param argument The argument name that is missing a value
      */
-    public void handleValueAbsent(CommandSender sender, @Nullable ArgumentReader reader , @Nonnull String argument) {
+    public void handleValueAbsent(CommandSender sender, @Nullable ArgumentReader reader, @Nonnull String argument) {
         StringBuilder builder = getArgumentPositionPrefix(reader);
-        if(reader != null){
+        if (reader != null) {
             builder.append("&c值缺失: 并未输入参数\"").append(argument).append("\"的值");
 
-        }else{
+        } else {
             builder.append("&c值缺失: 并未输入参数\"").append(argument).append("\"的值");
-
         }
         sendMessage(sender, builder.toString());
     }
@@ -294,8 +298,7 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      * @param sender The command sender to send the error to
      * @param argument The argument name that caused the error (may be null)
      * @param type The argument type
-     * @param from The minimum allowed value
-     * @param to The maximum allowed value (exclusive)
+     * @param range The description of allowed value
      * @param input The invalid input that was provided
      */
     @Override
@@ -304,16 +307,15 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
             @Nullable ArgumentReader reader,
             @Nullable String argument,
             TypeError.BaseArgumentType type,
-            String from,
-            String to,
+            String range,
             @Nonnull String input) {
         var builder = getArgumentPositionPrefix(reader);
         if (argument != null) {
-            builder.append("&c值不在范围内: 参数 %s 输入了类型: %s, 需要在范围 %s ~ %s(exclude) 之间, 但是输入了%s"
-                .formatted(argument, type.getDisplayNameZHCN(), from, to, input));
+            builder.append("&c值不在范围内: 参数 %s 输入了类型: %s, 需要在范围 %s 之间, 但是输入了%s"
+                    .formatted(argument, type.getDisplayNameZHCN(), range, input));
         } else {
-            builder.append("&c值不在范围内: 输入了类型: %s, 需要在范围 %s ~ %s(exclude) 之间, 但是输入了 %s"
-                .formatted(type.getDisplayNameZHCN(), from, to, input));
+            builder.append(
+                    "&c值不在范围内: 输入了类型: %s, 需要在范围 %s 之间, 但是输入了 %s".formatted(type.getDisplayNameZHCN(), range, input));
         }
         sendMessage(sender, builder.toString());
     }
@@ -334,18 +336,19 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
         }
     }
 
-    public void handlePermissionDenied(CommandSender sender, String permission, @Nullable ArgumentReader commandNodeName) {
+    public void handlePermissionDenied(
+            CommandSender sender, String permission, @Nullable ArgumentReader commandNodeName) {
         if (commandNodeName == null) {
             noPermission(sender);
         } else {
             sendMessage(sender, "&c你没有权限使用: " + commandNodeName.getAlreadyReadArgStr());
         }
     }
+
     @Override
-    public void handleUnexpectedArgument(CommandSender sender, ArgumentReader reader){
+    public void handleUnexpectedArgument(CommandSender sender, ArgumentReader reader) {
         showHelpCommand(sender, reader);
     }
-
 
     /**
      * Handles logical errors during command execution.
@@ -367,51 +370,52 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
         sendMessage(var1, "&c你没有权限使用该指令!");
     }
 
-    public Stream<String> getHelp(String prefix){
+    public Stream<String> getHelp(String prefix) {
         return getMainCommand().getHelp(prefix + getName() + " ");
     }
 
     @Override
-    public boolean onCustomCommand(@NotNull CommandSender var1, @Nullable Command apiUsage, ArgumentReader reader) throws ArgumentException {
+    public boolean onCustomCommand(@NotNull CommandSender var1, @Nullable Command apiUsage, ArgumentReader reader)
+            throws ArgumentException {
         // mainName as first
-        if(hasPermission(var1)){
-            if(reader.hasNext()){
-                if(getName().equalsIgnoreCase(reader.next())){
+        if (hasPermission(var1)) {
+            if (reader.hasNext()) {
+                if (getName().equalsIgnoreCase(reader.next())) {
                     return getMainCommand().onCustomCommand(var1, apiUsage, reader);
-                }else {
+                } else {
                     throw new ValueUnexpectedError(reader);
                 }
-            }else{
-                throw new ValueAbsentError(reader,"main_command");
+            } else {
+                throw new ValueAbsentError(reader, "main_command");
             }
-        }else {
+        } else {
             throw new PermissionDenyError(permissionRequired(), reader);
         }
     }
 
     @Override
-    public List<String> onCustomTabComplete(CommandSender sender, @org.jetbrains.annotations.Nullable Command apiUsage, ArgumentReader arguments) {
-        if(hasPermission(sender) && arguments.hasNext() && getName().equalsIgnoreCase(arguments.next())){
+    public List<String> onCustomTabComplete(
+            CommandSender sender, @org.jetbrains.annotations.Nullable Command apiUsage, ArgumentReader arguments) {
+        if (hasPermission(sender) && arguments.hasNext() && getName().equalsIgnoreCase(arguments.next())) {
             return getMainCommand().onCustomTabComplete(sender, apiUsage, arguments);
-        }
-        else return List.of();
+        } else return List.of();
     }
 
     @Override
     public Stream<String> onCustomHelp(CommandSender sender, ArgumentReader reader) {
-        if(hasPermission(sender)){
-            if(reader.hasNext()){
+        if (hasPermission(sender)) {
+            if (reader.hasNext()) {
                 // mainName as first
-                if(getName().equalsIgnoreCase(reader.next()) && hasPermission(sender)){
-                    return  getMainCommand().onCustomHelp(sender, reader);
-                }else{
+                if (getName().equalsIgnoreCase(reader.next()) && hasPermission(sender)) {
+                    return getMainCommand().onCustomHelp(sender, reader);
+                } else {
                     return Stream.empty();
                 }
 
-            }else{
+            } else {
                 return Stream.empty();
             }
-        }else{
+        } else {
             return Stream.empty();
         }
     }
@@ -422,13 +426,11 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      *
      * @param sender The command sender to show help to
      */
-
-
-    protected void showHelpCommand(CommandSender sender, ArgumentReader command){
+    protected void showHelpCommand(CommandSender sender, ArgumentReader command) {
         String already = command.getAlreadyReadArgStr();
         sender.sendMessage("/%s 全部指令".formatted(already));
-        onCustomHelp(sender,new ArgumentReader(command.getAlreadyReadArgs()))
-            .forEach(s -> sendMessage(sender, "&a" + s));
+        onCustomHelp(sender, new ArgumentReader(command.getAlreadyReadArgs()))
+                .forEach(s -> sendMessage(sender, "&a" + s));
     }
 
     /**
@@ -521,7 +523,7 @@ public  class AbstractMainCommand implements CustomTabExecutor, TabExecutor, Int
      * @return A supplier that returns the list of visible sub-command names
      */
     public Supplier<Stream<String>> subCommandsSupplier() {
-        return ()-> this.getSubCommands().stream().map(SubCommand::getName);
+        return () -> this.getSubCommands().stream().map(SubCommand::getName);
     }
 
     /**

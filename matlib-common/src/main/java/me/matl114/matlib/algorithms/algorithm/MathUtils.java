@@ -425,19 +425,19 @@ public class MathUtils {
         return new UUID((long) bits[0] << 32 | bits[1] & 4294967295L, (long) bits[2] << 32 | bits[3] & 4294967295L);
     }
 
-    public static double square(double d){
+    public static double square(double d) {
         return d * d;
     }
 
-    public static int square(int d){
+    public static int square(int d) {
         return d * d;
     }
 
-    public static long square(long d){
+    public static long square(long d) {
         return d * d;
     }
 
-    public static float square(float d){
+    public static float square(float d) {
         return d * d;
     }
 }

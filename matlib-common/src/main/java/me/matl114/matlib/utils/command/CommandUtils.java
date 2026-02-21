@@ -1,12 +1,11 @@
 package me.matl114.matlib.utils.command;
 
+import com.google.common.base.Supplier;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import com.google.common.base.Supplier;
 import me.matl114.matlib.utils.command.interruption.TypeError;
 import me.matl114.matlib.utils.command.interruption.ValueOutOfRangeError;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
@@ -181,7 +180,12 @@ public class CommandUtils {
             return;
         }
         throw new ValueOutOfRangeError(
-               null ,arg, String.valueOf(from), String.valueOf(to), String.valueOf(input), TypeError.BaseArgumentType.FLOAT);
+                null,
+                arg,
+                String.valueOf(from),
+                String.valueOf(to),
+                String.valueOf(input),
+                TypeError.BaseArgumentType.FLOAT);
     }
 
     /**

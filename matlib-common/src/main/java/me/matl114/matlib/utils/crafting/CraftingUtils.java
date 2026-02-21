@@ -1,12 +1,15 @@
 package me.matl114.matlib.utils.crafting;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import me.matl114.matlib.algorithms.algorithm.ArrayUtils;
 import me.matl114.matlib.algorithms.algorithm.FuncUtils;
 import me.matl114.matlib.algorithms.dataStructures.frames.bits.BitList;
 import me.matl114.matlib.algorithms.dataStructures.frames.mmap.MappingList;
+import me.matl114.matlib.algorithms.dataStructures.struct.IndexEntry;
+import me.matl114.matlib.algorithms.dataStructures.struct.IndexFastEntry;
 import me.matl114.matlib.utils.crafting.agents.CraftingOperation;
 import me.matl114.matlib.utils.crafting.agents.GeneratorAgent;
 import me.matl114.matlib.utils.crafting.agents.StackAgent;
@@ -48,12 +51,9 @@ public class CraftingUtils {
         int len2 = outputSlots.size();
         BitList visited = new BitList(len2);
         if (cnt > 0) {
-            PriorityQueue<GeneratorAgent> priorityRecipeOutput = new PriorityQueue<>(cnt + 1);
-            for (var agent : list) {
-                priorityRecipeOutput.add(agent);
-            }
+
             if (cnt == 1) {
-                GeneratorAgent agent = priorityRecipeOutput.poll(); //   getGreedyConsumer(recipeOutput[0]);
+                GeneratorAgent agent = list[0]; //   getGreedyConsumer(recipeOutput[0]);
                 if (agent != null) {
                     for (int i = 0; i < len2; ++i) {
                         StackBuffer itemCounter = outputSlots.get(i);
@@ -110,11 +110,20 @@ public class CraftingUtils {
             // 有可能是桶或者什么
             else {
                 // 维护一下当前matchAmount最小值
+                PriorityQueue<IndexEntry<GeneratorAgent>> priorityRecipeOutput = new PriorityQueue<>(
+                        cnt + 1,
+                        Comparator.<IndexEntry<GeneratorAgent>, GeneratorAgent>comparing(IndexEntry::getValue)
+                                .thenComparing(IndexEntry::getIndex));
+                for (int i = 0; i < list.length; ++i) {
+                    priorityRecipeOutput.add(new IndexFastEntry<>(i, list[i]));
+                }
                 while (true) {
-                    GeneratorAgent agent = priorityRecipeOutput.poll();
-                    if (agent == null) {
+                    // todo: find way of fixing it
+                    var agentPair = priorityRecipeOutput.poll();
+                    if (agentPair == null) {
                         break;
                     }
+                    var agent = agentPair.getValue();
                     boolean hasNextPushSlot = false;
                     for (int j = 0; j < len2; ++j) {
                         StackBuffer itemCounter = outputSlots.get(j);
@@ -167,7 +176,7 @@ public class CraftingUtils {
                     // 哦
                     // 要判断是否有nextSlot
                     if (hasNextPushSlot && agent.getMatchStackAmount() <= maxAmount2) {
-                        priorityRecipeOutput.add(agent);
+                        priorityRecipeOutput.add(agentPair);
                     } else {
                         // 这是不会再增加了 作为一个上线
                         maxAmount2 = Math.min(maxAmount2, agent.getMatchStackAmount());

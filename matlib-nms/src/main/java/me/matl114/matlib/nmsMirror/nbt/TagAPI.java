@@ -23,18 +23,18 @@ public interface TagAPI extends TargetDescriptor, TagHelper {
     @RedirectClass("net.minecraft.nbt.StringTag")
     @RedirectName("valueOf")
     public Object stringTag(String value);
-
+    // todo: these no longerr
     @ConstructorTarget
     @RedirectClass("net.minecraft.nbt.IntArrayTag")
-    public AbstractList<?> intArrayTag(int[] array);
+    public Iterable<?> intArrayTag(int[] array);
 
     @ConstructorTarget
     @RedirectClass("net.minecraft.nbt.ByteArrayTag")
-    public AbstractList<?> byteArrayTag(byte[] array);
+    public Iterable<?> byteArrayTag(byte[] array);
 
     @ConstructorTarget
     @RedirectClass("net.minecraft.nbt.LongArrayTag")
-    public AbstractList<?> longArrayTag(long[] array);
+    public Iterable<?> longArrayTag(long[] array);
 
     @MethodTarget(isStatic = true)
     @RedirectClass("net.minecraft.nbt.IntTag")
@@ -108,7 +108,7 @@ public interface TagAPI extends TargetDescriptor, TagHelper {
 
     @MethodTarget
     @RedirectClass("net.minecraft.nbt.CollectionTag")
-    Object remove(AbstractList<?> list, int index);
+    Object remove(Iterable<?> list, int index);
 
     @MethodTarget
     @RedirectClass("net.minecraft.nbt.CollectionTag")
@@ -212,7 +212,6 @@ public interface TagAPI extends TargetDescriptor, TagHelper {
     @Internal
     @IgnoreFailure(thresholdInclude = Version.v1_21_R4)
     Object readTagParseValue(Object tagParser);
-
 
     default Object parseNbt(String string) {
         Object tagParser = newTagParser(new StringReader(string));

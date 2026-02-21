@@ -1,6 +1,5 @@
 package me.matl114.matlib.utils.command.interruption;
 
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import org.bukkit.command.CommandSender;

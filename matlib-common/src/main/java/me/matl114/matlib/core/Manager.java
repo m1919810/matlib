@@ -44,7 +44,8 @@ public interface Manager {
             deconstruct();
         }
     }
-    default <T extends Manager> T cast(){
+
+    default <T extends Manager> T cast() {
         return (T) this;
     }
 }

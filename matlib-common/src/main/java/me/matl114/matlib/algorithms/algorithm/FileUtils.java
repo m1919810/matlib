@@ -12,14 +12,16 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.Map;
-
+import java.util.*;
+import me.matl114.matlib.common.lang.annotations.NeedTest;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.nodes.*;
 import org.yaml.snakeyaml.representer.Representer;
 
 /**
@@ -125,15 +127,15 @@ public class FileUtils {
         Files.copy(clazz.getResourceAsStream("/" + resource), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static File ensureConfigExists(String pathName, Plugin plugin){
-        try{
+    public static File ensureConfigExists(String pathName, Plugin plugin) {
+        try {
             String filePath = "plugins/" + plugin.getName().replace(" ", "_") + "/" + pathName;
             File file = new File(filePath);
-            if(!file.exists() || !file.isFile()){
+            if (!file.exists() || !file.isFile()) {
                 FileUtils.copyFile(plugin.getClass(), pathName, filePath);
             }
             return file;
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -617,9 +619,9 @@ public class FileUtils {
     public static void writeBinaryFile(File file, byte[] data, boolean append) {
         try {
             ensureParentDir(file);
-            StandardOpenOption[] options = append ?
-                new StandardOpenOption[]{StandardOpenOption.CREATE, StandardOpenOption.APPEND} :
-                new StandardOpenOption[]{StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING};
+            StandardOpenOption[] options = append
+                    ? new StandardOpenOption[] {StandardOpenOption.CREATE, StandardOpenOption.APPEND}
+                    : new StandardOpenOption[] {StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING};
 
             Files.write(file.toPath(), data, options);
         } catch (IOException e) {
@@ -647,6 +649,119 @@ public class FileUtils {
     public static void writeBinaryFile(String path, byte[] data, boolean append) {
         writeBinaryFile(new File(path), data, append);
     }
+
+    @NeedTest
+    public static <T> Map<String, ?> convertToYamlMap(T objectT) {
+        Map<String, ?> yamlMap;
+        if (objectT instanceof Map map0) {
+            yamlMap = new LinkedHashMap<>(map0);
+        } else {
+            // dump java bean
+            // todo : need test
+            Node node = YAML.represent(objectT);
+            yamlMap = (Map<String, ?>) convertYamlNode(node);
+            //            String yaml = dumpYamlAsMap(objectT);
+            //            yamlMap = YAML.load(yaml);
+
+        }
+        return yamlMap;
+    }
+
+    public static Object convertYamlNode(Node node) {
+        if (node instanceof ScalarNode) {
+            return convertScalarNode((ScalarNode) node);
+        } else if (node instanceof MappingNode) {
+            return convertMappingNode((MappingNode) node);
+        } else if (node instanceof SequenceNode) {
+            return convertSequenceNode((SequenceNode) node);
+        } else {
+            return null;
+        }
+    }
+
+    private static Object convertScalarNode(ScalarNode node) {
+        String value = node.getValue();
+        Tag tag = node.getTag();
+
+        try {
+            if (tag == Tag.NULL) {
+                return null;
+            } else if (tag == Tag.INT) {
+                return Integer.parseInt(value);
+            } else if (tag == Tag.FLOAT) {
+                return Float.parseFloat(value);
+            } else if (tag == Tag.BOOL) {
+                return Boolean.parseBoolean(value);
+            } else {
+                return value;
+            }
+        } catch (Exception e) {
+            return value;
+        }
+    }
+
+    private static Map<String, Object> convertMappingNode(MappingNode node) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (NodeTuple tuple : node.getValue()) {
+            String key = ((ScalarNode) tuple.getKeyNode()).getValue();
+            Object value = convertYamlNode(tuple.getValueNode());
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    private static List<Object> convertSequenceNode(SequenceNode node) {
+        List<Object> list = new ArrayList<>();
+        for (Node item : node.getValue()) {
+            list.add(convertYamlNode(item));
+        }
+        return list;
+    }
+
+    /**
+     * the YamlConfiguration stores the notes that will be ignored by yaml loader
+     * to keep the yaml
+     * @param currentConfig
+     * @param objectT
+     * @param <T>
+     */
+    public static <T> void convertToConfig(YamlConfiguration currentConfig, T objectT) {
+        Map<String, ?> yamlMap = convertToYamlMap(objectT);
+        Map<String, ?> valueMap = flattenMapConfig(
+                yamlMap, String.valueOf(currentConfig.getRoot().options().pathSeparator()));
+        for (var entry : valueMap.entrySet()) {
+            String path = entry.getKey();
+            Object val = entry.getValue();
+            currentConfig.set(path, val);
+        }
+    }
+
+    public static Map<String, ?> flattenMapConfig(Map<String, ?> map0, String sep) {
+        Map<String, ?> val = new LinkedHashMap<>();
+        flatten("", map0, (Map<String, Object>) val, sep);
+        return val;
+    }
+
+    private static void flatten(String prefix, Map<String, ?> source, Map<String, Object> result, String sep) {
+        for (Map.Entry<String, ?> entry : source.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            String newKey = prefix.isEmpty() ? key : prefix + sep + key;
+
+            if (value instanceof Map) {
+                // 递归处理嵌套Map
+                Map<String, ?> nestedMap = (Map<String, ?>) value;
+                flatten(newKey, nestedMap, result, sep);
+            } else {
+                result.put(newKey, value);
+            }
+        }
+    }
+
+    // todo: add copy to new options, copy compatible values to the new config,
+    // todo: add version flag, add version auto update
+    // todo: add Codec for java beans auto build
 
     // =========================== 辅助方法 ===========================
     /**

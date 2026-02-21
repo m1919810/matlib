@@ -5,7 +5,6 @@ import me.matl114.matlib.utils.CraftUtils;
 import me.matl114.matlib.utils.NMSInventoryUtils;
 import me.matl114.matlib.utils.WorldUtils;
 import org.bukkit.block.TileState;
-import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
@@ -100,10 +99,10 @@ public class ItemWithSlot<T extends ItemStackCache<T>> extends ItemCounter<T> {
             } else { // 不为空，同正常一样
                 // 已经是之前有了的 可以直接修改
                 updateItemStack();
-                //try mark changed if vanilla
+                // try mark changed if vanilla
                 // do not,  like hopper , too many update may be bad for the tps
-                //todo: add stopUpdateSignal method
-                if(false && menu instanceof TileState tileEntity) {
+                // todo: add stopUpdateSignal method
+                if (false && menu instanceof TileState tileEntity) {
                     WorldUtils.tileEntitySetChange(tileEntity);
                 }
             }

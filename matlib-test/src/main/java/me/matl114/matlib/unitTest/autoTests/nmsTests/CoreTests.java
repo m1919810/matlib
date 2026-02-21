@@ -20,7 +20,6 @@ import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import org.bukkit.Material;
 
-
 public class CoreTests implements TestCase {
     static TestReflection TEST = DescriptorImplBuilder.createMultiHelper(TestReflection.class);
 

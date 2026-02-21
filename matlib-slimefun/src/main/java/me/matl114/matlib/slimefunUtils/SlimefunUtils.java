@@ -6,7 +6,6 @@ import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.chat.ChatInput;
 import io.github.thebusybiscuit.slimefun4.libraries.paperlib.PaperLib;
 import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
-
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -31,8 +30,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.units.qual.C;
 
 public class SlimefunUtils {
 
@@ -254,15 +251,15 @@ public class SlimefunUtils {
         return true;
     }
 
-
-    public static void setupAutoUpdate(SlimefunAddon addon, File javaFile, String userName, String repo, String branch){
-        try{
+    public static void setupAutoUpdate(
+            SlimefunAddon addon, File javaFile, String userName, String repo, String branch) {
+        try {
             Plugin plugin = (Plugin) addon;
             if (plugin.getDescription().getVersion().startsWith("Build")) {
                 GuizhanUpdater.start(plugin, javaFile, userName, repo, branch);
             }
-        }catch (Throwable e){
-            addon.getLogger().log(Level.WARNING, "本粘液附属的自动更新无法启动: {0}" ,e.getMessage());
+        } catch (Throwable e) {
+            addon.getLogger().log(Level.WARNING, "本粘液附属的自动更新无法启动: {0}", e.getMessage());
         }
     }
 }
