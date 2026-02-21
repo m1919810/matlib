@@ -54,7 +54,7 @@ public interface TagAPI_v1_21_R4 extends TagAPI {
     @Internal
     @FieldTarget(isStatic = true)
     @RedirectClass(TagParser)
-    @RedirectName("NBT_OPS_PARSER")
+    @RedirectName("NBT_OPS_PARSERGetter")
     public Object getNbtTagParser();
 
     @Internal
