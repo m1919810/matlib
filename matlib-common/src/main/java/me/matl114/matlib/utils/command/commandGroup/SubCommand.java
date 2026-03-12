@@ -161,11 +161,11 @@ public abstract class SubCommand implements CustomTabExecutor {
 
         public SubCommand getFallbackCommand();
 
-        public void setFallbackCommand(SubCommand fallbackCommand, Supplier<Stream<String>> fallbackTabSuggestor);
+        public void setFallbackCommand(SubCommand fallbackCommand, SimpleCommandArgs.TabResult fallbackTabSuggestor);
 
         default <T extends SubCommandCaller> T withFallback(
                 SubCommand fallbackCommand, Supplier<Stream<String>> fallbackTabSuggestor) {
-            setFallbackCommand(fallbackCommand, fallbackTabSuggestor);
+            setFallbackCommand(fallbackCommand, SimpleCommandArgs.TabResult.ofStreamSupplier(fallbackTabSuggestor));
             return (T) this;
         }
         // todo: add help interface
@@ -466,6 +466,11 @@ public abstract class SubCommand implements CustomTabExecutor {
      */
     public SubCommand setTabCompletor(String arg, Supplier<List<String>> completions) {
         this.template.setTabCompletor(arg, completions);
+        return this;
+    }
+
+    public SubCommand setTabCompletor(String arg, SimpleCommandArgs.TabResult tabResult) {
+        this.template.setTabCompletor(arg, tabResult);
         return this;
     }
 }

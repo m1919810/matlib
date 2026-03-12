@@ -1,22 +1,110 @@
 package me.matl114.matlib.utils.command.params;
 
+import com.google.common.collect.Streams;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import me.matl114.matlib.common.lang.annotations.DoNotCall;
+import me.matl114.matlib.common.lang.annotations.DoNotOverride;
 import me.matl114.matlib.utils.command.CommandUtils;
+import me.matl114.matlib.utils.command.interruption.ArgumentException;
 import org.bukkit.command.CommandSender;
 
 public class SimpleCommandArgs {
     // todo: add Argument type,  consume more args
     // todo: use StringReader
+    public static interface TabResult {
+        public static TabResult EMPTY = (s, arg) -> Stream.empty();
+
+        @Nonnull
+        @DoNotCall
+        public Stream<String> completeInternal(CommandSender sender, List<InputArgument> args) throws ArgumentException;
+
+        @Nonnull
+        @DoNotOverride
+        default Stream<String> completeOrEmpty(CommandSender sender, List<InputArgument> args) {
+            try {
+                return completeInternal(sender, args);
+            } catch (ArgumentException e) {
+                return Stream.empty();
+            }
+        }
+
+        default TabResult combine(TabResult result) {
+            return (s, arg) -> Stream.concat(completeOrEmpty(s, arg), result.completeOrEmpty(s, arg));
+        }
+
+        public static TabResult ofFunction(Function<CommandSender, List<String>> f) {
+            return (s, arg) -> {
+                var list = f.apply(s);
+                return list == null ? Stream.empty() : list.stream();
+            };
+        }
+
+        public static TabResult ofStreamFunction(Function<CommandSender, Stream<String>> f) {
+            return (s, arg) -> {
+                var list = f.apply(s);
+                return list == null ? Stream.empty() : list;
+            };
+        }
+
+        public static TabResult ofSupplier(Supplier<List<String>> supplier) {
+            return (s, arg) -> {
+                var list = supplier.get();
+                return list == null ? Stream.empty() : list.stream();
+            };
+        }
+
+        public static TabResult ofStreamSupplier(Supplier<Stream<String>> supplier) {
+            return (s, arg) -> {
+                var list = supplier.get();
+                return list == null ? Stream.empty() : list;
+            };
+        }
+
+        public static TabResult ofDispatcher(BiFunction<CommandSender, String, Stream<String>> f) {
+            return (p, args) -> {
+                if (args.isEmpty()) return Stream.empty();
+                var re = args.get(args.size() - 1);
+                String result = re.result();
+                return result == null ? Stream.empty() : f.apply(p, result);
+            };
+        }
+
+        public static TabResult ofArgDispatcher(BiFunction<CommandSender, InputArgument, Stream<String>> f) {
+            return (p, args) -> {
+                if (args.isEmpty()) return Stream.empty();
+                var re = args.get(args.size() - 1);
+                return re == null ? Stream.empty() : f.apply(p, re);
+            };
+        }
+
+        default TabResult ofOptional(Predicate<List<InputArgument>> predicate) {
+            return (p, args) -> {
+                if (predicate.test(args)) return completeOrEmpty(p, args);
+                return Stream.empty();
+            };
+        }
+
+        default TabResult orElse(Predicate<List<InputArgument>> predicate, TabResult result) {
+            return (p, args) -> {
+                if (predicate.test(args)) return completeOrEmpty(p, args);
+                return result.completeOrEmpty(p, args);
+            };
+        }
+    }
+
     public static class Argument implements TabProvider {
         @Getter
         private final String argsName;
@@ -27,7 +115,7 @@ public class SimpleCommandArgs {
         @Setter
         private String defaultValue = null;
 
-        public Function<CommandSender, List<String>> tabCompletor = (p) -> List.of();
+        public TabResult tabCompletor = TabResult.EMPTY;
 
         public Argument(String argsName) {
             this.argsName = argsName;
@@ -44,8 +132,12 @@ public class SimpleCommandArgs {
             return argsAlias.contains(arg);
         }
 
-        public List<String> getTab(CommandSender sender) {
-            return tabCompletor.apply(sender);
+        public Stream<String> getTab(CommandSender sender, List<InputArgument> args) {
+            try {
+                return tabCompletor.completeOrEmpty(sender, args);
+            } catch (ArgumentException argumentException) {
+                return Stream.empty();
+            }
         }
     }
 
@@ -53,19 +145,26 @@ public class SimpleCommandArgs {
     @Getter
     @Setter
     public static class ArgumentBuilder {
+        public static final List<String> BOOL_TAB = List.of("true", "false");
+
         public ArgumentBuilder() {}
 
         String name;
         String defaultValue;
-        List<Function<CommandSender, Stream<String>>> tabCompletor = new ArrayList<>();
+        List<TabResult> tabCompletor = new ArrayList<>();
+
+        public ArgumentBuilder tabCompletor(TabResult result) {
+            tabCompletor.add(result);
+            return this;
+        }
 
         public ArgumentBuilder tabSupplier(Supplier<Stream<String>> list) {
-            tabCompletor.add((p) -> list.get());
+            tabCompletor.add(TabResult.ofStreamSupplier(list));
             return this;
         }
 
         public ArgumentBuilder tabCompletor(Function<CommandSender, Stream<String>> list) {
-            tabCompletor.add(list);
+            tabCompletor.add(TabResult.ofStreamFunction(list));
             return this;
         }
 
@@ -119,12 +218,12 @@ public class SimpleCommandArgs {
         }
 
         public ArgumentBuilder bool(boolean def) {
-            tabSupplier(() -> Stream.of("true", "false")).defaultValue(String.valueOf(def));
+            tabSupplier(BOOL_TAB::stream).defaultValue(String.valueOf(def));
             return this;
         }
 
         public ArgumentBuilder bool() {
-            tabSupplier(() -> Stream.of("true", "false"));
+            tabSupplier(BOOL_TAB::stream);
             return this;
         }
 
@@ -142,15 +241,34 @@ public class SimpleCommandArgs {
             return this;
         }
 
+        public ArgumentBuilder dispatchLast(BiFunction<CommandSender, String, Stream<String>> f) {
+            tabCompletor(TabResult.ofDispatcher(f));
+            return this;
+        }
+
+        public ArgumentBuilder dispatchLast(Function<String, Stream<String>> f) {
+            dispatchLast((p, str) -> f.apply(str));
+            return this;
+        }
+
+        public ArgumentBuilder dispatchLastArg(Function<InputArgument, Stream<String>> f) {
+            dispatchLastArg((p, str) -> f.apply(str));
+            return this;
+        }
+
+        public ArgumentBuilder dispatchLastArg(BiFunction<CommandSender, InputArgument, Stream<String>> f) {
+            tabCompletor(TabResult.ofArgDispatcher(f));
+            return this;
+        }
+
         public Argument build() {
             var arg = new Argument(name);
             arg.setDefaultValue(defaultValue);
-            arg.tabCompletor = (cmd) -> {
-                List<String> strings = new ArrayList<>();
-                for (var en : tabCompletor) {
-                    en.apply(cmd).forEach(strings::add);
-                }
-                return strings;
+            List<TabResult> tabResultList = List.copyOf(tabCompletor);
+            arg.tabCompletor = (p, args) -> {
+                return Streams.concat((Stream<String>[]) tabCompletor.stream()
+                        .map(s -> s.completeOrEmpty(p, args))
+                        .toArray(Stream[]::new));
             };
             arg.argsAlias.addAll(alias);
             return arg;
@@ -176,10 +294,18 @@ public class SimpleCommandArgs {
         }
     }
 
+    public void setTabCompletor(String arg, TabResult tabCompletor) {
+        for (Argument a : args) {
+            if (a.argsName.equals(arg)) {
+                a.tabCompletor = tabCompletor;
+            }
+        }
+    }
+
     public void setTabCompletor(String arg, Supplier<List<String>> tabCompletor) {
         for (Argument a : args) {
             if (a.argsName.equals(arg)) {
-                a.tabCompletor = (o) -> tabCompletor.get();
+                a.tabCompletor = TabResult.ofSupplier(tabCompletor);
             }
         }
     }
@@ -187,7 +313,7 @@ public class SimpleCommandArgs {
     public void setTabCompletor(String arg, Function<CommandSender, List<String>> tabCompletor) {
         for (Argument a : args) {
             if (a.argsName.equals(arg)) {
-                a.tabCompletor = tabCompletor;
+                a.tabCompletor = TabResult.ofFunction(tabCompletor);
             }
         }
     }

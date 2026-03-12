@@ -1,15 +1,15 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
+import me.matl114.matlib.utils.command.params.InputArgument;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import org.bukkit.command.CommandSender;
 
 public class TreeSubCommand extends SubCommand implements SubCommandDispatcher, SubCommand.SubCommandCaller {
     private SubCommand fallBackCommand = null;
-    private Supplier<Stream<String>> fallbackTabSuggestor = Stream::of;
+    private SimpleCommandArgs.TabResult fallbackTabSuggestor = SimpleCommandArgs.TabResult.EMPTY;
     private final Map<String, SubCommand> subCommands;
 
     public TreeSubCommand(String name, String... helpContent) {
@@ -18,9 +18,9 @@ public class TreeSubCommand extends SubCommand implements SubCommandDispatcher, 
         setTabCompletor("dispatch_" + name, this::onSubCommandSuggest);
     }
 
-    public List<String> onSubCommandSuggest() {
-        return Stream.concat(subCommands.keySet().stream(), fallbackTabSuggestor.get())
-                .toList();
+    public Stream<String> onSubCommandSuggest(CommandSender commandSender, List<InputArgument> argumentReader) {
+        return Stream.concat(
+                subCommands.keySet().stream(), fallbackTabSuggestor.completeOrEmpty(commandSender, argumentReader));
     }
 
     public Stream<String> getHelp(String prefix) {
@@ -33,7 +33,7 @@ public class TreeSubCommand extends SubCommand implements SubCommandDispatcher, 
         this.subCommands.put(command.getName(), command);
     }
 
-    public void setFallbackCommand(SubCommand fallbackCommand, Supplier<Stream<String>> fallbackTabSuggestor) {
+    public void setFallbackCommand(SubCommand fallbackCommand, SimpleCommandArgs.TabResult fallbackTabSuggestor) {
         this.fallBackCommand = fallbackCommand;
         this.fallbackTabSuggestor = fallbackTabSuggestor;
     }
