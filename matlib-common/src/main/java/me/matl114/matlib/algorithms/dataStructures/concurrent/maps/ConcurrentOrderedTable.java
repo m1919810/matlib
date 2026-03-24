@@ -1,18 +1,14 @@
 package me.matl114.matlib.algorithms.dataStructures.concurrent.maps;
 
-import me.matl114.matlib.algorithms.dataStructures.frames.collection.MappingIterator;
-
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 public class ConcurrentOrderedTable<K, V> {
     private final ConcurrentHashMap<K, V> delegate;
 
     private final ConcurrentLinkedQueue<K> order;
+
     public ConcurrentOrderedTable() {
         this.delegate = new ConcurrentHashMap<>();
         this.order = new ConcurrentLinkedQueue<>();
@@ -26,19 +22,19 @@ public class ConcurrentOrderedTable<K, V> {
     }
 
     public void put(K key, V value) {
-        if(value != null){
+        if (value != null) {
             putNonnull(key, value);
-        }else{
+        } else {
             remove(key);
         }
     }
 
     private void putNonnull(K key, V value) {
-        this.delegate.compute(key, (k ,v)-> {
-            if(v == null){
+        this.delegate.compute(key, (k, v) -> {
+            if (v == null) {
                 this.order.add(k);
                 return value;
-            }else{
+            } else {
                 return value;
             }
         });
@@ -52,26 +48,26 @@ public class ConcurrentOrderedTable<K, V> {
         public Itr(Iterator<K> iterator) {
             this.iterator = iterator;
         }
+
         K last;
         Iterator<K> iterator;
         V lastV;
         boolean nextRead;
 
-        public boolean updateNext(){
+        public boolean updateNext() {
             // iterator.next() != null is true
-            if(nextRead){
+            if (nextRead) {
                 return true;
             }
             boolean hasNext;
-            while((hasNext = iterator.hasNext()) && (last = iterator.next()) != null && (lastV = get(last)) == null){
+            while ((hasNext = iterator.hasNext()) && (last = iterator.next()) != null && (lastV = get(last)) == null) {}
 
-            }
             nextRead = hasNext;
             return hasNext;
         }
 
-        public void markRead(){
-            if(!nextRead)throw new IllegalStateException("read before hasNext");
+        public void markRead() {
+            if (!nextRead) throw new IllegalStateException("read before hasNext");
             this.nextRead = false;
         }
     }
@@ -95,8 +91,8 @@ public class ConcurrentOrderedTable<K, V> {
 
         @Override
         public void remove() {
-            if(last == null)throw new IllegalStateException("remove before hasNext");
-            if(nextRead)throw new IllegalStateException("remove before read");
+            if (last == null) throw new IllegalStateException("remove before hasNext");
+            if (nextRead) throw new IllegalStateException("remove before read");
             ConcurrentOrderedTable.this.remove(last);
         }
     }
@@ -105,5 +101,4 @@ public class ConcurrentOrderedTable<K, V> {
         Iterator<K> iterator = this.order.iterator();
         return new KeyItr(iterator);
     }
-
 }

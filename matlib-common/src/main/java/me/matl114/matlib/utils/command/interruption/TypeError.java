@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
-import org.bukkit.command.CommandSender;
+import me.matl114.matlib.utils.command.params.api.ArgumentType;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
 
 @Getter
 @AllArgsConstructor
@@ -16,20 +16,16 @@ public class TypeError extends ArgumentException {
     BaseArgumentType typeName;
     String input;
 
-    public TypeError(ArgumentReader reader, SimpleCommandArgs.Argument arg, BaseArgumentType typeName, String input) {
-        this(reader, arg == null ? null : arg.getArgsName(), typeName, input);
+    public TypeError(ArgumentType<?> argument, BaseArgumentType typeName, String input) {
+        this(null, argument == null ? null : argument.getArgsName(), typeName, input);
     }
 
     public TypeError(String argument, BaseArgumentType typeName, String input) {
         this(null, argument, typeName, input);
     }
 
-    public TypeError(SimpleCommandArgs.Argument arg, BaseArgumentType typeName, String input) {
-        this(null, arg == null ? null : arg.getArgsName(), typeName, input);
-    }
-
     @Override
-    public void handleAbort(CommandSender sender, InterruptionHandler command) {
+    public void handleAbort(CommandExecution sender, InterruptionHandler command) {
         command.handleTypeError(sender, reader, argument, typeName, input);
     }
 

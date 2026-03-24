@@ -8,8 +8,7 @@ import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.interruption.TypeError;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
 
 public interface CustomTabExecutor {
     /**
@@ -29,7 +28,7 @@ public interface CustomTabExecutor {
      * @param sender The command sender to check
      * @return true if the sender has permission, false otherwise
      */
-    default boolean hasPermission(CommandSender sender) {
+    default boolean hasPermission(CommandExecution sender) {
         String permission = permissionRequired();
         return permission == null || sender.hasPermission(permission);
     }
@@ -42,25 +41,27 @@ public interface CustomTabExecutor {
      * @return A pair containing the parsed input stream and remaining arguments
      */
     @Nonnull
-    public ArgumentInputStream parseInput(ArgumentReader args);
+    public ArgumentInputStream parseInput(CommandExecution execution, ArgumentReader args);
 
     public String getName();
 
-    public boolean onCustomCommand(CommandSender sender, Command command, ArgumentReader arguments);
+    public boolean onCustomCommand(CommandExecution sender, ArgumentReader arguments);
 
-    public List<String> onCustomTabComplete(CommandSender sender, Command command, ArgumentReader arguments);
+    public List<String> onCustomTabComplete(CommandExecution sender, ArgumentReader arguments);
 
-    public Stream<String> onCustomHelp(CommandSender sender, ArgumentReader arguments);
+    public Stream<String> onCustomHelp(CommandExecution sender, ArgumentReader arguments);
 
     //    @DoNotOverride
     //    @Override
-    //    default boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s,
+    //    default boolean onCommand(@NotNull CommandExecution CommandExecution, @NotNull Command command, @NotNull
+    // String s,
     // @NotNull String[] strings) {
-    //        return onCustomCommand(commandSender, command, new ArgumentReader(s, strings));
+    //        return onCustomCommand(CommandExecution, command, new ArgumentReader(s, strings));
     //    }
     //    @Override
     //    @DoNotOverride
-    //    default List<String> onTabComplete(@NotNull CommandSender var1, @NotNull Command var2, @NotNull String var3,
+    //    default List<String> onTabComplete(@NotNull CommandExecution var1, @NotNull Command var2, @NotNull String
+    // var3,
     // @NotNull String[] var4) {
     //        return onCustomTabComplete(var1, var2, new ArgumentReader(var3, var4));
     //    }

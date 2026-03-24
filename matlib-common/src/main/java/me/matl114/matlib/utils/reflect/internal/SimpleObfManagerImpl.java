@@ -48,8 +48,8 @@ public class SimpleObfManagerImpl implements SimpleObfManager {
                     "net.minecraft.network.protocol.game.ServerboundClientInformationPacket",
             "net.minecraft.world.item.equipment.trim.ArmorTrim", "net.minecraft.world.item.armortrim.ArmorTrim",
             "net.minecraft.network.chat.contents.data.DataSource", "net.minecraft.network.chat.contents.DataSource",
-            "net.minecraft.resources.ResourceLocation", "net.minecraft.resources.Identifier"
-        );
+            "net.minecraft.resources.ResourceLocation", "net.minecraft.resources.Identifier",
+            "net.minecraft.core.IRegistry", "net.minecraft.core.Registry");
     final Map<String, String> mojangVersionedPathMapper;
     final Map<String, String> mojangVersionedPathMapperInverse;
 

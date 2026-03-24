@@ -15,5 +15,6 @@ public class NMSTestset extends TestSet {
         addTest(new ItemCodecTests());
         addTest(new ItemMetaViewTests());
         addTest(new ItemDataTests());
+        addTest(new ItemMatchTests());
     }
 }

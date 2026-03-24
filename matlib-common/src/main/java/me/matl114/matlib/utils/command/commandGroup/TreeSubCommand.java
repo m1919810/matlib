@@ -3,24 +3,29 @@ package me.matl114.matlib.utils.command.commandGroup;
 import java.util.*;
 import java.util.stream.Stream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import me.matl114.matlib.utils.command.params.InputArgument;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
-import org.bukkit.command.CommandSender;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
+import me.matl114.matlib.utils.command.params.api.InputArgument;
+import me.matl114.matlib.utils.command.params.api.TabResult;
 
-public class TreeSubCommand extends SubCommand implements SubCommandDispatcher, SubCommand.SubCommandCaller {
+public class TreeSubCommand extends SubCommandImpl implements SubCommandDispatcher, SubCommand.SubCommandCaller {
     private SubCommand fallBackCommand = null;
-    private SimpleCommandArgs.TabResult fallbackTabSuggestor = SimpleCommandArgs.TabResult.EMPTY;
+    private TabResult fallbackTabSuggestor = TabResult.EMPTY;
     private final Map<String, SubCommand> subCommands;
 
     public TreeSubCommand(String name, String... helpContent) {
-        super(name, new SimpleCommandArgs("dispatch_" + name), helpContent);
+        super(name, null, helpContent);
+        this.template = new SimpleCommandArgs(SimpleCommandArgs.argumentBuilder()
+                .name("dispatch_" + name)
+                .tabCompletor(this::onSubCommandSuggest)
+                .build());
         this.subCommands = new LinkedHashMap<String, SubCommand>();
-        setTabCompletor("dispatch_" + name, this::onSubCommandSuggest);
     }
 
-    public Stream<String> onSubCommandSuggest(CommandSender commandSender, List<InputArgument> argumentReader) {
+    public Stream<String> onSubCommandSuggest(
+            CommandExecution CommandExecution, List<InputArgument<?>> argumentReader) {
         return Stream.concat(
-                subCommands.keySet().stream(), fallbackTabSuggestor.completeOrEmpty(commandSender, argumentReader));
+                subCommands.keySet().stream(), fallbackTabSuggestor.completeOrEmpty(CommandExecution, argumentReader));
     }
 
     public Stream<String> getHelp(String prefix) {
@@ -33,7 +38,7 @@ public class TreeSubCommand extends SubCommand implements SubCommandDispatcher, 
         this.subCommands.put(command.getName(), command);
     }
 
-    public void setFallbackCommand(SubCommand fallbackCommand, SimpleCommandArgs.TabResult fallbackTabSuggestor) {
+    public void setFallbackCommand(SubCommand fallbackCommand, TabResult fallbackTabSuggestor) {
         this.fallBackCommand = fallbackCommand;
         this.fallbackTabSuggestor = fallbackTabSuggestor;
     }
@@ -53,7 +58,7 @@ public class TreeSubCommand extends SubCommand implements SubCommandDispatcher, 
         return this.fallBackCommand;
     }
 
-    public Stream<String> onCustomHelp(CommandSender sender, ArgumentReader arguments) {
+    public Stream<String> onCustomHelp(CommandExecution sender, ArgumentReader arguments) {
         return SubCommandDispatcher.super.onCustomHelp(sender, arguments);
     }
 }

@@ -4,13 +4,25 @@ import java.util.List;
 import java.util.function.*;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
+import org.apache.commons.lang3.function.TriFunction;
 import org.bukkit.command.CommandSender;
 
 public interface CommandContext {
-    public boolean execute(CommandSender var1, ArgumentInputStream streamArgs, ArgumentReader argsReader);
+    public boolean execute(CommandExecution var1, ArgumentInputStream streamArgs, ArgumentReader argsReader);
 
-    default List<String> supplyTab(CommandSender var1, ArgumentInputStream streamArgs, ArgumentReader argsReader) {
+    default List<String> supplyTab(CommandExecution var1, ArgumentInputStream streamArgs, ArgumentReader argsReader) {
         return List.of();
+    }
+
+    public static CommandContext run(
+            TriFunction<CommandSender, ArgumentInputStream, ArgumentReader, Boolean> delegate) {
+        return ((var1, streamArgs, argsReader) -> {
+            if (var1.getExecutor() != null) {
+                return delegate.apply(var1.getExecutor(), streamArgs, argsReader);
+            }
+            return false;
+        });
     }
 
     public static CommandContext run(Runnable task) {
@@ -41,14 +53,20 @@ public interface CommandContext {
 
     public static CommandContext run(BiConsumer<CommandSender, ArgumentInputStream> var) {
         return ((var1, streamArgs, argsReader) -> {
-            var.accept(var1, streamArgs);
-            return true;
+            if (var1.getExecutor() != null) {
+                var.accept(var1.getExecutor(), streamArgs);
+                return true;
+            }
+            return false;
         });
     }
 
     public static CommandContext run(BiPredicate<CommandSender, ArgumentInputStream> var) {
         return (var1, streamArgs, argsReader) -> {
-            return var.test(var1, streamArgs);
+            if (var1.getExecutor() != null) {
+                return var.test(var1.getExecutor(), streamArgs);
+            }
+            return false;
         };
     }
 }

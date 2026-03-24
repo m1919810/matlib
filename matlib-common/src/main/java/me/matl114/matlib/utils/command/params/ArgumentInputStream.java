@@ -1,203 +1,74 @@
 package me.matl114.matlib.utils.command.params;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import me.matl114.matlib.utils.command.interruption.TypeError;
-import me.matl114.matlib.utils.command.interruption.ValueAbsentError;
-import me.matl114.matlib.utils.command.interruption.ValueOutOfRangeError;
-import org.bukkit.command.CommandSender;
+
+import com.google.common.collect.Streams;
+import me.matl114.matlib.utils.command.params.api.ArgumentType;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
+import me.matl114.matlib.utils.command.params.api.InputArgument;
 import org.jetbrains.annotations.Nullable;
 
 public class ArgumentInputStream {
-    @AllArgsConstructor
-    @Accessors(fluent = true)
-    @Setter
-    @Getter
-    public static class ArgumentReaderResult implements InputArgument {
-        // the index lies at the next index of result, where it just read the result, so the result is at top of
-        // alreadyRead arguments
-        // or the index lies at the end of the reader, where the result is not found, anywhere
-        public SimpleCommandArgs.Argument argument;
-        public String result;
-        public ArgumentReader reader;
-        int index;
-        boolean isDefault;
-
-        public ArgumentReader getReaderAt() {
-            return new ArgumentReader(reader).setCursor(index);
-        }
-        // if the default value is null and you're requiring a primitive type, then it is a ValueAbsentError , not a
-        // type error
-        private void checkDefaultNullPrimitive() {
-            if (isDefault && result == null) {
-                throw new ValueAbsentError(getReaderAt(), argument);
-            }
-        }
-
-        public int getInt() {
-            checkDefaultNullPrimitive();
-            try {
-                return Integer.parseInt(result);
-            } catch (Throwable e) {
-                throw new TypeError(getReaderAt(), argument, TypeError.BaseArgumentType.INT, result);
-            }
-        }
-
-        public boolean getBoolean() {
-            checkDefaultNullPrimitive();
-            switch (result) {
-                case "true":
-                    return true;
-                case "false":
-                    return false;
-                default:
-                    throw new TypeError(getReaderAt(), argument, TypeError.BaseArgumentType.BOOLEAN, result);
-            }
-        }
-
-        public float getFloat() {
-            checkDefaultNullPrimitive();
-            try {
-                return Float.parseFloat(result);
-            } catch (Throwable e) {
-                throw new TypeError(getReaderAt(), argument, TypeError.BaseArgumentType.FLOAT, result);
-            }
-        }
-
-        public double getDouble() {
-            checkDefaultNullPrimitive();
-            try {
-                return Double.parseDouble(result);
-            } catch (Throwable e) {
-                throw new TypeError(getReaderAt(), argument, TypeError.BaseArgumentType.FLOAT, result);
-            }
-        }
-
-        public int clampInt(int low, int highEx) {
-            int val = getInt();
-            if (val >= low && val < highEx) {
-                return val;
-            } else {
-                throw new ValueOutOfRangeError(getReaderAt(), argument.getArgsName(), low, highEx, val);
-            }
-        }
-
-        public float clampFloat(float low, float highEx) {
-            float val = getFloat();
-            if (val >= low && val < highEx) {
-                return val;
-            } else {
-                throw new ValueOutOfRangeError(getReaderAt(), argument.getArgsName(), low, highEx, val);
-            }
-        }
-
-        public double clampDouble(double low, double highEx) {
-            double val = getDouble();
-            if (val >= low && val < highEx) {
-                return val;
-            } else {
-                throw new ValueOutOfRangeError(
-                        getReaderAt(),
-                        argument.getArgsName(),
-                        String.valueOf(low),
-                        String.valueOf(highEx),
-                        String.valueOf(val),
-                        TypeError.BaseArgumentType.FLOAT);
-            }
-        }
-
-        public String nonnullResult() {
-            if (result == null) {
-                throw new ValueAbsentError(getReaderAt(), argument.getArgsName());
-            } else {
-                return result;
-            }
-        }
-
-        public <T extends Enum<T>> T enumResult(Class<T> type) {
-            String value = nonnullResult();
-            T[] results = type.getEnumConstants();
-            for (int i = 0; i < results.length; i++) {
-                if (results[i].name().equalsIgnoreCase(value)) {
-                    return results[i];
-                }
-            }
-            throw new ValueOutOfRangeError(
-                    this.getReaderAt(),
-                    argument.getArgsName(),
-                    Arrays.stream(type.getEnumConstants())
-                            .map(Enum::name)
-                            .map(s -> s.toLowerCase(Locale.ROOT))
-                            .collect(Collectors.toList()),
-                    value,
-                    TypeError.BaseArgumentType.ENUM);
-        }
-
-        public String selectResult(Collection<String> selections) {
-            String value = nonnullResult();
-            for (var str : selections) {
-                if (str.equalsIgnoreCase(value)) {
-                    return str;
-                }
-            }
-            throw new ValueOutOfRangeError(
-                    this.getReaderAt(), argument.getArgsName(), selections, value, TypeError.BaseArgumentType.ENUM);
-        }
-    }
 
     public ArgumentInputStream(
+            CommandExecution execution,
             ArgumentReader reader,
-            SimpleCommandArgs.Argument[] args,
-            Map<SimpleCommandArgs.Argument, ArgumentReaderResult> argsMap) {
+            List<ArgumentType<?>> argsSet,
+            List<InputArgument<?>> argsMap) {
+        this.execution = execution;
         this.reader = new ArgumentReader(reader);
-        this.arguments = args;
+        this.arguments = argsSet;
         this.argsMap = argsMap;
     }
 
+    CommandExecution execution;
     ArgumentReader reader;
-    SimpleCommandArgs.Argument[] arguments;
-    Map<SimpleCommandArgs.Argument, ArgumentReaderResult> argsMap;
+    List<ArgumentType<?>> arguments;
+    List<InputArgument<?>> argsMap;
+    //    Map<ArgumentType<?>, InputArgument<?>> argsMap;
     int i = 0;
 
     public boolean hasNext() {
-        return i < arguments.length;
+        return i < arguments.size();
     }
 
-    public SimpleCommandArgs.Argument nextArgument() {
-        return arguments[i++];
+    public ArgumentType<?> nextArgument() {
+        return arguments.get(i++);
     }
 
-    private ArgumentReaderResult createDefault(SimpleCommandArgs.Argument argument) {
-        return new ArgumentReaderResult(argument, argument.getDefaultValue(), reader, reader.cursor(), true);
+    private void solveTo(int i) {
+        for (var s = argsMap.size(); s <= i; s++) {
+            ArgumentType<?> type = arguments.get(s);
+            argsMap.add(type.consume(this.execution, argsMap, this.reader));
+        }
     }
 
-    public InputArgument peekNext() {
+    public <T> InputArgument<T> peekNext() {
         if (hasNext()) {
-            SimpleCommandArgs.Argument arg = arguments[i];
-            return argsMap.computeIfAbsent(arg, this::createDefault);
+            solveTo(i);
+            return (InputArgument<T>) argsMap.get(i);
         } else {
             throw new RuntimeException("Illegal to access undeclared argument");
         }
     }
 
     @Nonnull
-    public InputArgument next() {
+    public <T> InputArgument<T> next() {
         if (hasNext()) {
-            SimpleCommandArgs.Argument arg = nextArgument();
-            return argsMap.computeIfAbsent(arg, this::createDefault);
+            int idx = i;
+            solveTo(idx);
+            nextArgument();
+            return (InputArgument<T>) argsMap.get(idx);
         } else {
             throw new RuntimeException("Illegal to access undeclared argument");
         }
     }
 
-    @Nullable public String nextArg() {
-        return next().result();
+    @Nullable public <T> T nextArg() {
+        return this.<T>next().result();
     }
 
     public int nextInt() {
@@ -229,8 +100,13 @@ public class ArgumentInputStream {
     }
 
     @Nonnull
-    public String nextNonnull() {
-        return next().nonnullResult();
+    public <T> T nextNonnull() {
+        return this.<T>next().nonnullResult();
+    }
+
+    @Nonnull
+    public String nextNonnullString() {
+        return this.next().nonnullResultAsString();
     }
 
     public <T extends Enum<T>> T nextEnum(Class<T> type) {
@@ -241,26 +117,42 @@ public class ArgumentInputStream {
         return next().selectResult(selections);
     }
 
-    @Nullable public List<String> getTabComplete(CommandSender sender) {
-        List<InputArgument> argumentInputs = new ArrayList<>();
-        for (int i = 0; i <= arguments.length; i++) {
-            InputArgument argument;
-            if (i == arguments.length || (argument = argsMap.get(arguments[i])) == null) {
-                if (i == 0) {
-                    return null;
+    @Nonnull public Stream<String> getTabComplete(CommandExecution sender) {
+        if (argsMap.isEmpty()) {
+            return Stream.empty();
+        } else {
+            // we only tab at the last block of argument, so check the total length first
+            int wasAboutToTab = this.reader.getLength() - 1;
+            // argument not fully tabbed, tab the last argument present
+            int i = argsMap.size();
+            final int index = i - 1;
+            // remove this operation, that's ridiculous
+            // argumentInputs.remove(argumentInputs.size() - 1);
+            InputArgument<?> lastArgumentParsed = this.argsMap.get(index);
+            int tabbingCursorPos = lastArgumentParsed.getStartIndex();
+            if(tabbingCursorPos == wasAboutToTab) {
+                List<Stream<String>> streams = new ArrayList<>();
+                for (var s = index ; s >= 0 ; --s){
+                    InputArgument<?> argument = this.argsMap.get(s);
+                    // the argument before this will not be tabbed
+                    if(argument.getStartIndex() < tabbingCursorPos){
+                        break;
+                    }
+                    var tabResult = arguments.get(s).getTab(sender, s == index ?  argsMap : argsMap.subList(0, s + 1));
+                    if(tabResult != null){
+                        streams.add(tabResult);
+                    }
                 }
-                final int index = i - 1;
-                argumentInputs.remove(argumentInputs.size() - 1);
-                Stream<String> tablist = arguments[index].getTab(sender, argumentInputs);
-                tablist = tablist == null ? Stream.empty() : tablist;
-                ArgumentReaderResult result = argsMap.get(arguments[index]);
-                String resultResult = ((result != null && result.result() != null) ? result.result() : "").toLowerCase(Locale.ROOT);
-                return tablist.filter(s -> s.toLowerCase(Locale.ROOT).contains(resultResult))
-                        .toList();
-            } else {
-                argumentInputs.add(argument);
+                return Streams.concat(streams.toArray(Stream[]::new));
+            }else{
+                return Stream.empty();
             }
+
         }
-        return null;
+    }
+
+    public <T> T nextArgOrDefault(Supplier<T> def) {
+        T val = this.<T>next().result();
+        return val == null ? def.get() : val;
     }
 }

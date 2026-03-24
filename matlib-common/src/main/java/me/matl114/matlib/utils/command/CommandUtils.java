@@ -1,16 +1,12 @@
 package me.matl114.matlib.utils.command;
 
 import com.google.common.base.Supplier;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import me.matl114.matlib.utils.command.interruption.TypeError;
 import me.matl114.matlib.utils.command.interruption.ValueOutOfRangeError;
-import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
+import me.matl114.matlib.utils.command.params.api.ArgumentType;
+import me.matl114.matlib.utils.command.params.api.TabResult;
 import org.jetbrains.annotations.Nullable;
 
 public class CommandUtils {
@@ -46,54 +42,7 @@ public class CommandUtils {
         return Math.max(Math.min(max, value), min);
     }
 
-    public static Map<String, String> parseArguments(String[] args, SimpleCommandArgs.Argument[] requiredDefault) {
-        Map<String, String> arguments = new HashMap<>();
-        var iter = Arrays.stream(args).iterator();
-        var argIter = Arrays.stream(requiredDefault).iterator();
-        while (iter.hasNext()) {
-            String arg = iter.next();
-            if (arg.startsWith("-")) {
-                SimpleCommandArgs.Argument selected = null;
-                String trueName = arg.replaceFirst("^-+", "");
-                for (SimpleCommandArgs.Argument a : requiredDefault) {
-                    if (a.isAlias(trueName)) {
-                        trueName = a.getArgsName();
-                        break;
-                    }
-                }
-                if (arg.startsWith("--")) {
-                    // --args inputValue
-                    if (iter.hasNext()) {
-                        String arg2 = iter.next();
-
-                        arguments.put(trueName, arg2);
-                    } else {
-                        // ignored
-                    }
-                } else {
-                    // -f -v means boolean
-                    arguments.put(trueName, "true");
-                }
-            } else {
-                SimpleCommandArgs.Argument arg1 = null;
-                while (argIter.hasNext() && arguments.containsKey((arg1 = argIter.next()).getArgsName())) {
-                    // find next argument which is not already collected
-                }
-                if (arg1 != null) {
-                    arguments.put(arg1.getArgsName(), arg);
-                } else {
-                    // no more argument in list, but still --args -flag should be collected, so no break here
-                }
-            }
-        }
-        while (argIter.hasNext()) {
-            var re = argIter.next();
-            arguments.putIfAbsent(re.getArgsName(), re.getDefaultValue());
-        }
-        return arguments;
-    }
-
-    public static int gint(String val, @Nullable SimpleCommandArgs.Argument arg) {
+    public static int gint(String val, @Nullable ArgumentType<?> arg) {
         try {
             return Integer.parseInt(val);
         } catch (Throwable e) {
@@ -101,7 +50,7 @@ public class CommandUtils {
         }
     }
 
-    public static float gfloat(String val, @Nullable SimpleCommandArgs.Argument arg) {
+    public static float gfloat(String val, @Nullable ArgumentType<?> arg) {
         try {
             return Float.parseFloat(val);
         } catch (Throwable e) {
@@ -109,7 +58,7 @@ public class CommandUtils {
         }
     }
 
-    public static double gdouble(String val, @Nullable SimpleCommandArgs.Argument arg) {
+    public static double gdouble(String val, @Nullable ArgumentType<?> arg) {
         try {
             return Double.parseDouble(val);
         } catch (Throwable e) {
@@ -117,7 +66,7 @@ public class CommandUtils {
         }
     }
 
-    public static boolean gbool(String val, @Nullable SimpleCommandArgs.Argument arg) {
+    public static boolean gbool(String val, @Nullable ArgumentType<?> arg) {
         switch (val) {
             case "true":
                 return true;
@@ -245,26 +194,13 @@ public class CommandUtils {
         return FLOATS::stream;
     }
 
-    public static double getExecuteX(CommandSender sender) {
-        return sender instanceof HumanEntity humanEntity ? humanEntity.getX() : 0.0D;
+    public static TabResult createXResult() {
+        return TabResult.ofStreamFunction(p -> Stream.of("%.2f".formatted(p.getExecutePos().x), "~ ~ ~", "^ ^ ^"));
     }
 
-    public static double getExecuteY(CommandSender sender) {
-        return sender instanceof HumanEntity humanEntity ? humanEntity.getY() : 0.0D;
-    }
-
-    public static double getExecuteZ(CommandSender sender) {
-        return sender instanceof HumanEntity humanEntity ? humanEntity.getY() : 0.0D;
-    }
-
-    public static SimpleCommandArgs.TabResult createXResult() {
-        return SimpleCommandArgs.TabResult.ofStreamFunction(
-                p -> Stream.of("%.2f".formatted(getExecuteX(p)), "~ ~ ~", "^ ^ ^"));
-    }
-
-    public static SimpleCommandArgs.TabResult createYResult() {
-        return SimpleCommandArgs.TabResult.ofStreamFunction(p -> Stream.of("%.2f".formatted(getExecuteY(p))))
-                .combine(SimpleCommandArgs.TabResult.ofDispatcher((p, str) -> {
+    public static TabResult createYResult() {
+        return TabResult.ofStreamFunction(p -> Stream.of("%.2f".formatted(p.getExecutePos().y), "~ ~ ~", "^ ^ ^"))
+                .combine(TabResult.ofDispatcher((p, str) -> {
                     if (str.startsWith("^")) {
                         return Stream.of("^");
                     } else {
@@ -273,9 +209,9 @@ public class CommandUtils {
                 }));
     }
 
-    public static SimpleCommandArgs.TabResult createZResult() {
-        return SimpleCommandArgs.TabResult.ofStreamFunction(p -> Stream.of("%.2f".formatted(getExecuteZ(p))))
-                .combine(SimpleCommandArgs.TabResult.ofDispatcher((p, str) -> {
+    public static TabResult createZResult() {
+        return TabResult.ofStreamFunction(p -> Stream.of("%.2f".formatted(p.getExecutePos().z), "~ ~ ~", "^ ^ ^"))
+                .combine(TabResult.ofDispatcher((p, str) -> {
                     if (str.startsWith("^")) {
                         return Stream.of("^");
                     } else {

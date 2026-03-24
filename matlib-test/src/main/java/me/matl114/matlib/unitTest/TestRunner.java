@@ -12,19 +12,22 @@ import me.matl114.matlib.algorithms.algorithm.ExecutorUtils;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.core.Manager;
 import me.matl114.matlib.core.bukkit.schedule.ScheduleManager;
-import me.matl114.matlib.utils.AddUtils;
 import me.matl114.matlib.utils.Debug;
-import me.matl114.matlib.utils.TextUtils;
 import me.matl114.matlib.utils.command.commandGroup.AbstractMainCommand;
 import me.matl114.matlib.utils.command.commandGroup.CommandContext;
 import me.matl114.matlib.utils.command.commandGroup.SubCommand;
 import me.matl114.matlib.utils.command.commandGroup.TreeSubCommand;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
+import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
+import me.matl114.matlib.utils.command.params.impl.PosArgumentType;
+import me.matl114.matlib.utils.command.params.types.ExecutePos;
 import me.matl114.matlib.utils.reflect.ReflectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.joml.Vector3d;
 
 public class TestRunner extends AbstractMainCommand implements Manager {
     private Plugin plugin;
@@ -261,13 +264,22 @@ public class TestRunner extends AbstractMainCommand implements Manager {
                                 .complete())
                         .complete())
                 .complete();
+        command.subBuilder(SubCommand.taskBuilder())
+                .name("testmultiarg")
+                .arg(new PosArgumentType("arg1"))
+                .arg(SimpleCommandArgs.argumentBuilder(PosArgumentType::new)
+                        .name("arg2")
+                        .defaultObject(new ExecutePos.Fixed(new Vector3d(114, 514, 1919)))
+                        .build())
+                .post(e -> e.executor(CommandContext.run(this::testEveryThingInCommandStream)))
+                .complete();
     }
 
-    private boolean executeMain(CommandSender sender, ArgumentInputStream args, ArgumentReader reader) {
+    private boolean executeMain(CommandExecution sender, ArgumentInputStream args, ArgumentReader reader) {
         String val = args.nextArg();
         var re = testCases.get(val);
         if (re == null) {
-            TextUtils.sendMessage(sender, "&cTest case not found, run all");
+            sendMessage(sender, "&cTest case not found, run all");
             ScheduleManager.getManager().launchScheduled(TestRunner.this::runAutomaticTests, 10, false, 0);
         } else {
             ScheduleManager.getManager().launchScheduled(() -> runAutomaticTests(List.of(re.getA())), 10, false, 0);
@@ -275,23 +287,23 @@ public class TestRunner extends AbstractMainCommand implements Manager {
         return true;
     }
 
-    private boolean executeManual(CommandSender sender, ArgumentInputStream args, ArgumentReader reader) {
+    private boolean executeManual(CommandExecution sender, ArgumentInputStream args, ArgumentReader reader) {
         String testcase = args.nextArg();
         var re = TestRunner.this.manuallyExecutedCase.get(testcase);
         if (re != null) {
             ScheduleManager.getManager()
-                    .execute(() -> runManualTests(sender, List.of(re.getA()), reader.getRemainingArgs()));
+                    .execute(() -> runManualTests(sender.getExecutor(), List.of(re.getA()), reader.getRemainingArgs()));
         } else {
             if ("all".equals(testcase)) {
                 ScheduleManager.getManager()
                         .execute(() -> runManualTests(
-                                sender,
+                                sender.getExecutor(),
                                 manuallyExecutedCase.values().stream()
                                         .map(Pair::getA)
                                         .toList(),
                                 reader.getRemainingArgs()));
             } else {
-                AddUtils.sendMessage(sender, "&cTest case not found");
+                sendMessage(sender, "&cTest case not found");
             }
         }
         return true;

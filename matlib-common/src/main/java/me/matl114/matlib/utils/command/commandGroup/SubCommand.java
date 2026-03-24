@@ -9,12 +9,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
-import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.functions.core.TriFunction;
-import me.matl114.matlib.utils.command.CommandUtils;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
+import me.matl114.matlib.utils.command.params.api.ArgumentType;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
+import me.matl114.matlib.utils.command.params.api.TabResult;
 
 /**
  * Represents a sub-command within a command group system.
@@ -28,9 +29,9 @@ import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
  * <p>Each SubCommand has a name, help text, argument template, and optional executor.
  * The class implements TabExecutor to provide tab completion functionality.</p>
  */
-public abstract class SubCommand implements CustomTabExecutor {
+public interface SubCommand extends CustomTabExecutor {
     public static class Builder<T extends SubCommand> {
-        List<SimpleCommandArgs.Argument> argsMap = new ArrayList<>();
+        List<ArgumentType<?>> argsMap = new ArrayList<>();
         String name;
         List<String> helpers = new ArrayList<>();
         String permission;
@@ -86,22 +87,29 @@ public abstract class SubCommand implements CustomTabExecutor {
             return this;
         }
 
-        public Builder<T> arg(SimpleCommandArgs.Argument arg) {
+        public Builder<T> arg(ArgumentType<?> arg) {
             argsMap.add(arg);
             return this;
         }
 
-        public Builder<T> args(UnaryOperator<SimpleCommandArgs.ArgumentBuilder> arg) {
-            var builder = new SimpleCommandArgs.ArgumentBuilder();
+        public Builder<T> args(UnaryOperator<SimpleCommandArgs.ArgumentBuilder<?, ?>> arg) {
+            var builder = SimpleCommandArgs.argumentBuilder();
             arg.apply(builder);
             argsMap.add(builder.build());
+            return this;
+        }
+
+        public Builder<T> args(SimpleCommandArgs args) {
+            for (var arg : args.getArgs()) {
+                this.arg(arg);
+            }
             return this;
         }
 
         public T build() {
             T command = this.builder.apply(
                     name,
-                    new SimpleCommandArgs(this.argsMap.toArray(SimpleCommandArgs.Argument[]::new)),
+                    new SimpleCommandArgs(this.argsMap.toArray(ArgumentType<?>[]::new)),
                     helpers.toArray(String[]::new));
             postBuild(command);
             return command;
@@ -110,7 +118,7 @@ public abstract class SubCommand implements CustomTabExecutor {
         public <W extends SubCommand> W build(TriFunction<String, SimpleCommandArgs, String[], W> builder) {
             W command = builder.apply(
                     name,
-                    new SimpleCommandArgs(this.argsMap.toArray(SimpleCommandArgs.Argument[]::new)),
+                    new SimpleCommandArgs(this.argsMap.toArray(ArgumentType<?>[]::new)),
                     helpers.toArray(String[]::new));
             postBuild((T) command);
             return command;
@@ -129,18 +137,9 @@ public abstract class SubCommand implements CustomTabExecutor {
         return new Builder<>((a, b, c) -> new TreeSubCommand(a, c));
     }
 
-    public static Builder<DelegateSubCommand> delegateBuilder() {
-        return new Builder<>(DelegateSubCommand::new);
-    }
-
     public static <W extends SubCommand> Builder<W> factoryBuilder(
             TriFunction<String, SimpleCommandArgs, String[], W> factory) {
         return new Builder<>(factory);
-    }
-
-    @Nullable @Override
-    public String permissionRequired() {
-        return permission;
     }
 
     /**
@@ -155,17 +154,15 @@ public abstract class SubCommand implements CustomTabExecutor {
          */
         public void registerSub(SubCommand command);
 
-        public SubCommand getSubCommand(String name);
-
         public Collection<SubCommand> getSubCommands();
 
         public SubCommand getFallbackCommand();
 
-        public void setFallbackCommand(SubCommand fallbackCommand, SimpleCommandArgs.TabResult fallbackTabSuggestor);
+        public void setFallbackCommand(SubCommand fallbackCommand, TabResult fallbackTabSuggestor);
 
         default <T extends SubCommandCaller> T withFallback(
                 SubCommand fallbackCommand, Supplier<Stream<String>> fallbackTabSuggestor) {
-            setFallbackCommand(fallbackCommand, SimpleCommandArgs.TabResult.ofStreamSupplier(fallbackTabSuggestor));
+            setFallbackCommand(fallbackCommand, TabResult.ofStreamSupplier(fallbackTabSuggestor));
             return (T) this;
         }
         // todo: add help interface
@@ -229,78 +226,25 @@ public abstract class SubCommand implements CustomTabExecutor {
             return this;
         }
 
-        public SubBuilder<R, W> arg(SimpleCommandArgs.Argument arg) {
+        public SubBuilder<R, W> arg(ArgumentType<?> arg) {
             super.arg(arg);
             return this;
         }
 
-        public SubBuilder<R, W> args(UnaryOperator<SimpleCommandArgs.ArgumentBuilder> arg) {
+        public SubBuilder<R, W> args(UnaryOperator<SimpleCommandArgs.ArgumentBuilder<?, ?>> arg) {
             super.args(arg);
+            return this;
+        }
+
+        public SubBuilder<R, W> args(SimpleCommandArgs args) {
+            super.args(args);
             return this;
         }
     }
 
-    /** Help text lines for this sub-command */
-    /** Should be like an array of string: <name> <argument> <argument> function, function, function**/
-    String[] help;
 
-    /** Argument template defining the expected parameters */
-    SimpleCommandArgs template;
 
-    /** Name of this sub-command */
-    @Getter
-    String name;
-
-    @Setter
-    String permission;
-
-    /** Whether this sub-command should be hidden from help displays */
-    boolean hide = false;
-
-    private SubCommand() {}
-
-    /**
-     * Creates a new SubCommand with the specified name, argument template, and help text.
-     *
-     * @param name The name of the sub-command
-     * @param argsTemplate The argument template defining expected parameters
-     * @param help Help text lines for this sub-command
-     */
-    public SubCommand(String name, SimpleCommandArgs argsTemplate, String... help) {
-        this.name = name;
-        this.template = argsTemplate;
-        this.help = help;
-    }
-
-    /**
-     * Creates a new SubCommand with the specified name, argument template, and help text.
-     *
-     * @param name The name of the sub-command
-     * @param argsTemplate The argument template defining expected parameters
-     * @param help Help text lines for this sub-command
-     */
-    public SubCommand(String name, SimpleCommandArgs argsTemplate, List<String> help) {
-        this(name, argsTemplate, help.toArray(String[]::new));
-    }
-
-    /**
-     * Hides this sub-command from help displays.
-     *
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand hide() {
-        this.hide = true;
-        return this;
-    }
-
-    /**
-     * Checks if this sub-command is visible in help displays.
-     *
-     * @return true if the sub-command is visible, false if hidden
-     */
-    public boolean isVisiable() {
-        return !this.hide;
-    }
+    public void setPermission(String permission);
 
     /**
      * Registers this sub-command with the specified caller.
@@ -308,169 +252,8 @@ public abstract class SubCommand implements CustomTabExecutor {
      * @param caller The SubCommandCaller to register with
      * @return This SubCommand instance for method chaining
      */
-    public SubCommand register(SubCommandCaller caller) {
+    default SubCommand register(SubCommandCaller caller) {
         caller.registerSub(this);
-        return this;
-    }
-
-    /**
-     * Parses the input arguments according to the argument template.
-     * Returns a pair containing the parsed input stream and remaining arguments.
-     *
-     * @param args The arguments to parse
-     * @return A pair containing the parsed input stream and remaining arguments
-     */
-    @Nonnull
-    @Deprecated(forRemoval = true)
-    public Pair<ArgumentInputStream, String[]> parseInput(String[] args) {
-        ArgumentReader reader = new ArgumentReader(args);
-        var re = template.parseInputStream(reader);
-        return new Pair<>(re, reader.getRemainingArgs());
-    }
-
-    @Nonnull
-    public ArgumentInputStream parseInput(ArgumentReader args) {
-        return template.parseInputStream(args);
-    }
-
-    @Override
-    public Stream<String> getHelp(String prefix) {
-        return Arrays.stream(help).map(s -> prefix + s);
-    }
-
-    //    /**
-    //     * Parses arguments and creates a CommandArgumentMap for easy access to argument values.
-    //     *
-    //     * @param args The arguments to parse
-    //     * @return A CommandArgumentMap containing the parsed arguments
-    //     */
-    //    public CommandArgumentMap parseArgument(String[] args) {
-    //        return new CommandArgumentMap(CommandUtils.parseArguments(args, this.template.getArgs()));
-    //    }
-
-    /**
-     * Sets a default value for the specified argument.
-     *
-     * @param arg The argument name
-     * @param val The default value
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setDefault(String arg, String val) {
-        this.template.setDefault(arg, val);
-        return this;
-    }
-
-    /**
-     * Configures an argument as an integer with default value 0.
-     * Also sets up tab completion for integer values.
-     *
-     * @param arg The argument name
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setInt(String arg) {
-        setDefault(arg, "0");
-        setTabCompletor(arg, CommandUtils.numberSupplier());
-        return this;
-    }
-
-    /**
-     * Configures an argument as an integer with the specified default value.
-     * Also sets up tab completion for integer values.
-     *
-     * @param arg The argument name
-     * @param val The default integer value
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setInt(String arg, int val) {
-        setDefault(arg, String.valueOf(val));
-        setTabCompletor(arg, CommandUtils.numberSupplier());
-        return this;
-    }
-
-    /**
-     * Configures an argument as a float with default value 0.0.
-     * Also sets up tab completion for float values.
-     *
-     * @param arg The argument name
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setFloat(String arg) {
-        setDefault(arg, "0.0");
-        setTabCompletor(arg, CommandUtils.floatSupplier());
-        return this;
-    }
-
-    /**
-     * Configures an argument as a float with the specified default value.
-     * Also sets up tab completion for float values.
-     *
-     * @param arg The argument name
-     * @param val The default float value
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setFloat(String arg, float val) {
-        setDefault(arg, String.valueOf(val));
-        setTabCompletor(arg, CommandUtils.floatSupplier());
-        return this;
-    }
-
-    /**
-     * Configures an argument as an enum with the specified values.
-     * Sets up tab completion for the enum values.
-     *
-     * @param arg The argument name
-     * @param enumValues The collection of valid enum values
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setEnum(String arg, Collection<String> enumValues) {
-        List<String> enums = enumValues.stream().toList();
-        setTabCompletor(arg, () -> enums);
-        return this;
-    }
-
-    /**
-     * Configures an argument as an enum with the specified default value and enum values.
-     * Sets up tab completion for the enum values.
-     *
-     * @param arg The argument name
-     * @param defaultValue The default enum value
-     * @param enumValues The valid enum values
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setEnum(String arg, String defaultValue, String... enumValues) {
-        return setEnum(arg, defaultValue, List.of(enumValues));
-    }
-
-    /**
-     * Configures an argument as an enum with the specified default value and enum values.
-     * Sets up tab completion for the enum values.
-     *
-     * @param arg The argument name
-     * @param defaultValue The default enum value
-     * @param enumValues The collection of valid enum values
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setEnum(String arg, String defaultValue, Collection<String> enumValues) {
-        List<String> enums = enumValues.stream().toList();
-        setDefault(arg, defaultValue);
-        setTabCompletor(arg, () -> enums);
-        return this;
-    }
-
-    /**
-     * Sets a custom tab completer for the specified argument.
-     *
-     * @param arg The argument name
-     * @param completions A supplier that provides tab completion suggestions
-     * @return This SubCommand instance for method chaining
-     */
-    public SubCommand setTabCompletor(String arg, Supplier<List<String>> completions) {
-        this.template.setTabCompletor(arg, completions);
-        return this;
-    }
-
-    public SubCommand setTabCompletor(String arg, SimpleCommandArgs.TabResult tabResult) {
-        this.template.setTabCompletor(arg, tabResult);
         return this;
     }
 }

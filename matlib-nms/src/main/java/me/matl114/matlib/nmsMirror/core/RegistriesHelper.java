@@ -19,7 +19,7 @@ import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
 import me.matl114.matlib.utils.version.Version;
 
-@MultiDescriptive(targetDefault = "net.minecraft.core.Registry")
+@MultiDescriptive(targetDefault = "net.minecraft.core.IRegistry")
 public interface RegistriesHelper extends TargetDescriptor {
     @MethodTarget
     @RedirectClass(Holder)
@@ -82,7 +82,8 @@ public interface RegistriesHelper extends TargetDescriptor {
 
     @Note("Suggested")
     @MethodTarget
-    Optional getOptional(Object registry, @RedirectType(ResourceLocation) Object id);
+    // @IgnoreFailure(thresholdInclude = Version.v1_21_R8, below = false)
+    public Optional getOptional(Object registry, @RedirectType(ResourceLocation) Object id);
 
     @MethodTarget
     boolean containsKey(Object registry, @RedirectType(ResourceLocation) Object id);

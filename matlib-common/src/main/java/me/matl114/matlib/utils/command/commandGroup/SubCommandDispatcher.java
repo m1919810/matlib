@@ -6,68 +6,68 @@ import java.util.List;
 import java.util.stream.Stream;
 import me.matl114.matlib.utils.command.interruption.ArgumentException;
 import me.matl114.matlib.utils.command.interruption.PermissionDenyError;
-import me.matl114.matlib.utils.command.interruption.ValueUnexpectedError;
+import me.matl114.matlib.utils.command.interruption.DispatchFailureError;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import me.matl114.matlib.utils.command.params.api.CommandExecution;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface SubCommandDispatcher extends CustomTabExecutor, SubCommand.SubCommandCaller {
-    default List<String> onCustomTabComplete(
-            CommandSender sender, @Nullable Command apiUsage, ArgumentReader arguments) {
+    public SubCommand getSubCommand(String name);
+
+    default List<String> onCustomTabComplete(CommandExecution sender, ArgumentReader arguments) {
+        List<String> collectLore = new ArrayList<>();
         if (hasPermission(sender)) {
-            var re = parseInput(arguments);
-            if (!arguments.hasNext()) {
-                List<String> provider = re.getTabComplete(sender);
-                return provider == null ? new ArrayList<>() : provider;
-            } else {
-                var str = re.peekNext().result();
+            var re = parseInput(sender, arguments);
+
+            re.getTabComplete(sender).forEach(collectLore::add);
+            if(arguments.hasNext()) {
+                var str = re.peekNext().resultAsString();
                 SubCommand subCommand = getSubCommand(str);
                 if (subCommand != null) {
                     re.next();
-                    List<String> tab = subCommand.onCustomTabComplete(
-                            sender, apiUsage, arguments); // parseInput(elseArg).getTabComplete();
+                    List<String> tab =
+                        subCommand.onCustomTabComplete(sender, arguments); // parseInput(elseArg).getTabComplete();
                     if (tab != null) {
-                        return tab;
+                        collectLore.addAll(tab);
+                        return collectLore;
                     }
                 }
-                List<String> tab = onDefaultTab(sender, apiUsage, arguments);
+                List<String> tab = onDefaultTab(sender, arguments);
                 if (tab != null) {
-                    return tab;
+                    collectLore.addAll(tab);
+                    return collectLore;
                 }
             }
-        }
 
-        return new ArrayList<>();
+        }
+        return collectLore;
     }
 
-    default List<String> onDefaultTab(CommandSender sender, @Nullable Command apiUsage, ArgumentReader arguments) {
+    default List<String> onDefaultTab(CommandExecution sender, ArgumentReader arguments) {
         var defaultCmd = getFallbackCommand();
         if (defaultCmd == null) {
             return List.of();
         } else {
-            return defaultCmd.onCustomTabComplete(sender, apiUsage, arguments);
+            return defaultCmd.onCustomTabComplete(sender, arguments);
         }
     }
 
     @Override
-    default boolean onCustomCommand(@NotNull CommandSender var1, @Nullable Command apiUsage, ArgumentReader reader)
-            throws ArgumentException {
+    default boolean onCustomCommand(@NotNull CommandExecution var1, ArgumentReader reader) throws ArgumentException {
         if (hasPermission(var1)) {
             if (reader.hasNext()) {
                 String next = reader.next();
                 SubCommand command = getSubCommand(next);
                 if (command != null) {
                     // add permission check
-                    return command.onCustomCommand(var1, apiUsage, reader);
+                    return command.onCustomCommand(var1, reader);
                 }
                 // 没有对应的, 回退当前参数
                 reader.stepBack();
-                return onDefaultCommand(var1, apiUsage, reader);
+                return onDefaultCommand(var1, reader);
             } else {
                 // 认为在dispatch的时候值缺失算空串
-                throw new ValueUnexpectedError(reader);
+                throw new DispatchFailureError(reader);
             }
             // not consume
         } else {
@@ -75,17 +75,16 @@ public interface SubCommandDispatcher extends CustomTabExecutor, SubCommand.SubC
         }
     }
 
-    default boolean onDefaultCommand(@NotNull CommandSender var1, @Nullable Command apiUsage, ArgumentReader reader)
-            throws ArgumentException {
+    default boolean onDefaultCommand(@NotNull CommandExecution var1, ArgumentReader reader) throws ArgumentException {
         var defaultCmd = getFallbackCommand();
         if (defaultCmd == null) {
-            throw new ValueUnexpectedError(reader);
+            throw new DispatchFailureError(reader);
         } else {
-            return defaultCmd.onCustomCommand(var1, apiUsage, reader);
+            return defaultCmd.onCustomCommand(var1, reader);
         }
     }
 
-    default Stream<String> onCustomHelp(CommandSender sender, ArgumentReader reader) {
+    default Stream<String> onCustomHelp(CommandExecution sender, ArgumentReader reader) {
         if (hasPermission(sender)) {
             if (reader.hasNext()) {
                 String next = reader.peek();

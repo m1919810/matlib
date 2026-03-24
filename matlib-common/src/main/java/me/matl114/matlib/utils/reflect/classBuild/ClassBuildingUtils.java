@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import me.matl114.matlib.algorithms.dataStructures.struct.Pair;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.Debug;
+import me.matl114.matlib.utils.reflect.ByteCodeUtils;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.FailHard;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectName;
@@ -74,6 +75,21 @@ public class ClassBuildingUtils {
         });
     }
 
+    public static Class resolveClassNameOrJvmName(String classPath) {
+        if (classPath.endsWith(";")) {
+            try {
+                return SimpleObfManager.getManager().reobfClass(ByteCodeUtils.fromJvmType(classPath));
+            } catch (Throwable e) {
+            }
+        } else {
+            try {
+                return SimpleObfManager.getManager().reobfClass(classPath);
+            } catch (Throwable e) {
+            }
+        }
+        return null;
+    }
+
     public static List<Method> matchMethods(
             Method methodAccess,
             List<Method> methods,
@@ -104,15 +120,15 @@ public class ClassBuildingUtils {
                 static1 ? methodAccess.getParameterCount() : methodAccess.getParameterCount() - (selfAsParam ? 1 : 0);
         var startArgument = static1 ? 0 : 1;
         Method tar = null;
-        String[] paramI = new String[arguCount];
+        Class[] paramI = new Class[arguCount];
         Parameter[] params = methodAccess.getParameters();
         Class[] paramsCls = methodAccess.getParameterTypes();
         for (int i = 0; i < arguCount; ++i) {
             var redirect3 = params[i + startArgument].getAnnotation(RedirectType.class);
             if (redirect3 != null) {
-                paramI[i] = redirect3.value();
+                paramI[i] = resolveClassNameOrJvmName(redirect3.value());
             } else {
-                paramI[i] = SimpleObfManager.getManager().deobfToJvm(paramsCls[i + startArgument]);
+                paramI[i] = paramsCls[i + startArgument];
             }
         }
         //        if(Debug.isDebugMod()){
@@ -132,14 +148,7 @@ public class ClassBuildingUtils {
                     // match every type after deobf
                     var paramTypes = test.getParameterTypes();
                     for (int i = 0; i < arguCount; ++i) {
-                        //                    if(Debug.isDebugMod()){
-                        //                        Debug.logger("match param
-                        // ",ObfManager.getManager().deobfToJvm(paramTypes[i]),paramI[i]);
-                        //
-                        //                    }
-                        if (!SimpleObfManager.getManager()
-                                .deobfToJvm(paramTypes[i])
-                                .equals(paramI[i])) {
+                        if (!paramTypes[i].equals(paramI[i])) {
                             return false;
                         }
                     }
@@ -153,15 +162,15 @@ public class ClassBuildingUtils {
             Method constructorAccess, Constructor<?>[] targetConstructors) {
         var arguCount = constructorAccess.getParameterCount();
         Method tar = null;
-        String[] paramI = new String[arguCount];
+        Class[] paramI = new Class[arguCount];
         Parameter[] params = constructorAccess.getParameters();
         Class[] paramsCls = constructorAccess.getParameterTypes();
         for (int i = 0; i < arguCount; ++i) {
             var redirect3 = params[i].getAnnotation(RedirectType.class);
             if (redirect3 != null) {
-                paramI[i] = redirect3.value();
+                paramI[i] = resolveClassNameOrJvmName(redirect3.value());
             } else {
-                paramI[i] = SimpleObfManager.getManager().deobfToJvm(paramsCls[i]);
+                paramI[i] = paramsCls[i];
             }
         }
         return Arrays.stream(targetConstructors)
@@ -169,9 +178,7 @@ public class ClassBuildingUtils {
                 .filter(c -> {
                     var paramsTypes = c.getParameterTypes();
                     for (int i = 0; i < arguCount; ++i) {
-                        if (!SimpleObfManager.getManager()
-                                .deobfToJvm(paramsTypes[i])
-                                .equals(paramI[i])) {
+                        if (!paramsTypes[i].equals(paramI[i])) {
                             return false;
                         }
                     }
@@ -218,8 +225,8 @@ public class ClassBuildingUtils {
                 continue;
             }
             if (type != null) {
-                String typeName = SimpleObfManager.getManager().deobfToJvm(test.getType());
-                if (type.value().equals(typeName)) {
+                Class clz = resolveClassNameOrJvmName(type.value());
+                if (test.getType().equals(clz)) {
                     tar = test;
                     break;
                 }

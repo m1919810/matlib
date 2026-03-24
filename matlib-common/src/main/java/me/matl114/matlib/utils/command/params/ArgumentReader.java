@@ -1,20 +1,26 @@
 package me.matl114.matlib.utils.command.params;
 
+import me.matl114.matlib.common.lang.annotations.ConstArray;
+
 public class ArgumentReader {
-    String[] args;
+    @ConstArray
+    private final String[] args;
+
     int currentCursor;
 
     public ArgumentReader(String command, String[] args) {
-        this.args = new String[args.length + 1];
-        System.arraycopy(args, 0, this.args, 1, args.length);
+        String[] arr = new String[args.length + 1];
+        System.arraycopy(args, 0, arr, 1, args.length);
         // replace the name with our main command name
-        this.args[0] = command;
+        arr[0] = command;
+        this.args = arr;
         this.currentCursor = 1;
     }
 
     public ArgumentReader(ArgumentReader reader) {
-        this.args = new String[reader.args.length];
-        System.arraycopy(reader.args, 0, this.args, 0, reader.args.length);
+        // trusted array with no copy
+        this.args = reader.args; // new String[reader.args.length];
+        // System.arraycopy(reader.args, 0, this.args, 0, reader.args.length);
         this.currentCursor = reader.currentCursor;
     }
 
@@ -65,9 +71,7 @@ public class ArgumentReader {
     }
 
     public String[] getRemainingArgs() {
-        String[] remainingArgs = new String[args.length - currentCursor];
-        System.arraycopy(args, currentCursor, remainingArgs, 0, remainingArgs.length);
-        return remainingArgs;
+        return getArgsInRange(currentCursor, args.length);
     }
 
     public String getAlreadyReadArgStr() {
@@ -83,8 +87,20 @@ public class ArgumentReader {
     }
 
     public String[] getAlreadyReadArgs() {
-        String[] remainingArgs = new String[currentCursor];
-        System.arraycopy(args, 0, remainingArgs, 0, remainingArgs.length);
-        return remainingArgs;
+        return getArgsInRange(0, currentCursor);
+    }
+
+    public String[] getArgsInRange(int startIndex, int endIndex) {
+        String[] args = new String[endIndex - startIndex];
+        System.arraycopy(this.args, startIndex, args, 0, args.length);
+        return args;
+    }
+
+    public String getArgsAt(int index) {
+        return args[index];
+    }
+
+    public int getLength(){
+        return args.length;
     }
 }

@@ -3,10 +3,12 @@ package me.matl114.matlib.nmsMirror.craftbukkit.adventure;
 import static me.matl114.matlib.nmsMirror.Import.*;
 
 import java.util.*;
+import me.matl114.matlib.utils.reflect.classBuild.annotation.IgnoreFailure;
 import me.matl114.matlib.utils.reflect.classBuild.annotation.RedirectType;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MethodTarget;
 import me.matl114.matlib.utils.reflect.descriptor.annotations.MultiDescriptive;
 import me.matl114.matlib.utils.reflect.descriptor.buildTools.TargetDescriptor;
+import me.matl114.matlib.utils.version.Version;
 import net.kyori.adventure.text.Component;
 
 @MultiDescriptive(targetDefault = "io.papermc.paper.adventure.PaperAdventure")
@@ -18,9 +20,11 @@ public interface PaperAdventureAPI extends TargetDescriptor {
     ArrayList<Component> asAdventure(List<? extends Iterable<?>> comps);
 
     @MethodTarget(isStatic = true)
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R6, below = false)
     ArrayList<Component> asAdventureFromJson(List<String> jsonStrings);
 
     @MethodTarget(isStatic = true)
+    @IgnoreFailure(thresholdInclude = Version.v1_21_R6, below = false)
     ArrayList<String> asJson(List<? extends Component> adventure);
 
     @MethodTarget(isStatic = true)

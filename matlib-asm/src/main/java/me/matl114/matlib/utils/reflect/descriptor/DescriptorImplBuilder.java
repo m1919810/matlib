@@ -230,7 +230,7 @@ public class DescriptorImplBuilder {
                 Class<?> targetClass0;
                 var redirectClass = fieldAccess.getAnnotation(RedirectClass.class);
                 if (redirectClass != null) {
-                    targetClass0 = resolveClassNameOrJvmName(redirectClass.value());
+                    targetClass0 = ClassBuildingUtils.resolveClassNameOrJvmName(redirectClass.value());
                 } else {
                     targetClass0 = targetClass;
                 }
@@ -267,7 +267,7 @@ public class DescriptorImplBuilder {
                 Class<?> targetClass0;
                 var redirectClass = methodAccess.getAnnotation(RedirectClass.class);
                 if (redirectClass != null) {
-                    targetClass0 = resolveClassNameOrJvmName(redirectClass.value());
+                    targetClass0 = ClassBuildingUtils.resolveClassNameOrJvmName(redirectClass.value());
                 } else {
                     targetClass0 = targetClass;
                 }
@@ -292,7 +292,7 @@ public class DescriptorImplBuilder {
             if (multi) {
                 var redirectClass = constructorAccess.getAnnotation(RedirectClass.class);
                 if (redirectClass != null) {
-                    targetClass0 = resolveClassNameOrJvmName(redirectClass.value());
+                    targetClass0 = ClassBuildingUtils.resolveClassNameOrJvmName(redirectClass.value());
                 }
                 if (targetClass0 == null) {
                     uncompletedMethod.add(constructorAccess);
@@ -316,7 +316,7 @@ public class DescriptorImplBuilder {
             Class<?> castCls = null;
             var cast = typeCast.getAnnotation(CastCheck.class);
             String value = cast.value();
-            castCls = resolveClassNameOrJvmName(value);
+            castCls = ClassBuildingUtils.resolveClassNameOrJvmName(value);
             if (castCls != null) {
                 castCheckDescrip.put(typeCast, castCls);
             } else {
@@ -327,28 +327,13 @@ public class DescriptorImplBuilder {
             Class<?> castCls = null;
             var cast = typeCast.getAnnotation(GetType.class);
             String value = cast.value();
-            castCls = resolveClassNameOrJvmName(value);
+            castCls = ClassBuildingUtils.resolveClassNameOrJvmName(value);
             if (castCls != null) {
                 getTypeDescrip.put(typeCast, castCls);
             } else {
                 uncompletedMethod.add(typeCast);
             }
         }
-    }
-
-    static Class resolveClassNameOrJvmName(String classPath) {
-        if (classPath.endsWith(";")) {
-            try {
-                return ObfManager.getManager().reobfClass(ByteCodeUtils.fromJvmType(classPath));
-            } catch (Throwable e) {
-            }
-        } else {
-            try {
-                return ObfManager.getManager().reobfClass(classPath);
-            } catch (Throwable e) {
-            }
-        }
-        return null;
     }
 
     static Pair<Field, Boolean> matchFields(Method fieldAccess, List<Field> fields) {
