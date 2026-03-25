@@ -4,6 +4,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.MemorySection;
 
+import java.util.Map;
+
 public class ConfigUtils {
 
     public static MemorySection copySection(ConfigurationSection sec) {
@@ -14,6 +16,12 @@ public class ConfigUtils {
 
     public static void copySection(ConfigurationSection map2, ConfigurationSection sec) {
         for (var key : sec.getKeys(false)) {
+            map2.set(key, sec.get(key));
+        }
+    }
+
+    public static void copySection(ConfigurationSection map2, Map<String, ?> sec) {
+        for (var key : sec.keySet()) {
             map2.set(key, sec.get(key));
         }
     }

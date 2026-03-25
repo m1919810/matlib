@@ -39,6 +39,8 @@ public class ConfigOps implements DynamicOps<Object> {
             return outOps.empty();
         } else if (input instanceof ConfigurationSection) {
             return this.convertMap(outOps, input);
+        } else if(input instanceof Map<?, ?>){
+            return this.convertMap(outOps, input);
         } else if (input instanceof ByteList value) {
             return outOps.createByteList(ByteBuffer.wrap(value.toByteArray()));
         } else if (input instanceof IntList value) {
@@ -126,23 +128,28 @@ public class ConfigOps implements DynamicOps<Object> {
 
     @Override
     public DataResult<Object> mergeToMap(Object object, Object t1, Object t2) {
-        if (!(object instanceof ConfigurationSection) && object != null) {
+        ConfigurationSection map0 =
+                object instanceof ConfigurationSection ? ConfigUtils.copySection((ConfigurationSection) object) : new MemoryConfiguration();
+        if(object instanceof Map<?, ?> map){
+            ConfigUtils.copySection(map0, (Map)map);
+        }else if (!(object instanceof ConfigurationSection) && object != null) {
             return DataHelper.A.I.error(() -> "Not a Map");
         }
-        ConfigurationSection map0 =
-                object != null ? ConfigUtils.copySection((ConfigurationSection) object) : new MemoryConfiguration();
         map0.set(t1.toString(), t2);
         return DataHelper.A.I.success(map0);
     }
 
     @Override
     public DataResult<Object> mergeToMap(Object object, Map<Object, Object> values) {
-        if (!(object instanceof Map) && object != null) {
+
+        ConfigurationSection map0 =
+                object instanceof ConfigurationSection ? ConfigUtils.copySection((ConfigurationSection) object) : new MemoryConfiguration();
+        if(object instanceof Map<?, ?> map){
+            ConfigUtils.copySection(map0, (Map)map);
+        }else if (!(object instanceof Map) && object != null) {
 
             return DataHelper.A.I.error(() -> "Not a configuration");
         }
-        ConfigurationSection map0 =
-                object != null ? ConfigUtils.copySection((ConfigurationSection) object) : new MemoryConfiguration();
         for (Map.Entry<Object, Object> entry : values.entrySet()) {
             map0.set(entry.getKey().toString(), entry.getValue());
         }
@@ -157,18 +164,19 @@ public class ConfigOps implements DynamicOps<Object> {
                         .map(key -> Pair.of(
                                 key, map0.get(key)))) // .entrySet().stream().map(entry -> Pair.of(entry.getKey(),
                 // entry.getValue())))
-                : DataHelper.A.I.error(() -> "not a configuration");
+                : (object instanceof Map<?, ?> map1 ? DataHelper.A.I.success(map1.entrySet().stream().map(entry -> Pair.of(entry.getKey(),
+            entry.getValue()))): DataHelper.A.I.error(() -> "not a configuration"));
     }
 
     @Override
     public DataResult<Object> mergeToMap(Object object, MapLike<Object> values) {
-        if (!(object instanceof ConfigurationSection) && object != null) {
-
-            return DataHelper.A.I.error(() -> "Not a Map");
-        }
         ConfigurationSection map0 = new MemoryConfiguration();
         if (object instanceof ConfigurationSection sec) {
             ConfigUtils.copySection(map0, sec);
+        }else if(object instanceof Map<?, ?> map){
+            ConfigUtils.copySection(map0, (Map)map);
+        }else if(object != null){
+            return DataHelper.A.I.error(() -> "Not a Map");
         }
         values.entries().forEach(pr -> map0.set(pr.getFirst().toString(), pr.getSecond()));
         return DataHelper.A.I.success(map0);
@@ -219,9 +227,12 @@ public class ConfigOps implements DynamicOps<Object> {
             ConfigurationSection map2 = ConfigUtils.copySection(map0);
             map2.set(s, null);
             return map2;
-        } else {
-            return object;
-        }
+        } else if(object instanceof Map<?,?> map0){
+            ConfigurationSection map2 = new MemoryConfiguration();
+            ConfigUtils.copySection(map2, (Map)map0);
+            map2.set(s, null);
+            return map2;
+        }else return object;
     }
 
     public String toString() {
