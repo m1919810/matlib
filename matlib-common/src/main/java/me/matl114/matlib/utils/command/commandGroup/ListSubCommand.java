@@ -1,25 +1,23 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 import me.matl114.matlib.utils.command.interruption.ArgumentException;
 import me.matl114.matlib.utils.command.interruption.DispatchFailureError;
 import me.matl114.matlib.utils.command.interruption.PermissionDenyError;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.api.CommandExecution;
 import me.matl114.matlib.utils.command.params.api.TabResult;
-import org.bukkit.command.CommandExecutor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
-public class ListSubCommand implements SubCommand,  SubCommand.SubCommandCaller {
+public class ListSubCommand implements SubCommand, SubCommand.SubCommandCaller {
     List<SubCommand> root = new ArrayList<>();
     String permissionNode;
     String name;
+
     public ListSubCommand(String name) {
         this.name = name;
     }
@@ -28,7 +26,6 @@ public class ListSubCommand implements SubCommand,  SubCommand.SubCommandCaller 
     public void registerSub(SubCommand command) {
         root.add(command);
     }
-
 
     @Override
     public Collection<SubCommand> getSubCommands() {
@@ -45,8 +42,7 @@ public class ListSubCommand implements SubCommand,  SubCommand.SubCommandCaller 
         throw new UnsupportedOperationException();
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public String permissionRequired() {
         return permissionNode;
     }
@@ -66,23 +62,23 @@ public class ListSubCommand implements SubCommand,  SubCommand.SubCommandCaller 
         if (hasPermission(var1)) {
             ArgumentException catchExp = null;
             ArgumentReader currentReader;
-            for (var command : root){
-                try{
-                    if(command.onCustomCommand(var1, (currentReader = new ArgumentReader(reader)))){
+            for (var command : root) {
+                try {
+                    if (command.onCustomCommand(var1, (currentReader = new ArgumentReader(reader)))) {
                         return true;
                     }
-                }catch (ArgumentException e){
+                } catch (ArgumentException e) {
                     // add Condition Error to check Permission and executor, they may success execute another command
-                    if(e.isConditionError()){
+                    if (e.isConditionError()) {
                         catchExp = e;
-                    }else{
+                    } else {
                         throw e;
                     }
                 }
             }
-            if(catchExp != null){
+            if (catchExp != null) {
                 throw catchExp;
-            }else{
+            } else {
                 throw new DispatchFailureError(reader);
             }
         } else {
@@ -93,7 +89,9 @@ public class ListSubCommand implements SubCommand,  SubCommand.SubCommandCaller 
     @Override
     public List<String> onCustomTabComplete(CommandExecution sender, ArgumentReader arguments) {
         if (hasPermission(sender)) {
-            return root.stream().flatMap(s -> s.onCustomTabComplete(sender, new ArgumentReader(arguments)).stream()).toList();
+            return root.stream()
+                    .flatMap(s -> s.onCustomTabComplete(sender, new ArgumentReader(arguments)).stream())
+                    .toList();
         } else return List.of();
     }
 

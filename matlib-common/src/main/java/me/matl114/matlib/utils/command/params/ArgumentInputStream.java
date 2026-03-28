@@ -1,11 +1,10 @@
 package me.matl114.matlib.utils.command.params;
 
+import com.google.common.collect.Streams;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-
-import com.google.common.collect.Streams;
 import me.matl114.matlib.utils.command.params.api.ArgumentType;
 import me.matl114.matlib.utils.command.params.api.CommandExecution;
 import me.matl114.matlib.utils.command.params.api.InputArgument;
@@ -117,7 +116,8 @@ public class ArgumentInputStream {
         return next().selectResult(selections);
     }
 
-    @Nonnull public Stream<String> getTabComplete(CommandExecution sender) {
+    @Nonnull
+    public Stream<String> getTabComplete(CommandExecution sender) {
         if (argsMap.isEmpty()) {
             return Stream.empty();
         } else {
@@ -130,24 +130,23 @@ public class ArgumentInputStream {
             // argumentInputs.remove(argumentInputs.size() - 1);
             InputArgument<?> lastArgumentParsed = this.argsMap.get(index);
             int tabbingCursorPos = lastArgumentParsed.getStartIndex();
-            if(tabbingCursorPos == wasAboutToTab) {
+            if (tabbingCursorPos == wasAboutToTab) {
                 List<Stream<String>> streams = new ArrayList<>();
-                for (var s = index ; s >= 0 ; --s){
+                for (var s = index; s >= 0; --s) {
                     InputArgument<?> argument = this.argsMap.get(s);
                     // the argument before this will not be tabbed
-                    if(argument.getStartIndex() < tabbingCursorPos){
+                    if (argument.getStartIndex() < tabbingCursorPos) {
                         break;
                     }
-                    var tabResult = arguments.get(s).getTab(sender, s == index ?  argsMap : argsMap.subList(0, s + 1));
-                    if(tabResult != null){
+                    var tabResult = arguments.get(s).getTab(sender, s == index ? argsMap : argsMap.subList(0, s + 1));
+                    if (tabResult != null) {
                         streams.add(tabResult);
                     }
                 }
                 return Streams.concat(streams.toArray(Stream[]::new));
-            }else{
+            } else {
                 return Stream.empty();
             }
-
         }
     }
 

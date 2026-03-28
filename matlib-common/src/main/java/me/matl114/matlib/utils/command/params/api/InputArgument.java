@@ -14,11 +14,11 @@ public interface InputArgument<W> {
 
     public ArgumentReader getReader();
 
-    default ArgumentReader getEndReader(){
+    default ArgumentReader getEndReader() {
         return new ArgumentReader(getReader()).setCursor(getEndIndex());
     }
 
-    default ArgumentReader getStartReader(){
+    default ArgumentReader getStartReader() {
         return new ArgumentReader(getReader()).setCursor(getStartIndex());
     }
 

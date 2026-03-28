@@ -23,18 +23,17 @@ public class TaskSubCommand extends SubCommandImpl {
     @Override
     public List<String> onCustomTabComplete(CommandExecution sender, ArgumentReader arguments) {
         List<String> collectLore = new ArrayList<>();
-        if(hasPermission(sender)){
+        if (hasPermission(sender)) {
             var re = this.parseInput(sender, arguments);
             re.getTabComplete(sender).forEach(collectLore::add);
             if (arguments.hasNext()) {
                 // already filled all the arguments so use executor to supply the extra args
-                if(executor != null){
+                if (executor != null) {
                     collectLore.addAll(executor.supplyTab(sender, re, arguments));
                 }
             }
         }
         return collectLore;
-
     }
 
     @Override

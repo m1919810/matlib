@@ -8,7 +8,6 @@ import lombok.experimental.Accessors;
 import me.matl114.matlib.utils.command.interruption.PermissionDenyError;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
-import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.api.CommandExecution;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,23 +19,22 @@ public class DelegateSubCommand implements SubCommand {
     CustomTabExecutor delegate;
     String name;
     String permissionNode;
+
     public DelegateSubCommand(String name, CustomTabExecutor delegate) {
         this.name = name;
         this.delegate = delegate;
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public String permissionRequired() {
         return permissionNode;
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public ArgumentInputStream parseInput(CommandExecution execution, ArgumentReader args) {
-        if(this.delegate != null){
+        if (this.delegate != null) {
             return (this.delegate).parseInput(execution, args);
-        }else {
+        } else {
             return new ArgumentInputStream(execution, args, List.of(), List.of());
         }
     }
@@ -48,12 +46,12 @@ public class DelegateSubCommand implements SubCommand {
 
     @Override
     public boolean onCustomCommand(CommandExecution sender, ArgumentReader arguments) {
-        if(hasPermission(sender)){
-            if (delegate != null){
+        if (hasPermission(sender)) {
+            if (delegate != null) {
                 return delegate.onCustomCommand(sender, arguments);
             }
             return false;
-        }else {
+        } else {
             throw new PermissionDenyError(permissionNode, arguments);
         }
     }
@@ -72,9 +70,9 @@ public class DelegateSubCommand implements SubCommand {
 
     @Override
     public Stream<String> getHelp(String prefix) {
-        if(delegate != null){
+        if (delegate != null) {
             return delegate.getHelp(prefix);
-        }else {
+        } else {
             return Stream.empty();
         }
     }

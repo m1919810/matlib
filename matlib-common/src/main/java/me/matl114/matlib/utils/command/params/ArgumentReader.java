@@ -100,7 +100,7 @@ public class ArgumentReader {
         return args[index];
     }
 
-    public int getLength(){
+    public int getLength() {
         return args.length;
     }
 }

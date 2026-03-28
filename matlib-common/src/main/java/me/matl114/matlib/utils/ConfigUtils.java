@@ -1,10 +1,9 @@
 package me.matl114.matlib.utils;
 
+import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.MemorySection;
-
-import java.util.Map;
 
 public class ConfigUtils {
 

@@ -99,8 +99,7 @@ public interface ExecutePos {
                 yaw = 0;
             }
 
-            return executorPos.add(
-                lookCoordTooPos(pitch, yaw, vector3d.x, vector3d.y, vector3d.z));
+            return executorPos.add(lookCoordTooPos(pitch, yaw, vector3d.x, vector3d.y, vector3d.z));
         }
 
         @Override

@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import me.matl114.matlib.algorithms.algorithm.MathUtils;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.api.ArgumentType;
 import me.matl114.matlib.utils.command.params.api.CommandExecution;
@@ -45,18 +43,19 @@ public class PosArgumentType extends AbstractArgumentType<ExecutePos> implements
             return new PosArgumentResult(Optional.ofNullable(defaultValue), this, reader, reader.cursor());
         }
     }
-    public boolean isPartOfCoord(String str){
-        if(str.startsWith("^") || str.startsWith("~")){
+
+    public boolean isPartOfCoord(String str) {
+        if (str.startsWith("^") || str.startsWith("~")) {
             str = str.substring(1);
         }
-        if(str.startsWith("-")){
+        if (str.startsWith("-")) {
             str = str.substring(1);
         }
-        try{
-            if(str.isEmpty())return true;
+        try {
+            if (str.isEmpty()) return true;
             Double.parseDouble(str);
             return true;
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
     }

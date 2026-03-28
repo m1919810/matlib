@@ -62,9 +62,10 @@ public abstract class VersionedMeta {
             if (!instanceOne.hasVariant() || !instanceTwo.hasVariant()) {
                 return true;
             }
-
-            if (instanceOne.getVariant() != instanceTwo.getVariant()) {
-                return true;
+            if (instanceOne.hasVariant()) {
+                if (instanceOne.getVariant() != instanceTwo.getVariant()) {
+                    return true;
+                }
             }
         }
         // Banner
@@ -185,11 +186,15 @@ public abstract class VersionedMeta {
             if (instanceOne.hasColor() != instanceTwo.hasColor()) {
                 return true;
             }
-            if (!Objects.equals(instanceOne.getMapView(), instanceTwo.getMapView())) {
-                return true;
+            if (instanceOne.hasMapView()) {
+                if (!Objects.equals(instanceOne.getMapView(), instanceTwo.getMapView())) {
+                    return true;
+                }
             }
-            if (!Objects.equals(instanceOne.getLocationName(), instanceTwo.getLocationName())) {
-                return true;
+            if (instanceOne.hasLocationName()) {
+                if (!Objects.equals(instanceOne.getLocationName(), instanceTwo.getLocationName())) {
+                    return true;
+                }
             }
             if (!Objects.equals(instanceOne.getColor(), instanceTwo.getColor())) {
                 return true;
@@ -217,14 +222,16 @@ public abstract class VersionedMeta {
             if (instanceOne.hasVariant() != instanceTwo.hasVariant()) {
                 return true;
             }
-            if (!instanceOne.getPattern().equals(instanceTwo.getPattern())) {
-                return true;
-            }
-            if (!instanceOne.getBodyColor().equals(instanceTwo.getBodyColor())) {
-                return true;
-            }
-            if (!instanceOne.getPatternColor().equals(instanceTwo.getPatternColor())) {
-                return true;
+            if (instanceOne.hasVariant()) {
+                if (!instanceOne.getPattern().equals(instanceTwo.getPattern())) {
+                    return true;
+                }
+                if (!instanceOne.getBodyColor().equals(instanceTwo.getBodyColor())) {
+                    return true;
+                }
+                if (!instanceOne.getPatternColor().equals(instanceTwo.getPatternColor())) {
+                    return true;
+                }
             }
         }
 

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import me.matl114.matlib.utils.command.interruption.ArgumentException;
-import me.matl114.matlib.utils.command.interruption.PermissionDenyError;
 import me.matl114.matlib.utils.command.interruption.DispatchFailureError;
+import me.matl114.matlib.utils.command.interruption.PermissionDenyError;
 import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.api.CommandExecution;
 import org.jetbrains.annotations.NotNull;
@@ -20,13 +20,13 @@ public interface SubCommandDispatcher extends CustomTabExecutor, SubCommand.SubC
             var re = parseInput(sender, arguments);
 
             re.getTabComplete(sender).forEach(collectLore::add);
-            if(arguments.hasNext()) {
+            if (arguments.hasNext()) {
                 var str = re.peekNext().resultAsString();
                 SubCommand subCommand = getSubCommand(str);
                 if (subCommand != null) {
                     re.next();
                     List<String> tab =
-                        subCommand.onCustomTabComplete(sender, arguments); // parseInput(elseArg).getTabComplete();
+                            subCommand.onCustomTabComplete(sender, arguments); // parseInput(elseArg).getTabComplete();
                     if (tab != null) {
                         collectLore.addAll(tab);
                         return collectLore;
@@ -38,7 +38,6 @@ public interface SubCommandDispatcher extends CustomTabExecutor, SubCommand.SubC
                     return collectLore;
                 }
             }
-
         }
         return collectLore;
     }

@@ -3,13 +3,11 @@ package me.matl114.matlib.utils.command.commandGroup;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.Getter;
-import lombok.Setter;
 import me.matl114.matlib.common.lang.annotations.Note;
 import me.matl114.matlib.utils.command.interruption.*;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
@@ -51,19 +49,20 @@ import org.jetbrains.annotations.NotNull;
 public class AbstractMainCommand implements SubCommand, TabExecutor, InterruptionHandler {
     /** Internal reference to the root command */
     private final ListSubCommand root = new ListSubCommand("");
+
     {
         // this should be the first help command to be dispatched
         this.root.registerSub(new BridgeSubCommand(
-            "help",
-            SubCommand.taskBuilder()
-                .name("help")
-                .post(s -> s.executor(((var1, streamArgs, argsReader) -> {
-                    showHelpCommand(var1, new ArgumentReader(getName(), argsReader.getRemainingArgs()));
-                    return true;
-                })))
-                .build()
-        ));
+                "help",
+                SubCommand.taskBuilder()
+                        .name("help")
+                        .post(s -> s.executor(((var1, streamArgs, argsReader) -> {
+                            showHelpCommand(var1, new ArgumentReader(getName(), argsReader.getRemainingArgs()));
+                            return true;
+                        })))
+                        .build()));
     }
+
     public SubCommand.Builder<TreeSubCommand> mainBuilder() {
         return SubCommand.factoryBuilder((a, b, c) -> {
             var root = new TreeSubCommand(a, c);
@@ -91,7 +90,6 @@ public class AbstractMainCommand implements SubCommand, TabExecutor, Interruptio
     protected void sendMessage(CommandExecution sender, String message) {
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
-
 
     /**
      * Sends a adventure message to the command sender
@@ -172,7 +170,7 @@ public class AbstractMainCommand implements SubCommand, TabExecutor, Interruptio
         return root.getName();
     }
 
-    public void setMainName(String name){
+    public void setMainName(String name) {
         root.name = name;
     }
 
@@ -185,7 +183,7 @@ public class AbstractMainCommand implements SubCommand, TabExecutor, Interruptio
         return root.permissionRequired();
     }
 
-    public void setPermissionRequired(String required){
+    public void setPermissionRequired(String required) {
         root.setPermission(required);
     }
 
@@ -519,7 +517,7 @@ public class AbstractMainCommand implements SubCommand, TabExecutor, Interruptio
         root.setPermission(permission);
     }
 
-    public ListSubCommand getMainCommand(){
+    public ListSubCommand getMainCommand() {
         return root;
     }
 }

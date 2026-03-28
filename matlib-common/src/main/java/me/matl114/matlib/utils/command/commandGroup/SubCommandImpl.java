@@ -1,5 +1,8 @@
 package me.matl114.matlib.utils.command.commandGroup;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import me.matl114.matlib.utils.command.params.ArgumentInputStream;
@@ -7,10 +10,6 @@ import me.matl114.matlib.utils.command.params.ArgumentReader;
 import me.matl114.matlib.utils.command.params.SimpleCommandArgs;
 import me.matl114.matlib.utils.command.params.api.CommandExecution;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
 
 public abstract class SubCommandImpl implements SubCommand {
     /** Help text lines for this sub-command */
@@ -27,7 +26,7 @@ public abstract class SubCommandImpl implements SubCommand {
     @Setter
     String permission;
 
-    public String permissionRequired(){
+    public String permissionRequired() {
         return permission;
     }
 
@@ -55,12 +54,10 @@ public abstract class SubCommandImpl implements SubCommand {
         this(name, argsTemplate, help.toArray(String[]::new));
     }
 
-    @NotNull
-    @Override
+    @NotNull @Override
     public ArgumentInputStream parseInput(CommandExecution execution, ArgumentReader args) {
         return template.parseInputStream(execution, args);
     }
-
 
     @Override
     public Stream<String> getHelp(String prefix) {

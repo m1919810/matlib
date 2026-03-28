@@ -7,12 +7,16 @@ import me.matl114.matlib.utils.command.params.api.InputArgument;
 
 public abstract class AbstractArgumentResult<T> implements InputArgument<T> {
     public final ArgumentType<T> type;
+
     @Getter
     public final ArgumentReader reader;
+
     @Getter
     int startIndex;
+
     @Getter
     int endIndex;
+
     boolean isDefault;
     final T result;
     public boolean parseSuccess = true;
@@ -43,9 +47,9 @@ public abstract class AbstractArgumentResult<T> implements InputArgument<T> {
     public final String tabbingString() {
         if (this.startIndex < this.endIndex) {
             return this.reader.getArgsAt(this.endIndex - 1);
-        } else if(this.startIndex == this.endIndex){
+        } else if (this.startIndex == this.endIndex) {
             return this.reader.getLength() > this.endIndex ? this.reader.getArgsAt(this.endIndex) : null;
-        }else{
+        } else {
             return null;
         }
     }

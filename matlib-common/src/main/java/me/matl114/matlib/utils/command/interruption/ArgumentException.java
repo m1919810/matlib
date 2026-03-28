@@ -11,7 +11,7 @@ public abstract class ArgumentException extends RuntimeAbort {
     public abstract void handleAbort(CommandExecution sender, InterruptionHandler command);
 
     // if return true , this exception is thrown when condition check not pass
-    public boolean isConditionError(){
+    public boolean isConditionError() {
         return false;
     }
 }
